@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sổ tay E-M10 II — tổng hợp</title>
+<style>
+  :root{
+    --bg:#17181A; --card:#202226; --card2:#2A2D32; --line:#34383E;
+    --ink:#ECEEF0; --dim:#98A0A8;
+    --c-lens:#57BEC9; --c-exp:#F0B33C; --c-wb:#D267B0; --c-tone:#6FC08A; --c-out:#8E97A0;
+    --red:#E0574A;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 90px}
+  .wrap{max-width:1120px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(30px,7vw,54px);font-weight:800;letter-spacing:-.035em;margin:0 0 10px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 30px;max-width:600px}
+
+  h2{font-size:clamp(20px,3.6vw,27px);font-weight:800;letter-spacing:-.02em;
+     margin:58px 0 4px;display:flex;align-items:center;gap:11px}
+  h2 .bar{width:6px;height:26px;border-radius:99px;flex:none}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 20px;max-width:680px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- pipeline spine ---------- */
+  .spine{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:820px){.spine{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.spine{grid-template-columns:1fr}}
+  .stage{background:var(--card);border:1px solid var(--line);border-top-width:4px;
+         border-radius:16px;padding:14px 15px}
+  .stage b{display:block;font-size:15px;margin-bottom:4px}
+  .stage .who{font-family:var(--mono);font-size:11.5px;color:var(--dim);
+              text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:block}
+  .stage p{margin:0;font-size:13px;color:var(--dim)}
+  .s1{border-top-color:var(--c-lens)} .s2{border-top-color:var(--c-exp)}
+  .s3{border-top-color:var(--c-wb)}   .s4{border-top-color:var(--c-tone)}
+  .s5{border-top-color:var(--c-out)}
+
+  /* ---------- lab ---------- */
+  .lab{display:grid;grid-template-columns:1.02fr .98fr;gap:20px;padding:20px}
+  @media(max-width:900px){.lab{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#07100C}
+  .layer{position:absolute;inset:0;transform-origin:50% 62%}
+  .layer svg{display:block;width:100%;height:100%}
+  .ov{position:absolute;inset:0;pointer-events:none}
+  .tint{mix-blend-mode:multiply}
+  .grain{mix-blend-mode:overlay;opacity:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .wash{background:#fff;opacity:0}
+
+  .meter{margin-top:12px;background:var(--card2);border:1px solid var(--line);
+         border-radius:14px;padding:11px 13px}
+  .scale{position:relative;height:30px}
+  .rail{position:absolute;left:0;right:0;top:11px;height:4px;border-radius:99px;
+        background:linear-gradient(90deg,#2A3540,#3A3A2E,var(--c-exp),#3A3A2E,#2A3540)}
+  .needle{position:absolute;top:3px;width:4px;height:20px;border-radius:99px;background:var(--ink);
+          transform:translateX(-2px);transition:left .12s ease}
+  .ticks{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:flex-end}
+  .ticks span{font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+  .verdict{font-family:var(--mono);font-size:17px;margin-top:4px}
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .btn{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:99px;
+       padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp)}
+  .btn[aria-pressed=true]{background:var(--ink);color:#16181A;border-color:var(--ink);font-weight:700}
+  .btn:focus-visible,input:focus-visible{outline:2px solid var(--c-exp);outline-offset:3px}
+
+  .readout{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:4px}
+  @media(max-width:520px){.readout{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+  .tile b{display:block;font-family:var(--mono);font-size:17px;line-height:1.2}
+  .tile span{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+  .tile.l b{color:var(--c-lens)} .tile.e b{color:var(--c-exp)}
+  .tile.w b{color:var(--c-wb)} .tile.t b{color:var(--c-tone)}
+
+  .grp{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+  .grp .h{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+          margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .grp .h i{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+  .ctl{margin:9px 0 0}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline}
+  .ctl .top b{font-size:13.5px;font-weight:600}
+  .ctl .top i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--dim)}
+  input[type=range]{width:100%;height:24px}
+  #sFocal,#sAp{accent-color:var(--c-lens)}
+  #sSh,#sIso{accent-color:var(--c-exp)}
+  #sSat,#sCon,#sShp{accent-color:var(--c-tone)}
+
+  .pad{position:relative;width:100%;max-width:210px;aspect-ratio:1;border-radius:14px;
+       overflow:hidden;border:1px solid var(--line);cursor:crosshair;
+       background:
+         radial-gradient(circle at 50% 0%, rgba(111,192,138,.5), transparent 62%),
+         radial-gradient(circle at 50% 100%, rgba(210,103,176,.5), transparent 62%),
+         radial-gradient(circle at 100% 50%, rgba(240,179,60,.5), transparent 62%),
+         radial-gradient(circle at 0% 50%, rgba(87,142,201,.5), transparent 62%),
+         #22262B;}
+  .pad i.h{position:absolute;left:0;right:0;height:1px;top:50%;background:rgba(255,255,255,.13)}
+  .pad i.v{position:absolute;top:0;bottom:0;width:1px;left:50%;background:rgba(255,255,255,.13)}
+  .knob{position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;
+        border:3px solid #16181A;transform:translate(-50%,-50%);pointer-events:none}
+  .padwrap{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+  @media(max-width:520px){.padwrap{grid-template-columns:1fr}}
+  .padnote{font-family:var(--mono);font-size:12px;color:var(--dim);line-height:1.7}
+
+  .warns{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;min-height:28px}
+  .warn{font-family:var(--mono);font-size:11.5px;padding:5px 11px;border-radius:99px;
+        background:#3A2320;color:#F0A79C;border:1px solid #59332D}
+  .warn.good{background:#22331F;color:var(--c-tone);border-color:#31492D}
+
+  .recipe{margin-top:14px;background:var(--card2);border:1px solid var(--line);border-radius:14px;
+          padding:12px 14px;font-family:var(--mono);font-size:13px;word-break:break-word}
+  .recipe b{display:block;font-family:var(--disp);font-size:10.5px;letter-spacing:.09em;
+            text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+
+  /* ---------- decision ---------- */
+  .steps{display:grid;gap:10px}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:14px 16px;
+        background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:start}
+  .step .n{font-family:var(--mono);font-size:20px;font-weight:700;opacity:.8}
+  .step b{display:block;font-size:15px;margin-bottom:3px}
+  .step p{margin:0;font-size:13.5px;color:var(--dim)}
+
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1.1fr 1.5fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px} .row p{margin:0;font-size:13px;color:var(--dim)}
+  .row.bad{border-left:4px solid var(--red)}
+
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .lnk{display:block;text-decoration:none;color:inherit;background:var(--card);
+       border:1px solid var(--line);border-left-width:4px;border-radius:16px;padding:15px}
+  .lnk:hover{border-color:#4A525A}
+  .lnk .t{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim)}
+  .lnk b{display:block;font-size:16px;margin:5px 0 4px}
+  .lnk p{margin:0;font-size:13px;color:var(--dim)}
+
+  .note{margin-top:46px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:700px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Olympus OM-D E-M10 II · 14–42mm · JPEG</p>
+  <h1>Sổ tay: ánh sáng đi qua năm trạm</h1>
+  <p class="sub">Mỗi trạm bạn có một cái núm. Sửa sai trạm thì càng sửa càng hỏng — đó là toàn bộ nội dung bốn phần trước, gộp lại.</p>
+
+  <!-- ===== SPINE ===== -->
+  <div class="spine">
+    <div class="stage s1"><span class="who">Trạm 1 · ống kính</span><b>Bao nhiêu sáng lọt vào</b>
+      <p>Tiêu cự và khẩu độ. Quyết định luôn phông mờ hay nét.</p></div>
+    <div class="stage s2"><span class="who">Trạm 2 · phơi sáng</span><b>Đủ sáng hay chưa</b>
+      <p>Tốc độ và ISO cân với khẩu. Quyết định nhoè hay hạt.</p></div>
+    <div class="stage s3"><span class="who">Trạm 3 · white balance</span><b>Trắng có ra trắng</b>
+      <p>Trục A–B và G–M. Mọi thứ sau đây kế thừa sai lệch ở đây.</p></div>
+    <div class="stage s4"><span class="who">Trạm 4 · picture mode</span><b>Màu và tone</b>
+      <p>Saturation, Contrast, Gradation, rồi mới tới Sharpness.</p></div>
+    <div class="stage s5"><span class="who">Trạm 5 · ghi file</span><b>JPEG</b>
+      <p>Chốt lại. Cái gì đã cháy hoặc đã bệt thì mất hẳn.</p></div>
+  </div>
+
+  <!-- ===== LAB ===== -->
+  <h2><span class="bar" style="background:linear-gradient(var(--c-lens),var(--c-wb))"></span>Bàn thử — cả năm trạm cùng lúc</h2>
+  <p class="lead">Bấm một tình huống để nạp sẵn, rồi kéo từng núm xem trạm nào ảnh hưởng cái gì.</p>
+
+  <div class="card lab">
+    <div>
+      <div class="presets" id="presets">
+        <button class="btn" data-preset="canopy" aria-pressed="true">Dưới tán rừng</button>
+        <button class="btn" data-preset="shade" aria-pressed="false">Bóng râm</button>
+        <button class="btn" data-preset="summit" aria-pressed="false">Đỉnh núi nắng</button>
+        <button class="btn" data-preset="silk" aria-pressed="false">Suối nước mượt</button>
+      </div>
+
+      <div class="view" id="view">
+        <div class="layer" id="bgL"><svg viewBox="0 0 220 150"><use href="#fBg"/></svg></div>
+        <div class="layer" id="wL"><svg viewBox="0 0 220 150"><use href="#fWater"/></svg></div>
+        <div class="layer" id="fgL"><svg viewBox="0 0 220 150"><use href="#fFg"/></svg></div>
+        <div class="ov tint" id="tint"></div>
+        <div class="ov wash" id="wash"></div>
+        <div class="ov grain" id="grain"></div>
+      </div>
+
+      <div class="meter">
+        <div class="scale">
+          <div class="rail"></div><div class="needle" id="needle" style="left:50%"></div>
+          <div class="ticks"><span>−3</span><span>−2</span><span>−1</span><span>0</span><span>+1</span><span>+2</span><span>+3</span></div>
+        </div>
+        <div class="verdict" id="verdict">Vừa đủ sáng</div>
+      </div>
+
+      <div class="warns" id="warns"></div>
+
+      <div class="recipe"><b>Công thức đang đặt</b><span id="rec">—</span></div>
+    </div>
+
+    <div>
+      <div class="readout">
+        <div class="tile l"><b id="rFocal">42mm</b><span>Tiêu cự</span></div>
+        <div class="tile l"><b id="rAp">f/5.6</b><span>Khẩu</span></div>
+        <div class="tile e"><b id="rSh">1/60</b><span>Tốc độ</span></div>
+        <div class="tile e"><b id="rIso">800</b><span>ISO</span></div>
+      </div>
+
+      <div class="grp">
+        <div class="h"><i style="background:var(--c-lens)"></i>Trạm 1 · ống kính</div>
+        <div class="ctl"><div class="top"><b>Tiêu cự</b><i id="lFocal">42mm</i></div>
+          <input type="range" id="sFocal" min="14" max="42" step="1" value="42"></div>
+        <div class="ctl"><div class="top"><b>Khẩu độ</b><i id="lAp">f/5.6</i></div>
+          <input type="range" id="sAp" min="0" max="12" step="1" value="0"></div>
+      </div>
+
+      <div class="grp">
+        <div class="h"><i style="background:var(--c-exp)"></i>Trạm 2 · phơi sáng</div>
+        <div class="ctl"><div class="top"><b>Tốc độ</b><i id="lSh">1/60</i></div>
+          <input type="range" id="sSh" min="0" max="11" step="1" value="5"></div>
+        <div class="ctl"><div class="top"><b>ISO</b><i id="lIso">800</i></div>
+          <input type="range" id="sIso" min="0" max="6" step="1" value="2"></div>
+      </div>
+
+      <div class="grp">
+        <div class="h"><i style="background:var(--c-wb)"></i>Trạm 3 · white balance</div>
+        <div class="presets" style="margin-bottom:10px" id="wbBase">
+          <button class="btn" data-wb="auto" aria-pressed="true">Auto</button>
+          <button class="btn" data-wb="5300" aria-pressed="false">Sunny</button>
+          <button class="btn" data-wb="6000" aria-pressed="false">Cloudy</button>
+          <button class="btn" data-wb="7500" aria-pressed="false">Shade</button>
+        </div>
+        <div class="padwrap">
+          <div class="pad" id="pad" tabindex="0" role="slider" aria-label="Bù trừ white balance">
+            <i class="h"></i><i class="v"></i><div class="knob" id="knob" style="left:50%;top:50%"></div>
+          </div>
+          <div class="padnote">
+            trên = G · dưới = M<br>phải = A · trái = B<br><br>
+            <span style="color:var(--ink);font-size:15px" id="vShift">A ±0 &nbsp; G ±0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grp">
+        <div class="h"><i style="background:var(--c-tone)"></i>Trạm 4 · picture mode</div>
+        <div class="presets" style="margin-bottom:6px" id="pmBase">
+          <button class="btn" data-pm="muted" aria-pressed="true">Muted</button>
+          <button class="btn" data-pm="natural" aria-pressed="false">Natural</button>
+          <button class="btn" data-pm="vivid" aria-pressed="false">Vivid</button>
+          <button class="btn" data-pm="mono" aria-pressed="false">Mono</button>
+        </div>
+        <div class="ctl"><div class="top"><b>Saturation</b><i id="lSat">±0</i></div>
+          <input type="range" id="sSat" min="-2" max="2" step="1" value="0"></div>
+        <div class="ctl"><div class="top"><b>Contrast</b><i id="lCon">±0</i></div>
+          <input type="range" id="sCon" min="-2" max="2" step="1" value="0"></div>
+        <div class="ctl"><div class="top"><b>Sharpness</b><i id="lShp">±0</i></div>
+          <input type="range" id="sShp" min="-2" max="2" step="1" value="0"></div>
+        <div class="presets" style="margin-top:10px" id="gradBase">
+          <button class="btn" data-grad="normal" aria-pressed="true">Normal</button>
+          <button class="btn" data-grad="auto" aria-pressed="false">Auto</button>
+          <button class="btn" data-grad="high" aria-pressed="false">High Key</button>
+          <button class="btn" data-grad="low" aria-pressed="false">Low Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== THỨ TỰ QUYẾT ĐỊNH ===== -->
+  <h2><span class="bar" style="background:var(--c-exp)"></span>Thứ tự quyết định ngoài hiện trường</h2>
+  <p class="lead">Đừng chỉnh song song. Chốt xong bước trên mới xuống bước dưới.</p>
+
+  <div class="steps">
+    <div class="step"><span class="n">1</span><div><b>Ảnh này cần gì?</b>
+      <p>Phông mờ, đóng băng chuyển động, hay chỉ cần rõ hết. Câu này quyết định bốn bước sau.</p></div></div>
+    <div class="step"><span class="n">2</span><div><b>Chốt khẩu (chế độ A)</b>
+      <p>f/5.6 nếu thiếu sáng, f/8 nếu muốn rõ hết. Không đi quá f/11.</p></div></div>
+    <div class="step"><span class="n">3</span><div><b>Nhìn tốc độ máy trả về</b>
+      <p>Chậm hơn 1/60 ở đầu tele là bắt đầu rủi ro. Chưa đủ thì tăng ISO, đừng hạ tốc thêm.</p></div></div>
+    <div class="step"><span class="n">4</span><div><b>Bù sáng nếu cảnh quá trắng hoặc quá tối</b>
+      <p>Có trời trong khung thì thiên về âm. Trời cháy trắng là mất hẳn.</p></div></div>
+    <div class="step"><span class="n">5</span><div><b>WB rồi mới tới màu</b>
+      <p>Chữa ám màu trước. Saturation và Contrast chỉnh sau, và chỉnh nhẹ.</p></div></div>
+  </div>
+
+  <!-- ===== CẮN NHAU ===== -->
+  <h2><span class="bar" style="background:var(--red)"></span>Những cặp cắn nhau</h2>
+  <div class="rows">
+    <div class="row bad"><b>Vặn Kelvin để chữa ám xanh lá</b>
+      <p>Kelvin trượt dọc trục A–B. Ám xanh lá nằm trên trục G–M. Sai trục thì vặn bao nhiêu cũng không tới.</p></div>
+    <div class="row bad"><b>Sharpness +2 với ISO cao</b>
+      <p>Sharpness chạy ở trạm cuối nên nó làm nét luôn cả hạt nhiễu sinh ra ở trạm 2.</p></div>
+    <div class="row bad"><b>Contrast +2 với Gradation Auto</b>
+      <p>Một cái bẻ cong tone curve, một cái kéo phẳng lại. Kết quả đổi theo từng khung.</p></div>
+    <div class="row bad"><b>Khép sâu để "cho nét hơn"</b>
+      <p>Qua f/11 ảnh mềm đi vì nhiễu xạ, đồng thời tốc độ tụt xuống vùng rung tay.</p></div>
+    <div class="row bad"><b>Chờ hậu kỳ cứu</b>
+      <p>Bạn chụp JPEG. Vùng trời đã cháy trắng thì không còn dữ liệu để kéo về.</p></div>
+  </div>
+
+  <!-- ===== BỐN PHẦN ===== -->
+  <h2><span class="bar" style="background:var(--c-out)"></span>Bốn phần chi tiết</h2>
+  <p class="lead">Các liên kết chạy được nếu bạn để năm file trong cùng một thư mục.</p>
+
+  <div class="links">
+    <a class="lnk" style="border-left-color:var(--c-wb)" href="em10ii-mau.html">
+      <span class="t">Phần 1</span><b>Cài đặt màu</b>
+      <p>Picture Mode, WB, Art Filter — nhìn cùng một cảnh qua từng kiểu.</p></a>
+    <a class="lnk" style="border-left-color:var(--c-lens)" href="14-42mm-cho-nguoi-moi.html">
+      <span class="t">Phần 2</span><b>Ống kính 14–42mm</b>
+      <p>Bốn con số trên ống kính, và vì sao f/3.5 biến thành f/5.6.</p></a>
+    <a class="lnk" style="border-left-color:var(--c-exp)" href="phoi-sang-cho-nguoi-moi.html">
+      <span class="t">Phần 3</span><b>Phơi sáng</b>
+      <p>Ba cái van ánh sáng và ba cái giá phải trả.</p></a>
+    <a class="lnk" style="border-left-color:var(--c-tone)" href="wb-shift-va-tham-so.html">
+      <span class="t">Phần 4</span><b>Trục A–B / G–M</b>
+      <p>Vì sao Kelvin không chữa được ám xanh lá, và thứ tự pipeline.</p></a>
+  </div>
+
+  <p class="note">
+    Mọi khung ảnh trên trang là hình vẽ mô phỏng bằng CSS — đúng hướng thay đổi, không đúng mức chính xác.
+    Các bộ số trong phần tình huống là điểm xuất phát, không phải công thức chuẩn: ánh sáng dưới tán rừng
+    đổi theo loại lá, mật độ tán và giờ trong ngày. Cách kiểm chứng rẻ nhất vẫn là chụp cùng một khung
+    ba lần với ba giá trị rồi xem lại trên màn hình lớn.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="canopyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#9FCFA4"/><stop offset="1" stop-color="#2E5638"/></linearGradient>
+  <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EAF6FA"/><stop offset="1" stop-color="#A9D4E2"/></linearGradient>
+  <filter id="mb" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur id="mbB" stdDeviation="0 0"/></filter>
+
+  <symbol id="fBg" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#canopyG)"/>
+    <g fill="#24472F"><rect x="8" y="10" width="13" height="120" rx="3"/>
+      <rect x="38" y="0" width="10" height="132" rx="3"/>
+      <rect x="186" y="6" width="14" height="126" rx="3"/>
+      <rect x="164" y="0" width="9" height="120" rx="3"/></g>
+    <g fill="#3C7A4B" opacity=".9"><ellipse cx="30" cy="26" rx="34" ry="16"/>
+      <ellipse cx="190" cy="20" rx="38" ry="17"/><ellipse cx="110" cy="12" rx="42" ry="15"/></g>
+    <g fill="#FFE9A8" opacity=".55"><ellipse cx="72" cy="44" rx="15" ry="7"/>
+      <ellipse cx="148" cy="36" rx="11" ry="6"/></g>
+    <rect x="70" y="0" width="80" height="150" fill="#2F5C3C" opacity=".3"/>
+  </symbol>
+
+  <symbol id="fWater" viewBox="0 0 220 150">
+    <path d="M84,4 L136,4 L128,104 L92,104 Z" fill="url(#wg)" opacity=".92"/>
+    <g stroke="#FFFFFF" stroke-width="2.4" opacity=".75" stroke-linecap="round">
+      <path d="M96,10 L94,98"/><path d="M108,6 L107,100"/><path d="M120,12 L122,96"/>
+      <path d="M102,20 L101,86"/><path d="M115,24 L116,90"/></g>
+    <ellipse cx="110" cy="106" rx="26" ry="7" fill="#DDF0F6" opacity=".85"/>
+  </symbol>
+
+  <symbol id="fFg" viewBox="0 0 220 150">
+    <path d="M0,150 L0,120 Q40,108 78,118 Q110,126 150,114 Q190,104 220,116 L220,150 Z" fill="#22402C"/>
+    <ellipse cx="110" cy="124" rx="46" ry="10" fill="#3A6B7A" opacity=".6"/>
+    <g fill="#4A4038"><ellipse cx="46" cy="126" rx="22" ry="11"/><ellipse cx="176" cy="122" rx="19" ry="10"/></g>
+    <rect x="58" y="112" width="12" height="13" rx="4" fill="#D8382C"/>
+    <circle cx="64" cy="106" r="4.6" fill="#E9B58E"/>
+    <g stroke="#1B3324" stroke-width="2.6" fill="none" stroke-linecap="round">
+      <path d="M18,150 C22,132 14,126 20,116"/><path d="M20,124 C12,122 8,116 10,112"/>
+      <path d="M204,150 C200,134 208,128 202,118"/><path d="M202,126 C210,124 214,118 212,114"/></g>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  var AP=[5.6,6.3,7.1,8,9,10,11,13,14,16,18,20,22];
+  var SH=[["1/2",.5],["1/4",.25],["1/8",.125],["1/15",1/15],["1/30",1/30],["1/60",1/60],
+          ["1/125",1/125],["1/250",1/250],["1/500",1/500],["1/1000",1/1000],
+          ["1/2000",1/2000],["1/4000",1/4000]];
+  var ISO=[200,400,800,1600,3200,6400,12800];
+
+  /* cảnh: EV, nhiệt độ màu thật, lệch ngoài trục Planck */
+  var SCENE={
+    canopy:{ev:8,  k:6000, off:{r:.90,g:1,b:.90}},   /* lá lọc phổ -> xanh lá */
+    shade: {ev:11, k:7500, off:{r:.97,g:.99,b:1}},
+    summit:{ev:14, k:5300, off:{r:1,g:1,b:1}},
+    silk:  {ev:8,  k:6000, off:{r:.90,g:1,b:.90}}
+  };
+
+  var PM={muted:"saturate(.68) contrast(.92)",natural:"",
+          vivid:"saturate(1.55) contrast(1.12)",mono:"grayscale(1) contrast(1.12)"};
+  var GRAD={normal:"",auto:"brightness(1.05) contrast(.93)",
+            high:"brightness(1.13) contrast(.82)",low:"brightness(.9) contrast(1.17)"};
+
+  var st={scene:"canopy",focal:42,ap:0,sh:5,iso:2,wb:"auto",ab:0,gm:0,
+          pm:"muted",sat:0,con:0,shp:0,grad:"normal",tripod:false};
+
+  var PRESET={
+    canopy:{scene:"canopy",focal:42,ap:0,sh:5,iso:2,wb:"6000",ab:1,gm:-2,
+            pm:"muted",sat:0,con:-1,shp:-1,grad:"normal",tripod:false},
+    shade: {scene:"shade", focal:25,ap:0,sh:6,iso:0,wb:"7500",ab:2,gm:-1,
+            pm:"natural",sat:0,con:0,shp:0,grad:"normal",tripod:false},
+    summit:{scene:"summit",focal:14,ap:3,sh:8,iso:0,wb:"5300",ab:2,gm:0,
+            pm:"muted",sat:-1,con:-1,shp:0,grad:"auto",tripod:false},
+    silk:  {scene:"silk",  focal:25,ap:9,sh:0,iso:0,wb:"6000",ab:1,gm:-2,
+            pm:"muted",sat:0,con:-1,shp:0,grad:"normal",tripod:true}
+  };
+
+  function maxAp(f){ return f<17?3.5:(f<22?4:(f<29?4.5:(f<36?5:5.6))); }
+  function apIndexMin(f){
+    var m=maxAp(f),i;
+    for(i=0;i<AP.length;i++) if(AP[i]>=m-0.01) return i;
+    return 0;
+  }
+  function sign(v){return v>0?"+"+v:(v<0?""+v:"±0");}
+
+  function kToRGB(K){
+    var t=K/100,r,g,b,c=function(v){return Math.max(0,Math.min(255,v));};
+    if(t<=66){ r=255; g=99.4708025861*Math.log(t)-161.1195681661;
+      b=(t<=19)?0:138.5177312231*Math.log(t-10)-305.0447927307; }
+    else { r=329.698727446*Math.pow(t-60,-0.1332047592);
+      g=288.1221695283*Math.pow(t-60,-0.0755148492); b=255; }
+    return [c(r),c(g),c(b)];
+  }
+
+  /* bù trừ tay: A ấm lên, B lạnh đi, G xanh lá, M hồng tím */
+  function shiftMult(ab,gm){
+    var r=1,g=1,b=1;
+    if(ab>0){ g-=0.012*ab; b-=0.030*ab; } else if(ab<0){ r+=0.030*ab; g+=0.010*ab; }
+    if(gm>0){ r-=0.022*gm; b-=0.022*gm; } else if(gm<0){ g+=0.026*gm; }
+    return {r:r,g:g,b:b};
+  }
+
+  function toCSS(m){
+    var mx=Math.max(m.r,m.g,m.b);
+    return "rgb("+[m.r,m.g,m.b].map(function(v){
+      return Math.round(Math.max(0,Math.min(1,v/mx))*255);}).join(",")+")";
+  }
+
+  function render(){
+    var sc=SCENE[st.scene];
+
+    /* khẩu bị chặn dưới bởi tiêu cự */
+    var minI=apIndexMin(st.focal);
+    if(st.ap<minI) st.ap=minI;
+    $("sAp").min=minI;
+    if(+$("sAp").value!==st.ap) $("sAp").value=st.ap;
+
+    var N=AP[st.ap], t=SH[st.sh][1], tLbl=SH[st.sh][0], iso=ISO[st.iso];
+
+    /* phơi sáng */
+    var evSet=Math.log(N*N/t)/Math.LN2-Math.log(iso/100)/Math.LN2;
+    var d=sc.ev-evSet;
+    var br=Math.max(.22,Math.min(3.2,Math.pow(2,-d*0.55)));
+
+    /* trạm 4 áp lên toàn ảnh, theo đúng thứ tự pipeline */
+    var f=["brightness("+br.toFixed(3)+")"];
+    if(PM[st.pm]) f.push(PM[st.pm]);
+    if(st.sat) f.push("saturate("+(1+st.sat*0.22).toFixed(2)+")");
+    if(st.con) f.push("contrast("+(1+st.con*0.13).toFixed(2)+")");
+    if(GRAD[st.grad]) f.push(GRAD[st.grad]);
+    if(st.shp<0) f.push("blur("+(st.shp===-1?0.4:0.8)+"px)");
+    $("view").style.filter=f.join(" ");
+    $("wash").style.opacity=d<-0.5?Math.min(.5,(-d-0.5)*0.22).toFixed(2):0;
+
+    /* khung hình theo tiêu cự */
+    var z=(st.focal/14).toFixed(3);
+    $("bgL").style.transform="scale("+z+")";
+    $("wL").style.transform="scale("+z+")";
+    $("fgL").style.transform="scale("+z+")";
+
+    /* phông mờ theo khẩu và tiêu cự */
+    var bl=(st.focal*st.focal/N)/63;
+    $("bgL").style.filter="blur("+bl.toFixed(2)+"px)";
+
+    /* nước nhoè theo tốc độ */
+    var mb=Math.max(0,Math.min(14,Math.log(t*500)/Math.LN2*1.6));
+    $("mbB").setAttribute("stdDeviation","0 "+mb.toFixed(2));
+    $("wL").style.filter=mb>0.05?"url(#mb)":"none";
+
+    /* hạt theo ISO */
+    $("grain").style.opacity=(Math.log(iso/200)/Math.LN2*0.11).toFixed(3);
+
+    /* màu: ám cảnh -> WB nền -> bù tay */
+    var setK=(st.wb==="auto")?sc.k:parseInt(st.wb,10);
+    var a=kToRGB(sc.k), b2=kToRGB(setK);
+    var base={r:a[0]/Math.max(1,b2[0]),g:a[1]/Math.max(1,b2[1]),b:a[2]/Math.max(1,b2[2])};
+    var sh=shiftMult(st.ab,st.gm);
+    $("tint").style.background=toCSS({
+      r:base.r*sc.off.r*sh.r, g:base.g*sc.off.g*sh.g, b:base.b*sc.off.b*sh.b});
+
+    /* kim đo sáng */
+    $("needle").style.left=((Math.max(-3,Math.min(3,-d))+3)/6*100)+"%";
+    var v=$("verdict");
+    if(Math.abs(d)<0.4){v.textContent="Vừa đủ sáng";v.style.color="var(--c-tone)";}
+    else if(d>0){v.textContent="Tối "+d.toFixed(1)+" stop";v.style.color="#7FB6D6";}
+    else {v.textContent="Cháy "+(-d).toFixed(1)+" stop";v.style.color="var(--red)";}
+
+    /* nhãn */
+    var apTxt="f/"+(N%1===0?N:N.toFixed(1));
+    $("rFocal").textContent=st.focal+"mm"; $("lFocal").textContent=st.focal+"mm";
+    $("rAp").textContent=apTxt;            $("lAp").textContent=apTxt;
+    $("rSh").textContent=tLbl;             $("lSh").textContent=tLbl;
+    $("rIso").textContent=iso;             $("lIso").textContent=iso;
+    $("lSat").textContent=sign(st.sat); $("lCon").textContent=sign(st.con);
+    $("lShp").textContent=sign(st.shp);
+
+    var abT=st.ab===0?"A ±0":(st.ab>0?"A +"+st.ab:"B +"+(-st.ab));
+    var gmT=st.gm===0?"G ±0":(st.gm>0?"G +"+st.gm:"M +"+(-st.gm));
+    $("vShift").textContent=abT+"   "+gmT;
+    $("knob").style.left=((st.ab+7)/14*100)+"%";
+    $("knob").style.top=((7-st.gm)/14*100)+"%";
+
+    /* cảnh báo */
+    var w=[];
+    if(!st.tripod && t>1/(2*st.focal)) w.push("Rung tay ở "+tLbl+" với "+st.focal+"mm");
+    if(st.tripod) w.push("Cần chân máy hoặc đặt lên đá");
+    if(iso>=3200) w.push("ISO "+iso+" — hạt rõ");
+    if(N>=13) w.push(apTxt+" — nhiễu xạ, ảnh mềm");
+    if(st.shp>=2 && iso>=1600) w.push("Sharpness +2 đang làm nét cả hạt nhiễu");
+    if(st.con>=2 && st.grad==="auto") w.push("Contrast +2 và Gradation Auto đánh nhau");
+    if(Math.abs(d)>1.5) w.push("Lệch sáng "+Math.abs(d).toFixed(1)+" stop");
+    if(!w.length) w.push("Bộ số an toàn");
+    $("warns").innerHTML=w.map(function(x){
+      return '<span class="warn'+(x==="Bộ số an toàn"?" good":"")+'">'+x+'</span>';}).join("");
+
+    /* công thức */
+    var wbTxt=(st.wb==="auto")?"WB Auto":"CWB "+st.wb+"K";
+    $("rec").textContent=st.focal+"mm · "+apTxt+" · "+tLbl+" · ISO "+iso+" · "
+      +wbTxt+" "+abT.replace(" ","")+" "+gmT.replace(" ","")+" · "
+      +st.pm+" · Sat "+sign(st.sat)+" C "+sign(st.con)+" Sh "+sign(st.shp)
+      +" · Grad "+st.grad;
+  }
+
+  /* ---- sliders ---- */
+  [["sFocal","focal"],["sAp","ap"],["sSh","sh"],["sIso","iso"],
+   ["sSat","sat"],["sCon","con"],["sShp","shp"]].forEach(function(p){
+    $(p[0]).addEventListener("input",function(){ st[p[1]]=parseInt(this.value,10); render(); });
+  });
+
+  /* ---- nhóm nút ---- */
+  function group(attr,fn){
+    var list=document.querySelectorAll("[data-"+attr+"]");
+    Array.prototype.forEach.call(list,function(b){
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(list,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        fn(b.getAttribute("data-"+attr));
+      });
+    });
+  }
+  function syncGroup(attr,val){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-"+attr+"]"),function(b){
+      b.setAttribute("aria-pressed", b.getAttribute("data-"+attr)===val?"true":"false");
+    });
+  }
+  group("wb",function(v){st.wb=v;render();});
+  group("pm",function(v){st.pm=v;render();});
+  group("grad",function(v){st.grad=v;render();});
+  group("preset",function(v){
+    var p=PRESET[v],k;
+    for(k in p) if(Object.prototype.hasOwnProperty.call(p,k)) st[k]=p[k];
+    $("sFocal").value=st.focal; $("sAp").value=st.ap; $("sSh").value=st.sh;
+    $("sIso").value=st.iso; $("sSat").value=st.sat; $("sCon").value=st.con; $("sShp").value=st.shp;
+    syncGroup("wb",st.wb); syncGroup("pm",st.pm); syncGroup("grad",st.grad);
+    render();
+  });
+
+  /* ---- pad ---- */
+  var pad=$("pad"), drag=false;
+  function fromEvent(e){
+    var r=pad.getBoundingClientRect();
+    var x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    var y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    st.ab=Math.round(Math.max(-7,Math.min(7,x/r.width*14-7)));
+    st.gm=Math.round(Math.max(-7,Math.min(7,7-y/r.height*14)));
+    render();
+  }
+  pad.addEventListener("mousedown",function(e){drag=true;fromEvent(e);});
+  window.addEventListener("mousemove",function(e){if(drag)fromEvent(e);});
+  window.addEventListener("mouseup",function(){drag=false;});
+  pad.addEventListener("touchstart",function(e){e.preventDefault();fromEvent(e);},{passive:false});
+  pad.addEventListener("touchmove",function(e){e.preventDefault();fromEvent(e);},{passive:false});
+  pad.addEventListener("keydown",function(e){
+    var k=e.key,ok=true;
+    if(k==="ArrowRight") st.ab=Math.min(7,st.ab+1);
+    else if(k==="ArrowLeft") st.ab=Math.max(-7,st.ab-1);
+    else if(k==="ArrowUp") st.gm=Math.min(7,st.gm+1);
+    else if(k==="ArrowDown") st.gm=Math.max(-7,st.gm-1);
+    else ok=false;
+    if(ok){e.preventDefault();render();}
+  });
+
+  /* nạp preset đầu tiên */
+  (function(){
+    var p=PRESET.canopy,k;
+    for(k in p) if(Object.prototype.hasOwnProperty.call(p,k)) st[k]=p[k];
+    $("sFocal").value=st.focal; $("sAp").value=st.ap; $("sSh").value=st.sh;
+    $("sIso").value=st.iso; $("sSat").value=st.sat; $("sCon").value=st.con; $("sShp").value=st.shp;
+    syncGroup("wb",st.wb); syncGroup("pm",st.pm); syncGroup("grad",st.grad);
+    render();
+  })();
+})();
+</script>
+</body>
+</html>

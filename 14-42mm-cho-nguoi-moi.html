@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ống kính 14-42mm — hiểu bằng mắt</title>
+<style>
+  :root{
+    --paper:#F2F5F0; --card:#FFFFFF; --ink:#16221C; --dim:#5F7369; --line:#DBE2DA;
+    --mag:#C64A9B; --grn:#3F9E6E; --amb:#E39A1F; --sky:#5FA8D3;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1060px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(30px,7vw,54px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  h1 em{font-style:normal;color:var(--mag)}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:520px}
+
+  h2{font-size:clamp(20px,3.6vw,27px);font-weight:800;letter-spacing:-.02em;
+     margin:52px 0 4px;display:flex;align-items:center;gap:10px}
+  h2 .dot{width:14px;height:14px;border-radius:50%;flex:none}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:620px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;
+        box-shadow:0 1px 2px rgba(20,40,30,.05)}
+
+  /* ---- preview ---- */
+  .view{position:relative;border-radius:16px;overflow:hidden;background:#BFE0EE;
+        aspect-ratio:220/150}
+  .layer{position:absolute;inset:0;transform-origin:34% 74%}
+  .layer svg{display:block;width:100%;height:100%}
+  .mask{position:absolute;inset:0;pointer-events:none;
+        box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+
+  /* ---- hero ---- */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;padding:18px}
+  @media(max-width:760px){.hero{grid-template-columns:1fr}}
+
+  .readout{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .tile{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+  .tile b{display:block;font-family:var(--mono);font-size:22px;line-height:1.15;letter-spacing:-.02em}
+  .tile span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.09em}
+  .tile.mag b{color:var(--mag)} .tile.grn b{color:var(--grn)} .tile.amb b{color:var(--amb)}
+
+  .ctl{margin:16px 0 4px}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+  .ctl .top b{font-size:15px} .ctl .top i{font-style:normal;font-family:var(--mono);font-size:14px;color:var(--dim)}
+  input[type=range]{width:100%;height:26px;accent-color:var(--mag)}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--amb);outline-offset:3px}
+
+  .meter{height:12px;border-radius:99px;background:var(--paper);
+         border:1px solid var(--line);overflow:hidden;margin-top:4px}
+  .meter i{display:block;height:100%;background:var(--amb);transition:width .15s ease}
+
+  .iris{display:block;margin:0 auto}
+
+  /* ---- two ends ---- */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.two{grid-template-columns:1fr}}
+  .two .card{padding:12px}
+  .two .name{font-size:19px;font-weight:800;margin:12px 4px 2px}
+  .two .name em{font-style:normal;font-family:var(--mono);color:var(--mag)}
+  .two p{margin:0 4px;color:var(--dim);font-size:14px}
+
+  /* ---- recipe cards ---- */
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .three .card{padding:14px}
+  .three h3{margin:10px 2px 3px;font-size:16px}
+  .three p{margin:0 2px;color:var(--dim);font-size:13.5px}
+  .yes,.no{font-family:var(--mono);font-size:12px;padding:3px 9px;border-radius:99px;display:inline-block}
+  .yes{background:#E4F4EC;color:var(--grn)} .no{background:#FBE7E4;color:#C4483C}
+
+  /* ---- bars ---- */
+  .bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding:14px;overflow-x:auto}
+  .bars div{flex:1;min-width:34px;display:flex;flex-direction:column;justify-content:flex-end;
+            align-items:center;gap:6px}
+  .bars i{display:block;width:100%;border-radius:8px 8px 4px 4px;background:var(--line)}
+  .bars i.best{background:var(--grn)} .bars i.ok{background:var(--sky)} .bars i.bad{background:var(--amb)}
+  .bars span{font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+
+  .note{margin-top:40px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:640px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">M.Zuiko · Kit lens · E-M10 II</p>
+  <h1><em>14–42</em>mm f/3.5–5.6</h1>
+  <p class="sub">Bốn con số đó là toàn bộ ống kính. Kéo thanh trượt là thấy chúng làm gì.</p>
+
+  <!-- ===== HERO ===== -->
+  <div class="card hero">
+    <div>
+      <div class="view">
+        <div class="layer" id="bgL"><svg viewBox="0 0 220 150"><use href="#bg"/></svg></div>
+        <div class="layer" id="fgL"><svg viewBox="0 0 220 150"><use href="#fg"/></svg></div>
+        <div class="mask"></div>
+      </div>
+      <svg class="iris" id="iris" width="112" height="112" viewBox="-60 -60 120 120" aria-hidden="true"></svg>
+    </div>
+
+    <div>
+      <div class="readout">
+        <div class="tile mag"><b id="rMm">14mm</b><span>Vặn zoom</span></div>
+        <div class="tile"><b id="rEq">28mm</b><span>Bằng máy full-frame</span></div>
+        <div class="tile grn"><b id="rF">f/3.5</b><span>Mở to nhất</span></div>
+        <div class="tile amb"><b id="rAng">63°</b><span>Nhìn rộng</span></div>
+      </div>
+
+      <div class="ctl">
+        <div class="top"><b>Vặn zoom</b><i id="lMm">14mm</i></div>
+        <input type="range" id="sZ" min="14" max="42" step="1" value="14" aria-label="Tiêu cự">
+      </div>
+
+      <div class="ctl">
+        <div class="top"><b>Khẩu độ</b><i id="lF">f/3.5</i></div>
+        <input type="range" id="sA" min="0" max="16" step="1" value="0" aria-label="Khẩu độ">
+      </div>
+
+      <div class="ctl">
+        <div class="top"><b>Ánh sáng lọt vào</b><i id="lLux">100%</i></div>
+        <div class="meter"><i id="bar" style="width:100%"></i></div>
+      </div>
+
+      <div class="readout" style="margin-top:16px">
+        <div class="tile"><b id="rSh">1/30</b><span>Tốc độ tối thiểu</span></div>
+        <div class="tile"><b id="rBlur">Ít</b><span>Phông mờ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HAI ĐẦU ===== -->
+  <h2><span class="dot" style="background:var(--mag)"></span>Hai đầu ống kính</h2>
+  <p class="lead">Không zoom được nữa thì bạn phải đi bộ.</p>
+
+  <div class="two">
+    <div class="card">
+      <div class="view"><div class="layer" style="transform:none">
+        <svg viewBox="0 0 220 150"><use href="#bg"/><use href="#fg"/></svg></div></div>
+      <div class="name"><em>14mm</em> — thấy nhiều</div>
+      <p>Cả ngọn núi lọt khung. Mọi thứ trông xa và nhỏ.</p>
+    </div>
+    <div class="card">
+      <div class="view"><div class="layer" style="transform:scale(3)">
+        <svg viewBox="0 0 220 150"><use href="#bg"/><use href="#fg"/></svg></div></div>
+      <div class="name"><em>42mm</em> — thấy ít mà to</div>
+      <p>Kéo một mảnh lại gần. Núi phía sau trông dồn lại.</p>
+    </div>
+  </div>
+
+  <!-- ===== VÌ SAO f ĐỔI ===== -->
+  <h2><span class="dot" style="background:var(--grn)"></span>Vì sao f/3.5 thành f/5.6?</h2>
+  <p class="lead">Lỗ sáng không nhỏ đi. Ống kính dài ra, nên cái lỗ đó trông xa hơn.</p>
+
+  <div class="two">
+    <div class="card" style="padding:16px;text-align:center">
+      <svg viewBox="0 0 240 110" style="width:100%"><use href="#tube14"/></svg>
+      <div class="name" style="text-align:left"><em>14mm</em> — ống ngắn</div>
+      <p style="text-align:left">Lỗ sáng gần phim. Sáng nhiều → f/3.5.</p>
+    </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <svg viewBox="0 0 240 110" style="width:100%"><use href="#tube42"/></svg>
+      <div class="name" style="text-align:left"><em>42mm</em> — ống dài</div>
+      <p style="text-align:left">Cùng cái lỗ, xa hơn. Sáng ít → f/5.6.</p>
+    </div>
+  </div>
+
+  <!-- ===== XOÁ PHÔNG ===== -->
+  <h2><span class="dot" style="background:var(--amb)"></span>Muốn phông mờ?</h2>
+  <p class="lead">Ống này mờ phông yếu. Làm đủ ba việc thì mới thấy rõ.</p>
+
+  <div class="three">
+    <div class="card">
+      <svg viewBox="0 0 220 150" style="width:100%;border-radius:12px"><use href="#tip1"/></svg>
+      <span class="yes">1</span><h3>Vặn hết về 42mm</h3>
+      <p>Zoom càng dài, phông càng nhoè.</p>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 220 150" style="width:100%;border-radius:12px"><use href="#tip2"/></svg>
+      <span class="yes">2</span><h3>Lại thật gần chủ thể</h3>
+      <p>Gần nhất khoảng 20–25cm tính từ máy.</p>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 220 150" style="width:100%;border-radius:12px"><use href="#tip3"/></svg>
+      <span class="yes">3</span><h3>Cho phông ở thật xa</h3>
+      <p>Chủ thể sát tường thì không mờ được.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;padding:14px 16px">
+    <span class="no">Không hiệu quả</span>
+    <p style="margin:6px 0 0;color:var(--dim);font-size:14px">
+      Đứng xa vặn 14mm rồi mong phông mờ. Ống kính không làm được.</p>
+  </div>
+
+  <!-- ===== NÉT NHẤT ===== -->
+  <h2><span class="dot" style="background:var(--sky)"></span>Khẩu nào nét nhất?</h2>
+  <p class="lead">Không phải cứ khép nhỏ là nét hơn. Khép quá lại mờ đi.</p>
+
+  <div class="card bars">
+    <div><i style="height:52%"></i><span>3.5</span></div>
+    <div><i class="ok" style="height:74%"></i><span>4</span></div>
+    <div><i class="best" style="height:96%"></i><span>5.6</span></div>
+    <div><i class="best" style="height:90%"></i><span>8</span></div>
+    <div><i class="ok" style="height:62%"></i><span>11</span></div>
+    <div><i class="bad" style="height:40%"></i><span>16</span></div>
+    <div><i class="bad" style="height:26%"></i><span>22</span></div>
+  </div>
+  <p class="lead" style="margin-top:10px">Cứ để <b>f/5.6</b> hoặc <b>f/8</b> là an toàn.</p>
+
+  <!-- ===== RUNG TAY ===== -->
+  <h2><span class="dot" style="background:var(--ink)"></span>Tay rung thì sao?</h2>
+  <p class="lead">Zoom càng dài, rung càng lộ. Cần tốc độ nhanh hơn.</p>
+
+  <div class="two">
+    <div class="card" style="padding:16px">
+      <svg viewBox="0 0 220 120" style="width:100%"><use href="#shake14"/></svg>
+      <div class="name"><em>14mm</em></div><p>Từ 1/30 giây trở lên là ổn.</p>
+    </div>
+    <div class="card" style="padding:16px">
+      <svg viewBox="0 0 220 120" style="width:100%"><use href="#shake42"/></svg>
+      <div class="name"><em>42mm</em></div><p>Cần 1/80 giây trở lên.</p>
+    </div>
+  </div>
+
+  <p class="note">
+    Khung ảnh là hình vẽ mô phỏng, không phải ảnh chụp thật — dùng để thấy hướng thay đổi, không phải mức chính xác.
+    Bản 14-42mm EZ lấy nét gần nhất ~20cm, bản II R ~25cm; xem vòng ống kính của bạn ghi gì.
+    Máy có chống rung trong thân, nên thực tế bạn thường chụp chậm hơn con số trên vài nấc vẫn nét.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#67B4DC"/><stop offset="1" stop-color="#D6EDF4"/>
+  </linearGradient>
+
+  <symbol id="bg" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="182" cy="26" r="10" fill="#FFD24A"/>
+    <ellipse cx="46" cy="24" rx="19" ry="6.5" fill="#fff" opacity=".85"/>
+    <ellipse cx="62" cy="28" rx="12" ry="5" fill="#fff" opacity=".65"/>
+    <polygon points="0,96 34,46 62,74 88,40 122,96" fill="#8FA9B8"/>
+    <polygon points="88,40 99,57 78,55" fill="#F3F8FA"/>
+    <polygon points="104,96 146,42 190,96" fill="#7C99AB"/>
+    <polygon points="146,42 159,58 134,58" fill="#EBF3F7"/>
+    <path d="M0,88 Q55,68 110,86 T220,79 L220,150 L0,150 Z" fill="#3F7A50"/>
+    <g fill="#27543C">
+      <polygon points="20,78 29,100 11,100"/><polygon points="36,84 44,102 28,102"/>
+      <polygon points="168,80 178,102 158,102"/><polygon points="192,76 203,102 181,102"/>
+    </g>
+    <path d="M0,104 Q60,94 130,106 T220,101 L220,150 L0,150 Z" fill="#2C5E3B"/>
+  </symbol>
+
+  <symbol id="fg" viewBox="0 0 220 150">
+    <path d="M74,150 C74,132 70,124 72,112" stroke="#2E6B45" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M72,126 C64,124 60,118 61,113 C67,113 71,118 72,124" fill="#37804F"/>
+    <g transform="translate(72,108)">
+      <circle cx="0" cy="-7" r="6" fill="#E5544B"/><circle cx="6.6" cy="-2.2" r="6" fill="#E5544B"/>
+      <circle cx="4.1" cy="5.7" r="6" fill="#E5544B"/><circle cx="-4.1" cy="5.7" r="6" fill="#E5544B"/>
+      <circle cx="-6.6" cy="-2.2" r="6" fill="#E5544B"/>
+      <circle cx="0" cy="0" r="4.2" fill="#FFD24A"/>
+    </g>
+  </symbol>
+
+  <!-- ống ngắn / ống dài -->
+  <symbol id="tube14" viewBox="0 0 240 110">
+    <rect x="18" y="26" width="26" height="58" rx="4" fill="#2C3B34"/>
+    <rect x="44" y="34" width="62" height="42" rx="6" fill="#46584F"/>
+    <circle cx="106" cy="55" r="20" fill="#1D2A24"/>
+    <circle cx="106" cy="55" r="13" fill="#C64A9B" opacity=".9"/>
+    <g stroke="#E39A1F" stroke-width="2.4" stroke-linecap="round">
+      <path d="M106,45 L44,52"/><path d="M106,55 L44,55"/><path d="M106,65 L44,58"/>
+    </g>
+    <text x="26" y="100" font-family="ui-monospace,monospace" font-size="13" fill="#5F7369">ngắn</text>
+  </symbol>
+
+  <symbol id="tube42" viewBox="0 0 240 110">
+    <rect x="18" y="26" width="26" height="58" rx="4" fill="#2C3B34"/>
+    <rect x="44" y="34" width="140" height="42" rx="6" fill="#46584F"/>
+    <circle cx="184" cy="55" r="20" fill="#1D2A24"/>
+    <circle cx="184" cy="55" r="13" fill="#C64A9B" opacity=".9"/>
+    <g stroke="#E39A1F" stroke-width="2.4" stroke-linecap="round" opacity=".85">
+      <path d="M184,45 L44,53"/><path d="M184,55 L44,55"/><path d="M184,65 L44,57"/>
+    </g>
+    <text x="26" y="100" font-family="ui-monospace,monospace" font-size="13" fill="#5F7369">dài</text>
+  </symbol>
+
+  <!-- 3 mẹo xoá phông -->
+  <symbol id="tip1" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#EAF1EC"/>
+    <rect x="30" y="60" width="120" height="30" rx="8" fill="#46584F"/>
+    <circle cx="150" cy="75" r="17" fill="#1D2A24"/><circle cx="150" cy="75" r="11" fill="#C64A9B"/>
+    <path d="M40,116 L176,116" stroke="#C64A9B" stroke-width="4" stroke-linecap="round"/>
+    <path d="M168,110 L178,116 L168,122" fill="#C64A9B"/>
+    <text x="40" y="46" font-family="ui-monospace,monospace" font-size="19" fill="#16221C">42mm</text>
+  </symbol>
+
+  <symbol id="tip2" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#EAF1EC"/>
+    <rect x="14" y="58" width="46" height="34" rx="6" fill="#46584F"/>
+    <circle cx="60" cy="75" r="13" fill="#1D2A24"/>
+    <g transform="translate(104,75)">
+      <circle cx="0" cy="-11" r="9" fill="#E5544B"/><circle cx="10.5" cy="-3.4" r="9" fill="#E5544B"/>
+      <circle cx="6.5" cy="8.9" r="9" fill="#E5544B"/><circle cx="-6.5" cy="8.9" r="9" fill="#E5544B"/>
+      <circle cx="-10.5" cy="-3.4" r="9" fill="#E5544B"/><circle r="6" fill="#FFD24A"/>
+    </g>
+    <path d="M74,124 L96,124" stroke="#E39A1F" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="106" y="129" font-family="ui-monospace,monospace" font-size="14" fill="#5F7369">gần</text>
+  </symbol>
+
+  <symbol id="tip3" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#EAF1EC"/>
+    <g opacity=".45"><polygon points="120,96 158,46 200,96" fill="#8FA9B8"/>
+      <polygon points="150,96 182,58 214,96" fill="#7C99AB"/></g>
+    <rect x="14" y="60" width="40" height="30" rx="6" fill="#46584F"/>
+    <circle cx="54" cy="75" r="12" fill="#1D2A24"/>
+    <g transform="translate(88,75)">
+      <circle cx="0" cy="-9" r="7.5" fill="#E5544B"/><circle cx="8.7" cy="-2.8" r="7.5" fill="#E5544B"/>
+      <circle cx="5.4" cy="7.4" r="7.5" fill="#E5544B"/><circle cx="-5.4" cy="7.4" r="7.5" fill="#E5544B"/>
+      <circle cx="-8.7" cy="-2.8" r="7.5" fill="#E5544B"/><circle r="5" fill="#FFD24A"/>
+    </g>
+    <path d="M100,130 L192,130" stroke="#E39A1F" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="120" y="124" font-family="ui-monospace,monospace" font-size="13" fill="#5F7369">xa</text>
+  </symbol>
+
+  <!-- rung tay -->
+  <symbol id="shake14" viewBox="0 0 220 120">
+    <rect width="220" height="120" fill="#EAF1EC" rx="10"/>
+    <g transform="translate(110,58)">
+      <circle cx="0" cy="-13" r="11" fill="#E5544B"/><circle cx="12.6" cy="-4" r="11" fill="#E5544B"/>
+      <circle cx="7.8" cy="10.6" r="11" fill="#E5544B"/><circle cx="-7.8" cy="10.6" r="11" fill="#E5544B"/>
+      <circle cx="-12.6" cy="-4" r="11" fill="#E5544B"/><circle r="7" fill="#FFD24A"/>
+    </g>
+    <text x="82" y="106" font-family="ui-monospace,monospace" font-size="16" fill="#3F9E6E">1/30 · nét</text>
+  </symbol>
+
+  <symbol id="shake42" viewBox="0 0 220 120">
+    <rect width="220" height="120" fill="#EAF1EC" rx="10"/>
+    <g transform="translate(110,58)" opacity=".55" filter="url(#sh)">
+      <circle cx="0" cy="-13" r="11" fill="#E5544B"/><circle cx="12.6" cy="-4" r="11" fill="#E5544B"/>
+      <circle cx="7.8" cy="10.6" r="11" fill="#E5544B"/><circle cx="-7.8" cy="10.6" r="11" fill="#E5544B"/>
+      <circle cx="-12.6" cy="-4" r="11" fill="#E5544B"/><circle r="7" fill="#FFD24A"/>
+    </g>
+    <text x="66" y="106" font-family="ui-monospace,monospace" font-size="16" fill="#C4483C">1/30 · rung nhoè</text>
+  </symbol>
+
+  <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="2.6 0.8"/>
+  </filter>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+
+  var STOPS=[3.5,4,4.5,5,5.6,6.3,7.1,8,9,10,11,13,14,16,18,20,22];
+
+  /* ống kính mở to nhất được bao nhiêu, tuỳ zoom */
+  function maxAp(f){
+    if(f<17) return 3.5;
+    if(f<22) return 4;
+    if(f<29) return 4.5;
+    if(f<36) return 5;
+    return 5.6;
+  }
+  function stopIndex(N){
+    var i,best=0,d=1e9;
+    for(i=0;i<STOPS.length;i++){ var x=Math.abs(STOPS[i]-N); if(x<d){d=x;best=i;} }
+    return best;
+  }
+  function fmt(N){ return "f/"+(N%1===0?N.toFixed(0):N.toFixed(1)); }
+
+  /* góc nhìn ngang trên cảm biến Micro Four Thirds (rộng 17.3mm) */
+  function angle(f){ return Math.round(2*Math.atan(8.65/f)*180/Math.PI); }
+
+  function safeShutter(f){
+    var need=2*f, list=[30,40,50,60,80,100,125], i;
+    for(i=0;i<list.length;i++) if(list[i]>=need) return "1/"+list[i];
+    return "1/125";
+  }
+
+  var sZ=document.getElementById("sZ"), sA=document.getElementById("sA");
+  var bgL=document.getElementById("bgL"), fgL=document.getElementById("fgL");
+  var iris=document.getElementById("iris");
+
+  function heptagon(r){
+    var p=[],i,a;
+    for(i=0;i<7;i++){ a=-Math.PI/2+i*2*Math.PI/7; p.push((r*Math.cos(a)).toFixed(1)+","+(r*Math.sin(a)).toFixed(1)); }
+    return p.join(" ");
+  }
+
+  function drawIris(N){
+    var r=Math.max(6,46*3.5/N), i,a,x,y,s="";
+    s+='<circle r="54" fill="#1D2A24"/>';
+    s+='<circle r="49" fill="#33443B"/>';
+    s+='<polygon points="'+heptagon(r)+'" fill="#C64A9B"/>';
+    s+='<polygon points="'+heptagon(r*0.62)+'" fill="#E28FC5"/>';
+    for(i=0;i<7;i++){
+      a=-Math.PI/2+i*2*Math.PI/7+Math.PI/7;
+      x=49*Math.cos(a); y=49*Math.sin(a);
+      s+='<line x1="0" y1="0" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="#22302A" stroke-width="1.2" opacity=".55"/>';
+    }
+    s+='<text x="0" y="4" text-anchor="middle" font-family="ui-monospace,monospace" font-size="15" fill="#16221C" opacity=".0">x</text>';
+    iris.innerHTML=s;
+  }
+
+  function render(){
+    var f=parseInt(sZ.value,10);
+    var mn=maxAp(f), mnIdx=stopIndex(mn);
+
+    /* zoom vào thì không mở to như cũ được nữa -> tự đẩy lên */
+    if(parseInt(sA.value,10)<mnIdx) sA.value=mnIdx;
+    sA.min=mnIdx;
+    var N=STOPS[parseInt(sA.value,10)];
+
+    /* khung hình: zoom là cắt cúp, tâm ở bông hoa */
+    var sc=f/14;
+    bgL.style.transform="scale("+sc.toFixed(3)+")";
+    fgL.style.transform="scale("+sc.toFixed(3)+")";
+
+    /* phông mờ tăng theo tiêu cự, giảm khi khép khẩu */
+    var b=(f*f/N)/63;
+    bgL.style.filter="blur("+b.toFixed(2)+"px)";
+
+    /* ánh sáng lọt vào, so với f/3.5 */
+    var lux=Math.round(Math.pow(3.5/N,2)*100);
+
+    document.getElementById("rMm").textContent=f+"mm";
+    document.getElementById("lMm").textContent=f+"mm";
+    document.getElementById("rEq").textContent=(f*2)+"mm";
+    document.getElementById("rF").textContent=fmt(N);
+    document.getElementById("lF").textContent=fmt(N);
+    document.getElementById("rAng").textContent=angle(f)+"\u00B0";
+    document.getElementById("rSh").textContent=safeShutter(f);
+    document.getElementById("lLux").textContent=lux+"%";
+    document.getElementById("bar").style.width=Math.max(2,lux)+"%";
+    document.getElementById("rBlur").textContent=b<1.2?"Ít":(b<3?"Vừa":"Rõ");
+
+    drawIris(N);
+  }
+
+  sZ.addEventListener("input",render);
+  sA.addEventListener("input",render);
+  render();
+})();
+</script>
+</body>
+</html>

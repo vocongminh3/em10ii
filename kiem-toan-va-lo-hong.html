@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiểm toán — năm trang đã dạy gì và bỏ sót gì</title>
+<style>
+  :root{
+    --paper:#FAF8F3; --card:#FFFFFF; --ink:#14120F; --dim:#6E675C; --rule:#E3DCD0;
+    --red:#C0392B; --ok:#2E7D4F; --warn:#C97B12; --blue:#2F6690;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.5;padding:26px 16px 90px}
+  .wrap{max-width:940px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--red);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,46px);font-weight:800;letter-spacing:-.035em;margin:0 0 10px;max-width:16ch}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 8px;max-width:600px}
+
+  .verdict{border:2px solid var(--red);border-radius:16px;padding:18px 20px;margin:26px 0 0;
+           background:#FFF6F4}
+  .verdict b{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;
+             text-transform:uppercase;color:var(--red);margin-bottom:7px}
+  .verdict p{margin:0 0 8px;font-size:16px}
+  .verdict p:last-child{margin-bottom:0}
+
+  h2{font-size:clamp(19px,3.5vw,26px);font-weight:800;letter-spacing:-.02em;margin:56px 0 4px;
+     padding-bottom:9px;border-bottom:2px solid var(--ink)}
+  .lead{color:var(--dim);font-size:15px;margin:14px 0 20px;max-width:680px}
+
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:16px}
+
+  /* ---------- coverage ---------- */
+  .cov{padding:6px 18px 14px}
+  .crow{display:grid;grid-template-columns:190px 1fr 54px;gap:14px;align-items:center;
+        padding:11px 0;border-bottom:1px solid var(--rule)}
+  .crow:last-child{border-bottom:0}
+  @media(max-width:620px){.crow{grid-template-columns:1fr 44px;gap:6px}
+    .crow .track{grid-column:1/3}}
+  .crow b{font-size:14.5px;font-weight:600}
+  .track{height:12px;border-radius:99px;background:#EFEAE0;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:99px}
+  .pct{font-family:var(--mono);font-size:13px;color:var(--dim);text-align:right}
+
+  /* ---------- lies ---------- */
+  .lies{display:grid;gap:12px}
+  .lie{background:var(--card);border:1px solid var(--rule);border-left:4px solid var(--red);
+       border-radius:14px;padding:15px 17px}
+  .lie b{display:block;font-size:15.5px;margin-bottom:4px}
+  .lie code{font-family:var(--mono);font-size:12.5px;background:#F3EFE7;padding:2px 7px;border-radius:6px}
+  .lie p{margin:7px 0 0;font-size:14px;color:var(--dim)}
+  .lie .risk{margin-top:8px;font-size:13.5px;color:var(--ink)}
+  .lie .risk span{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+                  color:var(--red);margin-right:7px}
+
+  /* ---------- gaps ---------- */
+  .gap{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:17px 19px;
+       margin-bottom:12px}
+  .gap .hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .gap .rank{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--red);line-height:1}
+  .gap h3{margin:0;font-size:18px}
+  .gap .tag{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:99px;
+            background:#F3EFE7;color:var(--dim)}
+  .gap p{margin:6px 0 0;font-size:14px;color:var(--dim)}
+  .gap ul{margin:9px 0 0;padding-left:19px;font-size:14px}
+  .gap li{margin-bottom:4px}
+
+  /* ---------- conditional ---------- */
+  .cond{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:700px){.cond{grid-template-columns:1fr}}
+  .cond .c{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px 18px}
+  .cond h3{margin:0 0 8px;font-size:17px}
+  .cond .yes,.cond .no{font-size:14px;margin:0 0 10px;padding-left:22px;position:relative}
+  .cond .yes:before{content:"NÊN";position:absolute;left:0;top:1px;font-family:var(--mono);
+    font-size:9.5px;color:var(--ok);letter-spacing:.06em}
+  .cond .no:before{content:"KHÔNG";position:absolute;left:-4px;top:1px;font-family:var(--mono);
+    font-size:9.5px;color:var(--red);letter-spacing:.06em}
+  .cond .no{padding-left:38px}
+
+  /* ---------- assignment ---------- */
+  .asg{background:var(--ink);color:var(--paper);border-radius:18px;padding:22px 24px}
+  .asg .t{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;
+          color:#C9B98F;margin-bottom:8px}
+  .asg h3{margin:0 0 6px;font-size:22px;letter-spacing:-.02em}
+  .asg p{margin:0 0 14px;color:#CFC8BB;font-size:14.5px}
+  .asg ol{margin:0;padding-left:20px;font-size:15px}
+  .asg li{margin-bottom:9px}
+  .asg code{font-family:var(--mono);font-size:13px;background:#2B2723;padding:2px 7px;border-radius:6px}
+  .asg .end{margin-top:16px;padding-top:14px;border-top:1px solid #34302B;font-size:14px;color:#CFC8BB}
+
+  /* ---------- log ---------- */
+  .log{padding:18px}
+  .lgrid{display:grid;grid-template-columns:38px repeat(3,1fr);gap:6px;font-size:13px}
+  .lgrid .hd{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+             color:var(--dim);padding-bottom:6px;text-align:center}
+  .lgrid .hd:first-child{text-align:left}
+  .lgrid .idx{font-family:var(--mono);color:var(--dim);display:flex;align-items:center}
+  .tg{border:1px solid var(--rule);background:#fff;border-radius:9px;height:34px;cursor:pointer;
+      font-family:var(--mono);font-size:13px;color:var(--dim)}
+  .tg[data-on="1"]{background:#EAF5EE;border-color:var(--ok);color:var(--ok);font-weight:700}
+  .tg[data-on="0"]{background:#FBEDEB;border-color:var(--red);color:var(--red);font-weight:700}
+  .tg:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+  .tally{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .tally div{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:11px 13px}
+  .tally b{display:block;font-family:var(--mono);font-size:22px}
+  .tally span{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim)}
+  .diag{margin-top:14px;border-left:4px solid var(--blue);background:#F1F5F8;border-radius:0 12px 12px 0;
+        padding:13px 16px;font-size:14.5px}
+  .btnrow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .btn{border:1px solid var(--rule);background:#fff;border-radius:99px;padding:7px 15px;
+       font-size:13px;cursor:pointer;font-family:var(--disp)}
+
+  .note{margin-top:48px;border-left:3px solid var(--rule);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:700px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Kiểm toán · năm trang trước</p>
+  <h1>Đã dạy gì, nói dối chỗ nào, bỏ sót cái gì</h1>
+  <p class="sub">Đánh giá của người dựng ra chúng, không phải quảng cáo cho chúng.</p>
+
+  <div class="verdict">
+    <b>Kết luận đứng đầu</b>
+    <p>Rủi ro lớn nhất lúc này không phải thiếu kiến thức. Là bạn có năm trang tài liệu và có thể không có tấm ảnh mới nào.</p>
+    <p>Rủi ro lớn thứ hai: mental model của bạn đang hình thành từ hình vẽ CSS, không phải từ ảnh máy. Bốn chỗ nó lệch nằm ở mục dưới.</p>
+    <p>Lỗ hổng lớn nhất về nội dung: <b>lấy nét</b> — chủ đề không xuất hiện một chữ nào trong cả năm trang.</p>
+  </div>
+
+  <!-- ===== COVERAGE ===== -->
+  <h2>Bản đồ phủ sóng</h2>
+  <p class="lead">Tám vùng kỹ năng cần cho ảnh trekking. Thanh là phần năm trang đã chạm tới.</p>
+
+  <div class="card cov">
+    <div class="crow"><b>Điều khiển phơi sáng</b><div class="track"><i style="width:85%;background:var(--ok)"></i></div><span class="pct">85%</span></div>
+    <div class="crow"><b>Màu và white balance</b><div class="track"><i style="width:85%;background:var(--ok)"></i></div><span class="pct">85%</span></div>
+    <div class="crow"><b>Ống kính, khẩu, tiêu cự</b><div class="track"><i style="width:70%;background:var(--ok)"></i></div><span class="pct">70%</span></div>
+    <div class="crow"><b>Quy trình, thói quen bấm máy</b><div class="track"><i style="width:25%;background:var(--warn)"></i></div><span class="pct">25%</span></div>
+    <div class="crow"><b>Ánh sáng thật và thời điểm</b><div class="track"><i style="width:10%;background:var(--red)"></i></div><span class="pct">10%</span></div>
+    <div class="crow"><b>Hậu kỳ, RAW</b><div class="track"><i style="width:5%;background:var(--red)"></i></div><span class="pct">5%</span></div>
+    <div class="crow"><b>Bố cục</b><div class="track"><i style="width:0%;background:var(--red)"></i></div><span class="pct">0%</span></div>
+    <div class="crow"><b>Lấy nét</b><div class="track"><i style="width:0%;background:var(--red)"></i></div><span class="pct">0%</span></div>
+  </div>
+
+  <!-- ===== LIES ===== -->
+  <h2>Bốn chỗ mô phỏng nói dối</h2>
+  <p class="lead">Không phải lỗi vặt. Mỗi cái sinh ra một kỳ vọng sai mà bạn sẽ chỉ phát hiện khi chụp thật.</p>
+
+  <div class="lies">
+    <div class="lie">
+      <b>Phông mờ vẽ bằng <code>blur()</code> không phải bokeh</b>
+      <p>Bokeh thật có hình dạng theo lá khẩu, méo thành hình mắt mèo ở rìa khung, và nhoè khác nhau ở hậu cảnh với tiền cảnh. CSS blur làm nhoè đều tất cả.</p>
+      <p class="risk"><span>Hậu quả</span>Bạn sẽ kỳ vọng phông mượt hơn thực tế, rồi tưởng mình làm sai khi ảnh thật ra khác.</p>
+    </div>
+    <div class="lie">
+      <b><code>saturate()</code> đẩy đều mọi màu</b>
+      <p>Olympus dùng color matrix, kênh xanh lá và kênh đỏ được đẩy theo hệ số khác nhau. Vivid thật đẩy xanh lá mạnh hơn nhiều so với mô phỏng.</p>
+      <p class="risk"><span>Hậu quả</span>Bạn không đoán được kênh nào clip trước — mà trong rừng, xanh lá luôn là kênh vỡ đầu tiên.</p>
+    </div>
+    <div class="lie">
+      <b>Hạt nhiễu tôi vẽ là nhiễu đều</b>
+      <p>Noise thật đậm hơn ở vùng tối, và ở ISO cao còn có chroma noise — những đốm màu loang lổ mà mô phỏng không có.</p>
+      <p class="risk"><span>Hậu quả</span>Bạn sẽ đánh giá thấp thiệt hại của ISO 3200 ở vùng bóng dưới tán rừng.</p>
+    </div>
+    <div class="lie">
+      <b>Biểu đồ "khẩu nào nét nhất" là hình dạng chung</b>
+      <p>Nó mô tả xu hướng của ống kính zoom phổ thông, không phải số đo trên chính cái 14–42mm của bạn. Lens của bạn còn có mềm góc ở 14mm và viền tím ở vùng tương phản cao mà tôi không đề cập.</p>
+      <p class="risk"><span>Hậu quả</span>Bạn tin f/5.6 là đỉnh ở mọi tiêu cự. Ở 42mm điểm ngọt có thể lệch.</p>
+    </div>
+  </div>
+
+  <!-- ===== GAPS ===== -->
+  <h2>Ba lỗ hổng, xếp theo số ảnh bị hỏng</h2>
+  <p class="lead">Không xếp theo độ khó hay độ thú vị. Xếp theo cái nào làm bạn mất ảnh nhiều nhất.</p>
+
+  <div class="gap">
+    <div class="hd"><span class="rank">1</span><h3>Lấy nét</h3><span class="tag">chưa dạy · 0%</span></div>
+    <p>Ảnh sai màu còn sửa được. Ảnh sai sáng còn kéo lại được đôi chút. Ảnh trượt nét thì hỏng vĩnh viễn — không recipe nào cứu.</p>
+    <ul>
+      <li>E-M10 II lấy nét bằng contrast-detect: rất chính xác khi vật đứng yên, đuối khi vật lại gần hoặc ra xa.</li>
+      <li>Mặc định máy hay để vùng AF rộng và tự chọn điểm — nó sẽ bắt cành lá gần nhất thay vì chủ thể của bạn.</li>
+      <li>Kỹ thuật khoá nét rồi bố cục lại có sai số, và sai số đó lớn dần khi khẩu mở và chủ thể ở gần.</li>
+      <li>Máy có focus peaking cho lấy nét tay — công cụ tốt nhất cho cận cảnh hoa lá mà bạn chưa từng nghe tôi nhắc.</li>
+    </ul>
+  </div>
+
+  <div class="gap">
+    <div class="hd"><span class="rank">2</span><h3>Ánh sáng thật và thời điểm</h3><span class="tag">chưa dạy · 10%</span></div>
+    <p>Tôi dạy bạn điều khiển máy trong một loại ánh sáng cho sẵn. Chưa nói gì về chọn loại ánh sáng nào để đứng vào.</p>
+    <ul>
+      <li>Hướng sáng — ngược, xiên, thuận — quyết định hình khối của ảnh nhiều hơn mọi tham số cộng lại.</li>
+      <li>Nắng lốm đốm qua tán lá là kẻ thù: khoảng cách sáng-tối vượt xa khả năng sensor. Giải pháp không nằm ở setting mà ở chờ mây hoặc đổi hướng đứng.</li>
+      <li>Trời âm u trong rừng thường cho ảnh đẹp hơn trời nắng gắt — điều ngược với trực giác của hầu hết người mới.</li>
+    </ul>
+  </div>
+
+  <div class="gap">
+    <div class="hd"><span class="rank">3</span><h3>Bố cục</h3><span class="tag">chưa dạy · 0%</span></div>
+    <p>Setting đúng hoàn toàn vẫn có thể ra ảnh không ai muốn nhìn. Đây là vùng tôi im lặng suốt năm trang.</p>
+    <ul>
+      <li>Trong rừng, vấn đề bố cục điển hình là khung ảnh lộn xộn không có điểm nghỉ mắt.</li>
+      <li>Tiêu cự 42mm có tác dụng dọn khung mạnh hơn bạn nghĩ — nó là công cụ bố cục, không chỉ là công cụ kéo gần.</li>
+    </ul>
+  </div>
+
+  <!-- ===== CONDITIONAL ===== -->
+  <h2>Hai khuyến nghị có điều kiện</h2>
+  <p class="lead">Có điều kiện, không phải phán quyết. Điều kiện quan trọng hơn khuyến nghị.</p>
+
+  <div class="cond">
+    <div class="c">
+      <h3>Bật RAW+JPEG</h3>
+      <p class="yes">Nếu bạn thường xuyên có cả tán rừng tối và mảng trời sáng trong cùng khung. Đó đúng là chỗ JPEG vứt dữ liệu đi nhiều nhất, và RAW là bảo hiểm cho khoảng 5% ảnh khó.</p>
+      <p class="no">Nếu bạn chưa có ý định học hậu kỳ. File RAW không tự sửa gì cả — không mở ra thì nó chỉ là thẻ nhớ đầy nhanh gấp năm lần.</p>
+    </div>
+    <div class="c">
+      <h3>Mua một lens khẩu lớn</h3>
+      <p class="yes">Nếu sổ chụp của bạn cho thấy trên 30% ảnh hỏng vì thiếu sáng hoặc ISO quá cao. Một lens f/1.8 cho thêm khoảng 2,5 stop — đúng cái bạn thiếu dưới tán rừng.</p>
+      <p class="no">Trước khi có con số đó. Mua đồ trước khi có dữ liệu là cách né việc phải luyện, và nó luôn cảm thấy giống như tiến bộ.</p>
+    </div>
+  </div>
+
+  <!-- ===== ASSIGNMENT ===== -->
+  <h2>Việc phải làm trước khi đọc thêm bất cứ thứ gì</h2>
+
+  <div class="asg">
+    <div class="t">20 phút · không cần đi rừng</div>
+    <h3>Bài tập lấy nét</h3>
+    <p>Nhắm đúng lỗ hổng số 1. Ban công, công viên, quán cà phê có cây đều được.</p>
+    <ol>
+      <li>Chọn một cành lá hoặc bông hoa, phía sau có nền ở xa. Đặt máy <code>A · f/5.6 · 42mm</code>.</li>
+      <li>Chụp kiểu <b>A</b>: đặt điểm AF đơn đúng lên chiếc lá bạn muốn nét, bấm.</li>
+      <li>Chụp kiểu <b>B</b>: lấy nét ở giữa khung, giữ nửa cò, xoay máy bố cục lại, bấm.</li>
+      <li>Chụp kiểu <b>C</b>: chuyển sang lấy nét tay, bật focus peaking, tự xoay tới khi viền lá sáng lên.</li>
+      <li>Xem lại cả ba trên màn hình lớn, phóng 100%. Chỉ trả lời một câu: <b>cách nào trượt, và trượt về phía trước hay phía sau?</b></li>
+    </ol>
+    <div class="end">Câu trả lời đó là dữ liệu vào buổi học tiếp theo. Mang về, mình mổ cơ chế tại sao.</div>
+  </div>
+
+  <!-- ===== LOG ===== -->
+  <h2>Sổ chụp — vòng phản hồi bạn đang thiếu</h2>
+  <p class="lead">Năm trang vừa rồi toàn là đầu vào. Bạn chưa có cách nào đo xem mình có khá lên không. Chấm 20 ảnh gần nhất, mỗi ảnh ba tiêu chí.</p>
+
+  <div class="card log">
+    <div class="lgrid" id="grid">
+      <div class="hd">#</div><div class="hd">Nét</div><div class="hd">Sáng</div><div class="hd">Màu</div>
+    </div>
+
+    <div class="tally">
+      <div><b id="tF">0</b><span>Trượt nét</span></div>
+      <div><b id="tE">0</b><span>Sai sáng</span></div>
+      <div><b id="tC">0</b><span>Sai màu</span></div>
+    </div>
+
+    <div class="diag" id="diag">Bấm vào các ô để chấm. Mỗi ô bấm lần một là đạt, lần hai là hỏng, lần ba là bỏ trống.</div>
+
+    <div class="btnrow">
+      <button class="btn" id="reset">Xoá hết</button>
+      <button class="btn" id="exp">Xuất thành dòng chữ</button>
+    </div>
+    <div class="diag" id="out" style="display:none;font-family:var(--mono);font-size:12.5px"></div>
+  </div>
+
+  <p class="note">
+    Bảng chấm này chỉ giữ trong phiên đang mở — đóng tab là mất. Cố ý như vậy: sổ chụp thật nên nằm trong
+    một file của bạn, không nằm trong một trang tôi dựng.
+    Các con số phần trăm ở bản đồ phủ sóng là ước lượng của tôi về chính công việc của mình, không phải phép đo.
+  </p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var N=20, cols=["f","e","c"], data=[];
+  for(var i=0;i<N;i++) data.push({f:null,e:null,c:null});
+
+  var grid=$("grid");
+  function label(v){ return v===1?"✓":(v===0?"✕":"·"); }
+
+  for(var r=0;r<N;r++){
+    var idx=document.createElement("div");
+    idx.className="idx"; idx.textContent=(r+1);
+    grid.appendChild(idx);
+    for(var c=0;c<3;c++){
+      var b=document.createElement("button");
+      b.className="tg"; b.textContent="·";
+      b.setAttribute("data-r",r); b.setAttribute("data-c",cols[c]);
+      b.setAttribute("aria-label","Ảnh "+(r+1)+" — "+["nét","sáng","màu"][c]);
+      grid.appendChild(b);
+    }
+  }
+
+  grid.addEventListener("click",function(e){
+    var b=e.target;
+    if(!b.classList||!b.classList.contains("tg")) return;
+    var r=+b.getAttribute("data-r"), c=b.getAttribute("data-c");
+    var v=data[r][c];
+    data[r][c]=(v===null)?1:(v===1?0:null);
+    if(data[r][c]===null) b.removeAttribute("data-on");
+    else b.setAttribute("data-on",String(data[r][c]));
+    b.textContent=label(data[r][c]);
+    tally();
+  });
+
+  function tally(){
+    var f=0,e=0,c=0,total=0;
+    data.forEach(function(row){
+      if(row.f===0)f++; if(row.e===0)e++; if(row.c===0)c++;
+      if(row.f!==null||row.e!==null||row.c!==null) total++;
+    });
+    $("tF").textContent=f; $("tE").textContent=e; $("tC").textContent=c;
+
+    var d=$("diag");
+    if(total<5){ d.textContent="Chấm ít nhất 5 ảnh thì con số mới nói được gì."; return; }
+    var mx=Math.max(f,e,c);
+    if(mx===0){ d.textContent="Không có lỗi nào lặp lại. Nâng độ khó: chụp trong điều kiện sáng tệ hơn, hoặc chủ thể chuyển động."; return; }
+    if(f===mx) d.innerHTML="<b>Lỗi lặp nhiều nhất: trượt nét.</b> Đây đúng là vùng chưa được dạy. Làm bài tập lấy nét ở trên trước khi đụng tới màu.";
+    else if(e===mx) d.innerHTML="<b>Lỗi lặp nhiều nhất: sai sáng.</b> Kiểm tra bạn có đang dùng bù sáng không, và cảnh có mảng trời trong khung không. Quay lại phần phơi sáng.";
+    else d.innerHTML="<b>Lỗi lặp nhiều nhất: sai màu.</b> Kiểm tra ám màu nằm trên trục nào trước khi chỉnh. Quay lại phần trục A–B / G–M.";
+  }
+
+  $("reset").addEventListener("click",function(){
+    data.forEach(function(row){row.f=null;row.e=null;row.c=null;});
+    Array.prototype.forEach.call(document.querySelectorAll(".tg"),function(b){
+      b.removeAttribute("data-on"); b.textContent="·";
+    });
+    $("out").style.display="none";
+    tally();
+  });
+
+  $("exp").addEventListener("click",function(){
+    var lines=[];
+    data.forEach(function(row,i){
+      if(row.f===null&&row.e===null&&row.c===null) return;
+      lines.push((i+1)+": nét "+label(row.f)+"  sáng "+label(row.e)+"  màu "+label(row.c));
+    });
+    var o=$("out");
+    o.style.display="block";
+    o.textContent=lines.length?lines.join("\n"):"Chưa chấm ảnh nào.";
+    o.style.whiteSpace="pre-wrap";
+  });
+
+  tally();
+})();
+</script>
+</body>
+</html>

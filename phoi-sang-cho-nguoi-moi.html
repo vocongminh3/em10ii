@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phơi sáng — ba cái van ánh sáng</title>
+<style>
+  :root{
+    --bg:#151310; --card:#1F1B17; --card2:#2A241E; --line:#372F27;
+    --ink:#F4EEE4; --dim:#A3978A;
+    --hot:#FFC53D; --cool:#6FB7C9; --red:#E0574A; --ok:#7FC08A;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1060px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(30px,7vw,52px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  h1 em{font-style:normal;color:var(--hot)}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:540px}
+
+  h2{font-size:clamp(20px,3.6vw,27px);font-weight:800;letter-spacing:-.02em;
+     margin:54px 0 4px;display:flex;align-items:center;gap:10px}
+  h2 .dot{width:14px;height:14px;border-radius:50%;flex:none}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:640px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- hero ---------- */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;padding:18px}
+  @media(max-width:780px){.hero{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:220/150;background:#0A0F0C}
+  .layer{position:absolute;inset:0}
+  .layer svg{display:block;width:100%;height:100%}
+  .grain{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .wash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
+
+  /* ---------- meter ---------- */
+  .meter{margin-top:14px;background:var(--card2);border:1px solid var(--line);
+         border-radius:14px;padding:12px 14px}
+  .scale{position:relative;height:34px}
+  .ticks{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:flex-end}
+  .ticks span{font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .rail{position:absolute;left:0;right:0;top:13px;height:4px;border-radius:99px;
+        background:linear-gradient(90deg,#25303A,#3A342B,var(--hot),#3A342B,#25303A)}
+  .needle{position:absolute;top:4px;width:4px;height:22px;border-radius:99px;background:var(--ink);
+          transform:translateX(-2px);transition:left .12s ease}
+  .verdict{font-family:var(--mono);font-size:19px;margin-top:6px}
+
+  .readout{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+  .tile{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px 11px}
+  .tile b{display:block;font-family:var(--mono);font-size:19px;line-height:1.2}
+  .tile span{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+  .tile.a b{color:var(--cool)} .tile.s b{color:var(--hot)} .tile.i b{color:#D8A0E0}
+
+  .ctl{margin:14px 0 2px}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline}
+  .ctl .top b{font-size:14.5px}
+  .ctl .top i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--dim)}
+  input[type=range]{width:100%;height:26px}
+  #sA{accent-color:var(--cool)} #sS{accent-color:var(--hot)} #sI{accent-color:#D8A0E0}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--hot);outline-offset:3px}
+
+  .warns{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;min-height:30px}
+  .warn{font-family:var(--mono);font-size:12px;padding:5px 11px;border-radius:99px;
+        background:#3A2320;color:#F0A79C;border:1px solid #59332D}
+  .warn.good{background:#22331F;color:var(--ok);border-color:#31492D}
+
+  /* ---------- ladder ---------- */
+  .ladder{display:flex;gap:8px;padding:16px;overflow-x:auto;align-items:flex-end}
+  .ladder div{flex:1;min-width:52px;text-align:center}
+  .ladder i{display:block;border-radius:10px;background:var(--hot);margin-bottom:7px}
+  .ladder span{font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+
+  /* ---------- three ---------- */
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .three .card{padding:15px}
+  .three h3{margin:11px 2px 3px;font-size:17px}
+  .three p{margin:0 2px;color:var(--dim);font-size:13.5px}
+  .three .side{font-family:var(--mono);font-size:12px;margin-top:9px;display:inline-block;
+               padding:4px 10px;border-radius:99px;background:var(--card2);color:var(--ink)}
+
+  .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .mode{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+  .mode b{font-family:var(--mono);font-size:26px;display:block;color:var(--hot)}
+  .mode strong{display:block;font-size:14.5px;margin:4px 0 2px}
+  .mode p{margin:0;color:var(--dim);font-size:13px}
+  .mode.pick{border-color:var(--hot)}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:660px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Phần 3 · sau ống kính 14–42mm</p>
+  <h1>Ba cái <em>van</em> ánh sáng</h1>
+  <p class="sub">Ảnh sáng hay tối do đúng ba thứ. Mỗi thứ đều làm sáng được — nhưng mỗi thứ kèm một cái giá.</p>
+
+  <!-- ===== HERO ===== -->
+  <div class="card hero">
+    <div>
+      <div class="view" id="view">
+        <div class="layer" id="bgL"><svg viewBox="0 0 220 150"><use href="#exBg"/></svg></div>
+        <div class="layer" id="wL"><svg viewBox="0 0 220 150"><use href="#exWater"/></svg></div>
+        <div class="layer"><svg viewBox="0 0 220 150"><use href="#exFg"/></svg></div>
+        <div class="wash" id="wash"></div>
+        <div class="grain" id="grain"></div>
+      </div>
+
+      <div class="meter">
+        <div class="scale">
+          <div class="rail"></div>
+          <div class="needle" id="needle" style="left:50%"></div>
+          <div class="ticks"><span>−3</span><span>−2</span><span>−1</span><span>0</span><span>+1</span><span>+2</span><span>+3</span></div>
+        </div>
+        <div class="verdict" id="verdict">Vừa đủ sáng</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="readout">
+        <div class="tile a"><b id="rA">f/5.6</b><span>Khẩu</span></div>
+        <div class="tile s"><b id="rS">1/125</b><span>Tốc độ</span></div>
+        <div class="tile i"><b id="rI">200</b><span>ISO</span></div>
+      </div>
+
+      <div class="ctl">
+        <div class="top"><b>Khẩu độ — lỗ to hay nhỏ</b><i id="lA">f/5.6</i></div>
+        <input type="range" id="sA" min="0" max="12" step="1" value="0" aria-label="Khẩu độ">
+      </div>
+
+      <div class="ctl">
+        <div class="top"><b>Tốc độ — cửa mở lâu hay mau</b><i id="lS">1/125</i></div>
+        <input type="range" id="sS" min="0" max="11" step="1" value="6" aria-label="Tốc độ">
+      </div>
+
+      <div class="ctl">
+        <div class="top"><b>ISO — máy khuếch đại thêm</b><i id="lI">200</i></div>
+        <input type="range" id="sI" min="0" max="6" step="1" value="0" aria-label="ISO">
+      </div>
+
+      <div class="warns" id="warns"></div>
+
+      <p class="lead" style="font-size:13px;margin:14px 0 0">
+        Cảnh: trong rừng, nắng lọt qua tán lá. Ống kính để ở 42mm.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== MỘT STOP ===== -->
+  <h2><span class="dot" style="background:var(--hot)"></span>Một "stop" là gì?</h2>
+  <p class="lead">Một stop = gấp đôi ánh sáng, hoặc còn một nửa. Ba cái van đều đo bằng đơn vị này, nên chúng đổi được cho nhau.</p>
+
+  <div class="card ladder">
+    <div><i style="height:6px"></i><span>−3</span></div>
+    <div><i style="height:12px"></i><span>−2</span></div>
+    <div><i style="height:24px"></i><span>−1</span></div>
+    <div><i style="height:48px"></i><span>0</span></div>
+    <div><i style="height:96px"></i><span>+1</span></div>
+    <div><i style="height:144px"></i><span>+2</span></div>
+  </div>
+  <p class="lead" style="margin-top:12px">
+    Khép khẩu 1 stop → mở tốc chậm 1 stop, ảnh sáng như cũ. Đổi qua đổi lại được.
+  </p>
+
+  <!-- ===== BA CÁI GIÁ ===== -->
+  <h2><span class="dot" style="background:var(--cool)"></span>Cái giá của mỗi van</h2>
+  <p class="lead">Ba cái đều làm ảnh sáng lên. Nhưng chúng để lại ba dấu vết khác nhau.</p>
+
+  <div class="three">
+    <div class="card">
+      <svg viewBox="0 0 220 130" style="width:100%;border-radius:12px"><use href="#cA"/></svg>
+      <h3>Mở khẩu</h3>
+      <p>Lỗ to, sáng vào nhiều hơn.</p>
+      <span class="side">Phông mờ đi</span>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 220 130" style="width:100%;border-radius:12px"><use href="#cS"/></svg>
+      <h3>Chậm tốc độ</h3>
+      <p>Cửa mở lâu hơn, hứng nhiều sáng hơn.</p>
+      <span class="side">Thứ gì động sẽ nhoè</span>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 220 130" style="width:100%;border-radius:12px"><use href="#cI"/></svg>
+      <h3>Tăng ISO</h3>
+      <p>Máy vặn to tín hiệu lên.</p>
+      <span class="side">Ảnh nổi hạt, bệt màu</span>
+    </div>
+  </div>
+
+  <!-- ===== NÚM XOAY ===== -->
+  <h2><span class="dot" style="background:#D8A0E0"></span>Trên máy vặn núm nào?</h2>
+  <p class="lead">Bốn chữ trên bánh xe. Bạn chỉ cần hai.</p>
+
+  <div class="modes">
+    <div class="mode pick"><b>A</b><strong>Bạn chọn khẩu</strong><p>Máy tự lo tốc độ. Dùng cái này 90% thời gian.</p></div>
+    <div class="mode pick"><b>S</b><strong>Bạn chọn tốc độ</strong><p>Khi cần đóng băng, hoặc cố tình cho nước mượt.</p></div>
+    <div class="mode"><b>P</b><strong>Máy chọn cả hai</strong><p>Nhanh, nhưng bạn mất quyền quyết định.</p></div>
+    <div class="mode"><b>M</b><strong>Bạn chọn tất</strong><p>Để sau. Chỉ cần khi ánh sáng không đổi.</p></div>
+  </div>
+
+  <!-- ===== BÙ SÁNG ===== -->
+  <h2><span class="dot" style="background:var(--red)"></span>Nút quan trọng nhất</h2>
+  <p class="lead">Máy đo sáng bằng cách đoán mọi thứ đều xam xám. Gặp cảnh quá trắng hoặc quá đen là nó đoán sai.</p>
+
+  <div class="three">
+    <div class="card">
+      <svg viewBox="0 0 220 130" style="width:100%;border-radius:12px"><use href="#evPlus"/></svg>
+      <h3>Cảnh trắng nhiều</h3>
+      <p>Sương mù, trời sáng, đá vôi. Máy làm ảnh xám xịt.</p>
+      <span class="side" style="color:var(--hot)">Bù +0.3 đến +1</span>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 220 130" style="width:100%;border-radius:12px"><use href="#evMinus"/></svg>
+      <h3>Cảnh tối nhiều</h3>
+      <p>Trong rừng rậm, bóng đổ. Máy làm ảnh sáng bệch.</p>
+      <span class="side" style="color:var(--cool)">Bù −0.3 đến −1</span>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 220 130" style="width:100%;border-radius:12px"><use href="#evSky"/></svg>
+      <h3>Có trời trong khung</h3>
+      <p>Trời cháy trắng thì mất luôn, không cứu được.</p>
+      <span class="side" style="color:var(--cool)">Bù −0.3, ưu tiên giữ trời</span>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:14px">Trên E-M10 II: xoay <b>vòng sau</b> khi đang ngắm. Con số ±nhảy ngay trong khung.</p>
+
+  <!-- ===== CHEAT SHEET ===== -->
+  <h2><span class="dot" style="background:var(--ok)"></span>Ba tình huống đi rừng</h2>
+  <p class="lead">Đặt sẵn, khỏi nghĩ.</p>
+
+  <div class="three">
+    <div class="card">
+      <h3 style="margin-top:0">Dưới tán rừng, thiếu sáng</h3>
+      <p style="font-family:var(--mono);font-size:13.5px;color:var(--ink);margin-top:8px">
+        A · f/5.6 · ISO Auto (trần 3200)</p>
+      <p style="margin-top:8px">Canh tốc độ đừng chậm hơn 1/60.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Trên đỉnh, nắng gắt</h3>
+      <p style="font-family:var(--mono);font-size:13.5px;color:var(--ink);margin-top:8px">
+        A · f/8 · ISO 200 · bù −0.3</p>
+      <p style="margin-top:8px">Khép −0.3 để giữ chi tiết trên trời.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Suối, muốn nước mượt</h3>
+      <p style="font-family:var(--mono);font-size:13.5px;color:var(--ink);margin-top:8px">
+        S · 1/4 giây · ISO 200</p>
+      <p style="margin-top:8px">Đặt máy lên đá. Cầm tay là hỏng.</p>
+    </div>
+  </div>
+
+  <p class="note">
+    Khung ảnh là hình vẽ mô phỏng — đúng hướng thay đổi, không đúng mức chính xác.
+    Cảnh mẫu được giả định ở EV 11 (rừng có nắng lọt), nên bộ số "vừa đủ" ở đây không phải bộ số đúng cho mọi cảnh.
+    Máy có chống rung trong thân nên thực tế bạn cầm tay chậm hơn cảnh báo vài nấc vẫn nét.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="canopy" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#9FCFA4"/><stop offset="1" stop-color="#2E5638"/>
+  </linearGradient>
+  <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EAF6FA"/><stop offset="1" stop-color="#A9D4E2"/>
+  </linearGradient>
+
+  <filter id="mb" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur id="mbB" stdDeviation="0 0"/>
+  </filter>
+
+  <symbol id="exBg" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#canopy)"/>
+    <g fill="#24472F">
+      <rect x="8" y="10" width="13" height="120" rx="3"/>
+      <rect x="38" y="0" width="10" height="132" rx="3"/>
+      <rect x="186" y="6" width="14" height="126" rx="3"/>
+      <rect x="164" y="0" width="9" height="120" rx="3"/>
+    </g>
+    <g fill="#3C7A4B" opacity=".9">
+      <ellipse cx="30" cy="26" rx="34" ry="16"/><ellipse cx="190" cy="20" rx="38" ry="17"/>
+      <ellipse cx="110" cy="12" rx="42" ry="15"/>
+    </g>
+    <g fill="#FFE9A8" opacity=".55">
+      <ellipse cx="72" cy="44" rx="15" ry="7"/><ellipse cx="148" cy="36" rx="11" ry="6"/>
+    </g>
+    <rect x="70" y="0" width="80" height="150" fill="#2F5C3C" opacity=".35"/>
+  </symbol>
+
+  <symbol id="exWater" viewBox="0 0 220 150">
+    <path d="M84,4 L136,4 L128,104 L92,104 Z" fill="url(#wg)" opacity=".92"/>
+    <g stroke="#FFFFFF" stroke-width="2.4" opacity=".75" stroke-linecap="round">
+      <path d="M96,10 L94,98"/><path d="M108,6 L107,100"/><path d="M120,12 L122,96"/>
+      <path d="M102,20 L101,86"/><path d="M115,24 L116,90"/>
+    </g>
+    <ellipse cx="110" cy="106" rx="26" ry="7" fill="#DDF0F6" opacity=".85"/>
+  </symbol>
+
+  <symbol id="exFg" viewBox="0 0 220 150">
+    <path d="M0,150 L0,120 Q40,108 78,118 Q110,126 150,114 Q190,104 220,116 L220,150 Z" fill="#22402C"/>
+    <ellipse cx="110" cy="124" rx="46" ry="10" fill="#3A6B7A" opacity=".65"/>
+    <g fill="#4A4038">
+      <ellipse cx="46" cy="126" rx="22" ry="11"/><ellipse cx="176" cy="122" rx="19" ry="10"/>
+    </g>
+    <g stroke="#1B3324" stroke-width="2.6" fill="none" stroke-linecap="round">
+      <path d="M18,150 C22,132 14,126 20,116"/><path d="M20,124 C12,122 8,116 10,112"/>
+      <path d="M20,132 C30,130 34,124 33,120"/>
+    </g>
+    <g stroke="#1B3324" stroke-width="2.6" fill="none" stroke-linecap="round">
+      <path d="M204,150 C200,134 208,128 202,118"/><path d="M202,126 C210,124 214,118 212,114"/>
+    </g>
+  </symbol>
+
+  <!-- ba cái giá -->
+  <symbol id="cA" viewBox="0 0 220 130">
+    <rect width="220" height="130" fill="#2A241E"/>
+    <g filter="url(#softb)"><circle cx="58" cy="44" r="16" fill="#6FB7C9" opacity=".55"/>
+      <circle cx="96" cy="34" r="12" fill="#6FB7C9" opacity=".4"/>
+      <circle cx="150" cy="46" r="18" fill="#6FB7C9" opacity=".45"/></g>
+    <g transform="translate(110,84)">
+      <circle cx="0" cy="-12" r="10" fill="#E0574A"/><circle cx="11.4" cy="-3.7" r="10" fill="#E0574A"/>
+      <circle cx="7" cy="9.7" r="10" fill="#E0574A"/><circle cx="-7" cy="9.7" r="10" fill="#E0574A"/>
+      <circle cx="-11.4" cy="-3.7" r="10" fill="#E0574A"/><circle r="6.5" fill="#FFC53D"/>
+    </g>
+  </symbol>
+
+  <symbol id="cS" viewBox="0 0 220 130">
+    <rect width="220" height="130" fill="#2A241E"/>
+    <g stroke="#FFC53D" stroke-width="5" stroke-linecap="round" opacity=".8">
+      <path d="M36,40 L150,40"/><path d="M52,66 L176,66"/><path d="M30,92 L138,92"/>
+    </g>
+    <circle cx="168" cy="92" r="13" fill="#FFC53D" opacity=".35"/>
+    <circle cx="182" cy="92" r="13" fill="#FFC53D" opacity=".55"/>
+    <circle cx="196" cy="92" r="13" fill="#FFC53D"/>
+  </symbol>
+
+  <symbol id="cI" viewBox="0 0 220 130">
+    <rect width="220" height="130" fill="#2A241E"/>
+    <g fill="#D8A0E0">
+      <rect x="24" y="80" width="26" height="26" rx="5" opacity=".25"/>
+      <rect x="58" y="66" width="26" height="40" rx="5" opacity=".4"/>
+      <rect x="92" y="50" width="26" height="56" rx="5" opacity=".6"/>
+      <rect x="126" y="34" width="26" height="72" rx="5" opacity=".8"/>
+      <rect x="160" y="20" width="26" height="86" rx="5"/>
+    </g>
+    <g fill="#F4EEE4" opacity=".5">
+      <circle cx="170" cy="40" r="2"/><circle cx="178" cy="58" r="1.6"/><circle cx="164" cy="70" r="2.2"/>
+      <circle cx="182" cy="84" r="1.8"/><circle cx="136" cy="52" r="1.6"/><circle cx="146" cy="76" r="2"/>
+    </g>
+  </symbol>
+
+  <!-- bù sáng -->
+  <symbol id="evPlus" viewBox="0 0 220 130">
+    <rect width="220" height="130" fill="#DFE7EA"/>
+    <ellipse cx="70" cy="60" rx="52" ry="24" fill="#F4F8F9"/>
+    <ellipse cx="150" cy="78" rx="46" ry="20" fill="#EDF3F5"/>
+    <g stroke="#4A4038" stroke-width="3" fill="none"><path d="M20,106 L200,106"/></g>
+    <text x="14" y="34" font-family="ui-monospace,monospace" font-size="26" fill="#B08419">+1</text>
+  </symbol>
+
+  <symbol id="evMinus" viewBox="0 0 220 130">
+    <rect width="220" height="130" fill="#1B2E22"/>
+    <g fill="#12211A"><rect x="16" y="14" width="20" height="102" rx="4"/>
+      <rect x="60" y="6" width="16" height="110" rx="4"/><rect x="180" y="10" width="22" height="106" rx="4"/></g>
+    <ellipse cx="120" cy="40" rx="46" ry="18" fill="#2C4A34"/>
+    <text x="150" y="34" font-family="ui-monospace,monospace" font-size="26" fill="#8FD1DE">−1</text>
+  </symbol>
+
+  <symbol id="evSky" viewBox="0 0 220 130">
+    <rect width="220" height="130" fill="#8FC7E0"/>
+    <rect y="70" width="220" height="60" fill="#2F5C3C"/>
+    <circle cx="176" cy="30" r="16" fill="#FFF6D6"/>
+    <polygon points="20,70 62,30 104,70" fill="#5D7C8C"/>
+    <text x="14" y="34" font-family="ui-monospace,monospace" font-size="24" fill="#12303F">−0.3</text>
+  </symbol>
+
+  <filter id="softb"><feGaussianBlur stdDeviation="4"/></filter>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+
+  var AP=[5.6,6.3,7.1,8,9,10,11,13,14,16,18,20,22];
+  var SH=[["1/4",0.25],["1/8",0.125],["1/15",1/15],["1/30",1/30],["1/60",1/60],
+          ["1/125",1/125],["1/250",1/250],["1/500",1/500],["1/1000",1/1000],
+          ["1/2000",1/2000],["1/4000",1/4000],["1/2",0.5]];
+  /* sắp lại theo thứ tự chậm -> nhanh */
+  SH=[["1/2",0.5],["1/4",0.25],["1/8",0.125],["1/15",1/15],["1/30",1/30],["1/60",1/60],
+      ["1/125",1/125],["1/250",1/250],["1/500",1/500],["1/1000",1/1000],
+      ["1/2000",1/2000],["1/4000",1/4000]];
+  var ISO=[200,400,800,1600,3200,6400,12800];
+
+  var EV_SCENE=11;      /* rừng có nắng lọt */
+  var FOCAL=42;         /* ống kính để hết tele */
+
+  var $=function(id){return document.getElementById(id);};
+  var sA=$("sA"), sS=$("sS"), sI=$("sI");
+
+  function render(){
+    var N=AP[+sA.value], t=SH[+sS.value][1], tLabel=SH[+sS.value][0], iso=ISO[+sI.value];
+
+    /* EV của bộ số đang đặt, quy về ISO 100 */
+    var evSet=Math.log(N*N/t)/Math.LN2 - Math.log(iso/100)/Math.LN2;
+    var d=EV_SCENE-evSet;               /* d>0: thiếu sáng, d<0: thừa sáng */
+
+    /* độ sáng ảnh */
+    var br=Math.pow(2,-d*0.55);
+    br=Math.max(0.22,Math.min(3.2,br));
+    $("view").style.filter="brightness("+br.toFixed(3)+")";
+    $("wash").style.opacity=d<-0.5?Math.min(0.5,(-d-0.5)*0.22).toFixed(2):0;
+
+    /* phông mờ theo khẩu, ở 42mm */
+    var bl=(FOCAL*FOCAL/N)/63;
+    $("bgL").style.filter="blur("+bl.toFixed(2)+"px)";
+
+    /* nước nhoè theo tốc độ */
+    var mb=Math.max(0,Math.min(14,Math.log(t*500)/Math.LN2*1.6));
+    document.getElementById("mbB").setAttribute("stdDeviation","0 "+mb.toFixed(2));
+    $("wL").style.filter=mb>0.05?"url(#mb)":"none";
+
+    /* hạt theo ISO */
+    $("grain").style.opacity=(Math.log(iso/200)/Math.LN2*0.11).toFixed(3);
+
+    /* kim đo sáng */
+    var pos=Math.max(-3,Math.min(3,-d));
+    $("needle").style.left=((pos+3)/6*100)+"%";
+
+    var v=$("verdict");
+    if(Math.abs(d)<0.4){ v.textContent="Vừa đủ sáng"; v.style.color="var(--ok)"; }
+    else if(d>0){ v.textContent="Tối "+d.toFixed(1)+" stop"; v.style.color="var(--cool)"; }
+    else { v.textContent="Cháy "+(-d).toFixed(1)+" stop"; v.style.color="var(--red)"; }
+
+    $("rA").textContent="f/"+(N%1===0?N:N.toFixed(1));
+    $("lA").textContent=$("rA").textContent;
+    $("rS").textContent=tLabel; $("lS").textContent=tLabel;
+    $("rI").textContent=iso;    $("lI").textContent=iso;
+
+    /* cảnh báo */
+    var w=[];
+    if(t>1/(2*FOCAL)) w.push("Cầm tay sẽ rung ở "+tLabel);
+    if(iso>=3200) w.push("ISO "+iso+" — hạt rõ");
+    if(N>=13) w.push("f/"+N+" — khép quá, ảnh mềm đi");
+    if(mb>4) w.push("Nước thành dải mượt");
+    if(!w.length) w.push("Bộ số an toàn");
+    $("warns").innerHTML=w.map(function(x,i){
+      return '<span class="warn'+(w.length===1&&i===0?" good":"")+'">'+x+'</span>';
+    }).join("");
+  }
+
+  sA.addEventListener("input",render);
+  sS.addEventListener("input",render);
+  sI.addEventListener("input",render);
+  render();
+})();
+</script>
+</body>
+</html>

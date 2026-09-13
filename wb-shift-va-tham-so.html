@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trục A–B / G–M và bộ tham số Picture Mode</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  h1 .a{color:var(--amber)} h1 .b{color:var(--blue)}
+  h1 .g{color:var(--green)} h1 .m{color:var(--mag)}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:560px}
+
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:660px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- lab ---------- */
+  .lab{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;padding:20px}
+  @media(max-width:860px){.lab{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .view svg{display:block;width:100%;height:100%}
+  .tint{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply}
+
+  .scenes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .recipe{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;
+          padding:12px 14px;font-family:var(--mono);font-size:13.5px;word-break:break-word}
+  .recipe b{display:block;font-family:var(--disp);font-size:11px;letter-spacing:.09em;
+            text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+  .copy{margin-top:9px;border:1px solid var(--line);background:#fff;border-radius:99px;
+        padding:6px 14px;font-size:12.5px;cursor:pointer;font-family:var(--disp)}
+
+  /* ---------- pad ---------- */
+  .pad{position:relative;width:100%;max-width:330px;aspect-ratio:1;margin:0 auto;
+       border-radius:16px;overflow:hidden;border:1px solid var(--line);cursor:crosshair;
+       background:
+         radial-gradient(circle at 50% 0%, rgba(77,168,94,.55), transparent 62%),
+         radial-gradient(circle at 50% 100%, rgba(196,85,160,.55), transparent 62%),
+         radial-gradient(circle at 100% 50%, rgba(224,160,56,.55), transparent 62%),
+         radial-gradient(circle at 0% 50%, rgba(78,127,208,.55), transparent 62%),
+         #FBFAFC;}
+  .pad .cross{position:absolute;inset:0;pointer-events:none}
+  .pad .cross i{position:absolute;background:rgba(26,21,32,.14)}
+  .pad .cross i.h{left:0;right:0;height:1px;top:50%}
+  .pad .cross i.v{top:0;bottom:0;width:1px;left:50%}
+  .knob{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;
+        border:3px solid var(--ink);transform:translate(-50%,-50%);pointer-events:none;
+        box-shadow:0 2px 6px rgba(0,0,0,.18)}
+  .padlbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;
+          color:var(--dim);max-width:330px;margin:6px auto 0}
+  .padtop{text-align:center;font-family:var(--mono);font-size:12px;color:var(--dim);margin-bottom:6px}
+
+  .axisval{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px auto 0;max-width:330px}
+  .axisval div{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
+  .axisval b{display:block;font-family:var(--mono);font-size:20px}
+  .axisval span{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
+
+  /* ---------- sliders ---------- */
+  .ctl{margin:14px 0 2px}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline}
+  .ctl .top b{font-size:14px}
+  .ctl .top i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--dim)}
+  input[type=range]{width:100%;height:26px;accent-color:var(--ink)}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+
+  /* ---------- pipeline ---------- */
+  .pipe{display:flex;gap:10px;padding:18px;overflow-x:auto;align-items:stretch}
+  .pipe .st{flex:1;min-width:132px;background:var(--paper);border:1px solid var(--line);
+            border-radius:14px;padding:11px 12px}
+  .pipe .st b{display:block;font-size:14px;margin-bottom:3px}
+  .pipe .st p{margin:0;font-size:12.5px;color:var(--dim)}
+  .pipe .st.wb{border-color:var(--amber)} .pipe .st.sat{border-color:var(--mag)}
+  .pipe .st.tone{border-color:var(--blue)} .pipe .st.shp{border-color:var(--green)}
+
+  /* ---------- tables as cards ---------- */
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1.1fr .8fr 1.4fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px}
+  .row code{font-family:var(--mono);font-size:13.5px;color:var(--ink)}
+  .row p{margin:0;font-size:13px;color:var(--dim)}
+
+  .warnrow{border-left:4px solid var(--mag)}
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:680px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Phần 4 · tinh chỉnh màu</p>
+  <h1>Trục <span class="a">A</span>–<span class="b">B</span> và <span class="g">G</span>–<span class="m">M</span></h1>
+  <p class="sub">Kelvin chỉ đi được một chiều. Ám màu nào không nằm trên chiều đó thì phải sửa bằng trục còn lại.</p>
+
+  <!-- ===== LAB ===== -->
+  <div class="card lab">
+    <div>
+      <div class="view">
+        <svg viewBox="0 0 220 150" id="scene"><use href="#forest"/></svg>
+        <div class="tint" id="cast"></div>
+        <div class="tint" id="fix"></div>
+      </div>
+
+      <div class="scenes">
+        <button class="sbtn" data-scene="forest" aria-pressed="true">Dưới tán rừng</button>
+        <button class="sbtn" data-scene="shade" aria-pressed="false">Bóng râm trời xanh</button>
+        <button class="sbtn" data-scene="neutral" aria-pressed="false">Ánh sáng chuẩn</button>
+      </div>
+
+      <div class="recipe">
+        <b>Công thức đang đặt</b>
+        <span id="rec">—</span>
+        <br><button class="copy" id="copyBtn">Sao chép</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="padtop">G +7 &nbsp;·&nbsp; xanh lá</div>
+      <div class="pad" id="pad" tabindex="0" role="slider" aria-label="Bù trừ white balance hai trục"
+           aria-valuetext="A 0, G 0">
+        <div class="cross"><i class="h"></i><i class="v"></i></div>
+        <div class="knob" id="knob" style="left:50%;top:50%"></div>
+      </div>
+      <div class="padlbl"><span>B +7 · xanh dương</span><span>amber · A +7</span></div>
+      <div class="padtop" style="margin:6px 0 0">M +7 &nbsp;·&nbsp; hồng tím</div>
+
+      <div class="axisval">
+        <div><b id="vAB">A ±0</b><span>Trục nhiệt độ</span></div>
+        <div><b id="vGM">G ±0</b><span>Trục tint</span></div>
+      </div>
+
+      <div class="ctl" style="margin-top:22px">
+        <div class="top"><b>Saturation</b><i id="lSat">±0</i></div>
+        <input type="range" id="sSat" min="-2" max="2" step="1" value="0">
+      </div>
+      <div class="ctl">
+        <div class="top"><b>Contrast</b><i id="lCon">±0</i></div>
+        <input type="range" id="sCon" min="-2" max="2" step="1" value="0">
+      </div>
+      <div class="ctl">
+        <div class="top"><b>Sharpness</b><i id="lSha">±0</i></div>
+        <input type="range" id="sSha" min="-2" max="2" step="1" value="0">
+      </div>
+
+      <p class="lead" style="font-size:13px;margin:16px 0 4px">Gradation</p>
+      <div class="chips">
+        <button class="sbtn" data-grad="normal" aria-pressed="true">Normal</button>
+        <button class="sbtn" data-grad="auto" aria-pressed="false">Auto</button>
+        <button class="sbtn" data-grad="high" aria-pressed="false">High Key</button>
+        <button class="sbtn" data-grad="low" aria-pressed="false">Low Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PIPELINE ===== -->
+  <h2>Thứ tự máy xử lý</h2>
+  <p class="lead">Cái đứng trước quyết định cái đứng sau nhận được gì. Sửa sai chỗ thì càng sửa càng hỏng.</p>
+
+  <div class="card pipe">
+    <div class="st wb"><b>1 · White Balance</b><p>A–B và G–M. Quyết định "trắng là trắng".</p></div>
+    <div class="st sat"><b>2 · Saturation</b><p>Nhân độ đậm màu. Kế thừa mọi sai lệch của bước 1.</p></div>
+    <div class="st tone"><b>3 · Tone curve</b><p>Contrast, Gradation, Highlight &amp; Shadow.</p></div>
+    <div class="st shp"><b>4 · Sharpness</b><p>Tăng tương phản viền. Khuếch đại cả noise.</p></div>
+    <div class="st"><b>5 · JPEG</b><p>Ghi ra file. Không quay lại được.</p></div>
+  </div>
+
+  <!-- ===== TỪNG THAM SỐ ===== -->
+  <h2>Bốn tham số, bốn cái giá</h2>
+  <p class="lead">Mỗi cái đều có mặt trái, và mặt trái lộ ra ở đúng loại cảnh bạn hay chụp.</p>
+
+  <div class="rows">
+    <div class="row">
+      <b>Saturation</b><code>−2 … +2</code>
+      <p>Nhân hệ số color matrix. Trong rừng, kênh xanh lá vốn mạnh nhất nên nó bệt trước tiên. Giữ ở −1 đến 0.</p>
+    </div>
+    <div class="row">
+      <b>Contrast</b><code>−2 … +2</code>
+      <p>Bẻ cả tone curve. Tác dụng phụ: làm màu trông đậm hơn dù bạn không đụng Saturation. Rừng đã tương phản cao sẵn, +1 là quá.</p>
+    </div>
+    <div class="row">
+      <b>Sharpness</b><code>−2 … +2</code>
+      <p>Unsharp mask. Cành cây trên nền trời sẽ viền trắng nếu đẩy cao. ISO trên 1600 thì hạ về −1.</p>
+    </div>
+    <div class="row">
+      <b>Gradation</b><code>Normal / Auto / High / Low</code>
+      <p>Auto là tone mapping cục bộ, không phải một nấc trên curve. Nó kéo phẳng ảnh và đánh nhau với Contrast.</p>
+    </div>
+  </div>
+
+  <h2>Những cặp cắn nhau</h2>
+  <div class="rows">
+    <div class="row warnrow">
+      <b>Contrast +2 &amp; Gradation Auto</b><code>xung đột</code>
+      <p>Một cái bẻ cong curve, một cái kéo phẳng lại. Kết quả khó đoán, khác nhau từng khung.</p>
+    </div>
+    <div class="row warnrow">
+      <b>Sharpness +2 &amp; ISO cao</b><code>xung đột</code>
+      <p>Sharpness chạy sau cùng nên nó làm nét luôn cả hạt nhiễu.</p>
+    </div>
+    <div class="row warnrow">
+      <b>Saturation +2 &amp; Contrast +2</b><code>xung đột</code>
+      <p>Cộng dồn. Lá rừng clip mất chi tiết ở kênh xanh lá trước khi bạn kịp nhận ra.</p>
+    </div>
+    <div class="row warnrow">
+      <b>Vặn Kelvin để chữa ám xanh lá</b><code>sai trục</code>
+      <p>Kelvin trượt dọc A–B. Ám xanh lá nằm trên G–M. Vặn bao nhiêu cũng không tới.</p>
+    </div>
+  </div>
+
+  <!-- ===== ĐIỂM XUẤT PHÁT ===== -->
+  <h2>Điểm xuất phát cho từng cảnh</h2>
+  <p class="lead">Không phải công thức chuẩn — là chỗ để bắt đầu rồi tự chụp thử và kéo lệch đi.</p>
+
+  <div class="rows">
+    <div class="row"><b>Rừng rậm, tán dày</b><code>CWB 5500K · A+1 M+2</code>
+      <p>Lá lọc ánh sáng thành xanh lá. M kéo ngược lại.</p></div>
+    <div class="row"><b>Rừng có sương sớm</b><code>CWB 6000K · A+2 M+1</code>
+      <p>Sương làm ánh sáng lạnh và bệt; A kéo ấm lên.</p></div>
+    <div class="row"><b>Đỉnh núi, trời xanh gắt</b><code>WB Sunny · A+2 G0</code>
+      <p>Bóng đổ nhận ánh sáng phản từ trời xanh nên ngả lạnh.</p></div>
+    <div class="row"><b>Bóng râm, chụp người</b><code>WB Shade · A+1 M+1</code>
+      <p>M+1 làm da bớt xanh xám.</p></div>
+    <div class="row"><b>Phố đêm, đèn LED</b><code>CWB 3800K · A0 M+2</code>
+      <p>LED rẻ có phổ khuyết, lệch xanh lá rất rõ.</p></div>
+  </div>
+
+  <p class="note">
+    Khung ảnh là hình vẽ mô phỏng bằng CSS — đúng hướng thay đổi, không đúng mức chính xác.
+    Mỗi bước trên trục A–B / G–M ứng với một lượng cố định trên thang mired chứ không phải Kelvin,
+    nên một bước ở 3000K và một bước ở 8000K đổi số Kelvin rất khác nhau dù cảm nhận tương đương —
+    giá trị mired cụ thể cho mỗi bước Olympus không công bố, muốn biết chính xác thì phải chụp thử và đo.
+    Trên máy, hai trục có thể hiện thành hai thanh riêng thay vì một lưới; giá trị vẫn là A±7 và G±7.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC0DF"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="canopyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8FC49A"/><stop offset="1" stop-color="#2E5638"/></linearGradient>
+
+  <symbol id="forest" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#canopyG)"/>
+    <g fill="#2A5136"><rect x="10" y="8" width="14" height="126" rx="3"/>
+      <rect x="42" y="0" width="10" height="136" rx="3"/>
+      <rect x="182" y="4" width="15" height="130" rx="3"/>
+      <rect x="158" y="0" width="9" height="124" rx="3"/></g>
+    <g fill="#438554" opacity=".9"><ellipse cx="30" cy="24" rx="36" ry="16"/>
+      <ellipse cx="188" cy="18" rx="38" ry="17"/><ellipse cx="108" cy="10" rx="44" ry="15"/></g>
+    <g fill="#FFEFBC" opacity=".5"><ellipse cx="74" cy="42" rx="16" ry="7"/>
+      <ellipse cx="146" cy="34" rx="11" ry="6"/></g>
+    <path d="M0,150 L0,116 Q44,104 84,116 Q120,126 158,112 Q194,100 220,112 L220,150 Z" fill="#24462F"/>
+    <path d="M96,150 C100,132 86,124 94,112" stroke="#C9A272" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <circle cx="40" cy="128" r="3" fill="#FF5A4A"/><circle cx="176" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="shade" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="184" cy="24" r="10" fill="#FFF3CC"/>
+    <polygon points="0,92 36,44 66,72 92,38 126,92" fill="#93ABBA"/>
+    <polygon points="92,38 103,55 82,53" fill="#F3F8FA"/>
+    <polygon points="108,92 148,42 192,92" fill="#7E9BAD"/>
+    <path d="M0,86 Q56,66 112,84 T220,77 L220,150 L0,150 Z" fill="#4A7F59"/>
+    <path d="M0,104 Q60,94 130,106 T220,100 L220,150 L0,150 Z" fill="#35624392"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <g fill="#2F5C3C"><polygon points="24,80 34,104 14,104"/><polygon points="188,76 200,104 176,104"/></g>
+    <circle cx="46" cy="128" r="3" fill="#FF5A4A"/><circle cx="170" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="neutral" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <g><rect x="14" y="14" width="38" height="38" fill="#FFFFFF"/>
+       <rect x="56" y="14" width="38" height="38" fill="#C9C9C9"/>
+       <rect x="98" y="14" width="38" height="38" fill="#8C8C8C"/>
+       <rect x="140" y="14" width="38" height="38" fill="#4A4A4A"/>
+       <rect x="182" y="14" width="24" height="38" fill="#141414"/></g>
+    <g><rect x="14" y="60" width="38" height="30" fill="#C8352C"/>
+       <rect x="56" y="60" width="38" height="30" fill="#E0A038"/>
+       <rect x="98" y="60" width="38" height="30" fill="#4DA85E"/>
+       <rect x="140" y="60" width="38" height="30" fill="#4E7FD0"/>
+       <rect x="182" y="60" width="24" height="30" fill="#C455A0"/></g>
+    <rect x="14" y="98" width="192" height="38" rx="6" fill="#E9B58E"/>
+    <text x="18" y="122" font-family="ui-monospace,monospace" font-size="13" fill="#6B5A4E">tông da</text>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  var state={ab:0, gm:0, sat:0, con:0, sha:0, grad:"normal", scene:"forest"};
+
+  /* ám màu sẵn có của từng cảnh, dưới dạng hệ số nhân RGB */
+  var CAST={
+    forest:{r:0.90,g:1.00,b:0.90},   /* ánh sáng lọc qua lá -> xanh lá */
+    shade:{r:0.90,g:0.95,b:1.00},    /* bóng râm dưới trời xanh -> lạnh */
+    neutral:{r:1,g:1,b:1}
+  };
+
+  var GRAD={normal:"",auto:"brightness(1.05) contrast(.93)",
+            high:"brightness(1.13) contrast(.82)",low:"brightness(.9) contrast(1.17)"};
+
+  /* trục A-B: A>0 ấm lên (giảm blue), B ngược lại
+     trục G-M: G>0 xanh lá lên (giảm red+blue), M ngược lại */
+  function wbMult(ab,gm){
+    var r=1,g=1,b=1;
+    if(ab>0){ g-=0.012*ab; b-=0.030*ab; }
+    else if(ab<0){ r-=0.030*(-ab); g-=0.010*(-ab); }
+    if(gm>0){ r-=0.022*gm; b-=0.022*gm; }
+    else if(gm<0){ g-=0.026*(-gm); }
+    return {r:r,g:g,b:b};
+  }
+
+  function toRGB(m){
+    var mx=Math.max(m.r,m.g,m.b);
+    return "rgb("+[m.r,m.g,m.b].map(function(v){
+      return Math.round(Math.max(0,Math.min(1,v/mx))*255);
+    }).join(",")+")";
+  }
+
+  function sign(v){return v>0?"+"+v:(v<0?""+v:"±0");}
+
+  function render(){
+    /* ám màu gốc của cảnh */
+    $("cast").style.background=toRGB(CAST[state.scene]);
+
+    /* bù trừ của người dùng */
+    $("fix").style.background=toRGB(wbMult(state.ab,state.gm));
+
+    /* các tham số picture mode, áp theo đúng thứ tự pipeline */
+    var f=[];
+    if(state.sat) f.push("saturate("+(1+state.sat*0.22).toFixed(2)+")");
+    if(state.con) f.push("contrast("+(1+state.con*0.13).toFixed(2)+")");
+    if(GRAD[state.grad]) f.push(GRAD[state.grad]);
+    if(state.sha>0) f.push("contrast("+(1+state.sha*0.05).toFixed(2)+")");
+    if(state.sha<0) f.push("blur("+(state.sha===-1?0.45:0.85)+"px)");
+    $("scene").style.filter=f.length?f.join(" "):"none";
+
+    /* nhãn */
+    $("vAB").textContent=(state.ab>=0?"A ":"B ")+sign(Math.abs(state.ab)===0?0:Math.abs(state.ab)).replace("+","+");
+    $("vAB").textContent=state.ab===0?"A ±0":(state.ab>0?"A +"+state.ab:"B +"+(-state.ab));
+    $("vGM").textContent=state.gm===0?"G ±0":(state.gm>0?"G +"+state.gm:"M +"+(-state.gm));
+    $("lSat").textContent=sign(state.sat);
+    $("lCon").textContent=sign(state.con);
+    $("lSha").textContent=sign(state.sha);
+
+    var knob=$("knob");
+    knob.style.left=((state.ab+7)/14*100)+"%";
+    knob.style.top=((7-state.gm)/14*100)+"%";
+    $("pad").setAttribute("aria-valuetext",$("vAB").textContent+", "+$("vGM").textContent);
+
+    $("rec").textContent=
+      $("vAB").textContent.replace(" ","")+" "+$("vGM").textContent.replace(" ","")
+      +" · Sat "+sign(state.sat)+" · Contrast "+sign(state.con)
+      +" · Sharp "+sign(state.sha)+" · Grad "+state.grad;
+  }
+
+  /* ---- pad kéo thả ---- */
+  var pad=$("pad"), dragging=false;
+  function setFromEvent(e){
+    var r=pad.getBoundingClientRect();
+    var cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    var cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    state.ab=Math.round(Math.max(-7,Math.min(7, cx/r.width*14-7)));
+    state.gm=Math.round(Math.max(-7,Math.min(7, 7-cy/r.height*14)));
+    render();
+  }
+  pad.addEventListener("mousedown",function(e){dragging=true;setFromEvent(e);});
+  window.addEventListener("mousemove",function(e){if(dragging)setFromEvent(e);});
+  window.addEventListener("mouseup",function(){dragging=false;});
+  pad.addEventListener("touchstart",function(e){e.preventDefault();setFromEvent(e);},{passive:false});
+  pad.addEventListener("touchmove",function(e){e.preventDefault();setFromEvent(e);},{passive:false});
+  pad.addEventListener("keydown",function(e){
+    var k=e.key, done=true;
+    if(k==="ArrowRight") state.ab=Math.min(7,state.ab+1);
+    else if(k==="ArrowLeft") state.ab=Math.max(-7,state.ab-1);
+    else if(k==="ArrowUp") state.gm=Math.min(7,state.gm+1);
+    else if(k==="ArrowDown") state.gm=Math.max(-7,state.gm-1);
+    else done=false;
+    if(done){e.preventDefault();render();}
+  });
+
+  /* ---- sliders ---- */
+  [["sSat","sat"],["sCon","con"],["sSha","sha"]].forEach(function(p){
+    $(p[0]).addEventListener("input",function(){ state[p[1]]=parseInt(this.value,10); render(); });
+  });
+
+  /* ---- nút nhóm ---- */
+  function group(attr,fn){
+    var list=document.querySelectorAll("[data-"+attr+"]");
+    Array.prototype.forEach.call(list,function(b){
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(list,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        fn(b.getAttribute("data-"+attr));
+      });
+    });
+  }
+  group("grad",function(v){ state.grad=v; render(); });
+  group("scene",function(v){
+    state.scene=v;
+    $("scene").innerHTML='<use href="#'+v+'"/>';
+    render();
+  });
+
+  /* ---- copy ---- */
+  $("copyBtn").addEventListener("click",function(){
+    var txt=$("rec").textContent, btn=this;
+    function done(ok){ btn.textContent=ok?"Đã chép":"Không chép được — bôi đen để copy";
+      setTimeout(function(){btn.textContent="Sao chép";},1800); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});
+    } else { done(false); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
