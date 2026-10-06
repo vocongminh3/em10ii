@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Art Filter — mô phỏng bằng mắt</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:600px}
+
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:660px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- lab ---------- */
+  .lab{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;padding:20px}
+  @media(max-width:860px){.lab{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .view svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+  .layer{position:absolute;inset:0;pointer-events:none}
+
+  .scenes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .recipe{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;
+          padding:12px 14px;font-family:var(--mono);font-size:13px;word-break:break-word}
+  .recipe b{display:block;font-family:var(--disp);font-size:11px;letter-spacing:.09em;
+            text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+  .copy{margin-top:9px;border:1px solid var(--line);background:#fff;border-radius:99px;
+        padding:6px 14px;font-size:12.5px;cursor:pointer;font-family:var(--disp)}
+
+  .presets{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:420px){.presets{grid-template-columns:1fr}}
+  .pbtn{border:1px solid var(--line);background:var(--paper);border-radius:12px;
+        padding:10px 12px;font-size:13.5px;cursor:pointer;font-family:var(--disp);
+        color:var(--ink);text-align:left}
+  .pbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .ctl{margin:16px 0 2px}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline}
+  .ctl .top b{font-size:14px}
+  .ctl .top i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--dim)}
+  input[type=range]{width:100%;height:26px;accent-color:var(--ink)}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  .desc{margin-top:14px;font-size:13.5px;color:var(--dim);min-height:54px}
+
+  /* ---------- rows ---------- */
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1.1fr .8fr 1.4fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px}
+  .row code{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .row p{margin:0;font-size:13px;color:var(--dim)}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:680px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Phần 5 · giả lập filter máy</p>
+  <h1>Art Filter — mô phỏng bằng mắt</h1>
+  <p class="sub">12 chế độ Art Filter của dòng E-M10 II, dựng lại bằng CSS filter. Không phải công thức xử lý ảnh thật của Olympus — chỉ để thấy hướng thay đổi trước khi bấm máy.</p>
+
+  <!-- ===== LAB ===== -->
+  <div class="card lab">
+    <div>
+      <div class="view">
+        <svg id="scene" viewBox="0 0 220 150"><use href="#forest"/></svg>
+        <svg id="glow" class="layer" viewBox="0 0 220 150" style="opacity:0;mix-blend-mode:screen"><use href="#forest"/></svg>
+        <svg id="dioTop" class="layer" viewBox="0 0 220 150" style="opacity:0;clip-path:polygon(0 0,100% 0,100% 34%,0 34%)"><use href="#forest"/></svg>
+        <svg id="dioBot" class="layer" viewBox="0 0 220 150" style="opacity:0;clip-path:polygon(0 66%,100% 66%,100% 100%,0 100%)"><use href="#forest"/></svg>
+        <div class="layer" id="vignette" style="opacity:0;background:radial-gradient(ellipse at 50% 50%, transparent 38%, rgba(0,0,0,.95) 100%)"></div>
+        <div class="layer" id="grain" style="opacity:0;mix-blend-mode:overlay"></div>
+        <div class="layer" id="tint" style="opacity:0"></div>
+      </div>
+
+      <div class="scenes">
+        <button class="sbtn" data-scene="forest" aria-pressed="true">Dưới tán rừng</button>
+        <button class="sbtn" data-scene="shade" aria-pressed="false">Bóng râm trời xanh</button>
+        <button class="sbtn" data-scene="neutral" aria-pressed="false">Bảng màu chuẩn</button>
+      </div>
+
+      <div class="recipe">
+        <b>Đang xem</b>
+        <span id="rec">—</span>
+        <br><button class="copy" id="copyBtn">Sao chép</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="lead" style="margin:0 0 10px">Chọn filter</p>
+      <div class="presets" id="presetGrid"></div>
+
+      <div class="ctl">
+        <div class="top"><b>Cường độ</b><i id="lInt">100%</i></div>
+        <input type="range" id="sInt" min="0" max="150" step="5" value="100">
+      </div>
+
+      <p class="desc" id="descBox"></p>
+    </div>
+  </div>
+
+  <!-- ===== GHI CHÚ TỪNG FILTER ===== -->
+  <h2>Hợp cảnh nào, cẩn thận gì</h2>
+  <p class="lead">Filter càng mạnh tay càng khó phục hồi — máy ghi thẳng ra JPEG theo filter, không lưu bản gốc trừ khi bật RAW+JPEG.</p>
+
+  <div class="rows">
+    <div class="row"><b>Pop Art</b><code>chợ, đồ vật màu</code>
+      <p>Đẩy bão hoà cực đại. Tránh dùng cho da người — dễ cam gắt, bết chi tiết.</p></div>
+    <div class="row"><b>Soft Focus</b><code>chân dung, hoa</code>
+      <p>Lớp glow phủ lên làm mất chi tiết nét mảnh. Cần chủ thể lớn, bố cục đơn giản.</p></div>
+    <div class="row"><b>Pale &amp; Light Color / Light Tone</b><code>nhật ký, đời thường</code>
+      <p>Bệt tương phản mạnh. Cảnh đã thiếu sáng thì càng bệt thêm, tránh dùng trong nhà tối.</p></div>
+    <div class="row"><b>Grainy Film</b><code>đường phố, kiến trúc</code>
+      <p>Đen trắng gắt + hạt giả. ISO cao cộng dồn hạt thật lẫn hạt giả, ảnh dễ bết mảng tối.</p></div>
+    <div class="row"><b>Pin Hole</b><code>tĩnh vật, chân dung gần</code>
+      <p>Bốn góc tối rất nặng. Chủ thể phải nằm giữa khung, đừng đặt sát biên.</p></div>
+    <div class="row"><b>Diorama</b><code>cảnh từ trên cao</code>
+      <p>Mô phỏng độ sâu trường ảnh nông giả. Vô nghĩa nếu chụp cận cảnh — chỉ ăn ảnh toàn cảnh nhìn từ trên.</p></div>
+    <div class="row"><b>Cross Process</b><code>đường phố, ánh đèn màu</code>
+      <p>Ám xanh lục vùng tối, vàng vùng sáng. Rất kén cảnh có tông da vì da dễ ngả xanh bệnh.</p></div>
+    <div class="row"><b>Gentle Sepia / Vintage</b><code>hoài cổ, kiến trúc cũ</code>
+      <p>Vintage cộng thêm hạt và tối góc — nặng tay hơn Gentle Sepia khá nhiều dù cùng gốc màu nâu.</p></div>
+    <div class="row"><b>Dramatic Tone</b><code>trời nhiều mây, phong cảnh</code>
+      <p>Tương phản cực cao kiểu HDR giả. Vùng midtone khuôn mặt dễ mất chi tiết trước tiên.</p></div>
+  </div>
+
+  <p class="note">
+    Đây là mô phỏng bằng CSS filter (contrast/saturate/brightness/sepia/grayscale/hue-rotate)
+    cộng thêm lớp vignette, hạt film và glow dựng bằng SVG/gradient — đúng hướng thay đổi,
+    không phải thuật toán JPEG thật của Olympus. Riêng Key Line, Watercolor và Partial Color
+    cần xử lý theo từng điểm ảnh (dò biên, tách vùng màu) mà CSS thuần không làm được nên
+    không đưa vào bản mô phỏng này.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC0DF"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="canopyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8FC49A"/><stop offset="1" stop-color="#2E5638"/></linearGradient>
+
+  <symbol id="forest" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#canopyG)"/>
+    <g fill="#2A5136"><rect x="10" y="8" width="14" height="126" rx="3"/>
+      <rect x="42" y="0" width="10" height="136" rx="3"/>
+      <rect x="182" y="4" width="15" height="130" rx="3"/>
+      <rect x="158" y="0" width="9" height="124" rx="3"/></g>
+    <g fill="#438554" opacity=".9"><ellipse cx="30" cy="24" rx="36" ry="16"/>
+      <ellipse cx="188" cy="18" rx="38" ry="17"/><ellipse cx="108" cy="10" rx="44" ry="15"/></g>
+    <g fill="#FFEFBC" opacity=".5"><ellipse cx="74" cy="42" rx="16" ry="7"/>
+      <ellipse cx="146" cy="34" rx="11" ry="6"/></g>
+    <path d="M0,150 L0,116 Q44,104 84,116 Q120,126 158,112 Q194,100 220,112 L220,150 Z" fill="#24462F"/>
+    <path d="M96,150 C100,132 86,124 94,112" stroke="#C9A272" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <circle cx="40" cy="128" r="3" fill="#FF5A4A"/><circle cx="176" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="shade" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="184" cy="24" r="10" fill="#FFF3CC"/>
+    <polygon points="0,92 36,44 66,72 92,38 126,92" fill="#93ABBA"/>
+    <polygon points="92,38 103,55 82,53" fill="#F3F8FA"/>
+    <polygon points="108,92 148,42 192,92" fill="#7E9BAD"/>
+    <path d="M0,86 Q56,66 112,84 T220,77 L220,150 L0,150 Z" fill="#4A7F59"/>
+    <path d="M0,104 Q60,94 130,106 T220,100 L220,150 L0,150 Z" fill="#35624392"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <g fill="#2F5C3C"><polygon points="24,80 34,104 14,104"/><polygon points="188,76 200,104 176,104"/></g>
+    <circle cx="46" cy="128" r="3" fill="#FF5A4A"/><circle cx="170" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="neutral" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <g><rect x="14" y="14" width="38" height="38" fill="#FFFFFF"/>
+       <rect x="56" y="14" width="38" height="38" fill="#C9C9C9"/>
+       <rect x="98" y="14" width="38" height="38" fill="#8C8C8C"/>
+       <rect x="140" y="14" width="38" height="38" fill="#4A4A4A"/>
+       <rect x="182" y="14" width="24" height="38" fill="#141414"/></g>
+    <g><rect x="14" y="60" width="38" height="30" fill="#C8352C"/>
+       <rect x="56" y="60" width="38" height="30" fill="#E0A038"/>
+       <rect x="98" y="60" width="38" height="30" fill="#4DA85E"/>
+       <rect x="140" y="60" width="38" height="30" fill="#4E7FD0"/>
+       <rect x="182" y="60" width="24" height="30" fill="#C455A0"/></g>
+    <rect x="14" y="98" width="192" height="38" rx="6" fill="#E9B58E"/>
+    <text x="18" y="122" font-family="ui-monospace,monospace" font-size="13" fill="#6B5A4E">tông da</text>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  /* identity = giá trị "không filter" của mỗi kênh */
+  var ID={c:1,s:1,b:1,se:0,g:0,h:0,vig:0,grain:0,tintOp:0,glow:0,dio:0};
+
+  var PRESETS=[
+    {key:"none", name:"Tiêu chuẩn", c:1,s:1,b:1,se:0,g:0,h:0, vig:0,grain:0,glow:0,dio:0,
+     desc:"Không áp filter — ảnh gốc theo Picture Mode thường."},
+    {key:"pop", name:"Pop Art", c:1.35,s:2.3,b:1.05,se:0,g:0,h:0, vig:.15,grain:0,glow:0,dio:0,
+     desc:"Đẩy mọi màu lên cực đại. Da người dễ ngả cam/đỏ gắt, không hợp chân dung tự nhiên."},
+    {key:"soft", name:"Soft Focus", c:.82,s:1.05,b:1.15,se:0,g:0,h:0, vig:0,grain:0,glow:.55,dio:0,
+     desc:"Giảm tương phản, cộng lớp sáng mờ phủ lên — cảm giác mơ màng, hợp chân dung ánh sáng dịu."},
+    {key:"pale", name:"Pale & Light Color", c:.7,s:.55,b:1.3,se:0,g:0,h:0, vig:0,grain:0,glow:0,dio:0,
+     desc:"Bệt màu, đẩy sáng — tông pastel nhẹ. Hợp nhật ký ánh sáng tốt, không hợp cảnh thiếu sáng."},
+    {key:"light", name:"Light Tone", c:.6,s:.9,b:1.18,se:0,g:0,h:0, vig:0,grain:0,glow:0,dio:0,
+     desc:"Giữ màu thật hơn Pale & Light nhưng vẫn kéo phẳng tương phản, đẩy sáng vùng tối."},
+    {key:"grain", name:"Grainy Film", c:1.4,s:0,b:.92,se:0,g:1,h:0, vig:.1,grain:.85,glow:0,dio:0,
+     desc:"Đen trắng tương phản mạnh, phủ hạt film giả lập — cộng dồn với nhiễu ISO thật."},
+    {key:"pin", name:"Pin Hole", c:1.12,s:.8,b:.95,se:0,g:0,h:0, vig:.6,grain:.15,glow:0,dio:0,
+     desc:"Tối bốn góc rất mạnh mô phỏng ống kính lỗ kim. Chủ thể phải nằm giữa khung."},
+    {key:"dio", name:"Diorama", c:1.2,s:1.5,b:1.02,se:0,g:0,h:0, vig:.1,grain:0,glow:0,dio:.95,
+     desc:"Bo mờ dải trên/dưới khung, đẩy màu đậm — giả lập độ sâu trường ảnh cực nông."},
+    {key:"cross", name:"Cross Process", c:1.25,s:1.5,b:1.03,se:0,g:0,h:18, vig:.12,grain:0,glow:0,dio:0,
+     tint:"#2E8B7A", tintBlend:"screen", tintOp:.16,
+     desc:"Đổi trục màu kiểu tráng phim sai thuốc — tối ngả xanh lục, sáng ngả vàng."},
+    {key:"sepia", name:"Gentle Sepia", c:.95,s:.6,b:1.05,se:.75,g:0,h:0, vig:0,grain:0,glow:0,dio:0,
+     desc:"Sepia nhẹ, giữ tương phản gần chuẩn — hoài cổ nhưng không gắt như Vintage."},
+    {key:"dram", name:"Dramatic Tone", c:1.65,s:1.35,b:.82,se:0,g:0,h:0, vig:.35,grain:0,glow:0,dio:0,
+     desc:"Tương phản cực cao kiểu HDR giả. Chi tiết midtone (khuôn mặt) mất trước tiên."},
+    {key:"vint", name:"Vintage", c:.88,s:.75,b:1.08,se:.4,g:0,h:0, vig:.28,grain:.3,glow:.15,dio:0,
+     tint:"#C68A3D", tintBlend:"multiply", tintOp:.12,
+     desc:"Ám vàng nâu, hạt nhẹ, tối bốn góc và một lớp glow mờ — mô phỏng phim cũ phai màu."}
+  ];
+
+  var state={preset:"none", intensity:100, scene:"forest"};
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+
+  function grainDataURI(){
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">'+
+      '<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>'+
+      '<feColorMatrix type="saturate" values="0"/></filter>'+
+      '<rect width="100%" height="100%" filter="url(#n)"/></svg>';
+    return "url(\"data:image/svg+xml;utf8,"+encodeURIComponent(svg)+"\")";
+  }
+  $("grain").style.backgroundImage=grainDataURI();
+  $("grain").style.backgroundSize="120px 120px";
+
+  function currentPreset(){
+    for(var i=0;i<PRESETS.length;i++) if(PRESETS[i].key===state.preset) return PRESETS[i];
+    return PRESETS[0];
+  }
+
+  function render(){
+    var p=currentPreset(), t=state.intensity/100;
+
+    var c=lerp(ID.c,p.c,t), s=lerp(ID.s,p.s,t), b=lerp(ID.b,p.b,t),
+        se=lerp(ID.se,p.se,t), g=lerp(ID.g,p.g,t), h=lerp(ID.h,p.h,t),
+        vig=Math.max(0,lerp(ID.vig,p.vig,t)), grain=Math.max(0,lerp(ID.grain,p.grain,t)),
+        glow=Math.max(0,lerp(ID.glow,p.glow,t)), dio=Math.max(0,lerp(ID.dio,p.dio,t)),
+        tintOp=Math.max(0,lerp(ID.tintOp,p.tintOp||0,t));
+
+    var f="contrast("+c.toFixed(2)+") saturate("+s.toFixed(2)+") brightness("+b.toFixed(2)+")"+
+          (se?" sepia("+se.toFixed(2)+")":"")+
+          (g?" grayscale("+g.toFixed(2)+")":"")+
+          (h?" hue-rotate("+h.toFixed(0)+"deg)":"");
+
+    $("scene").style.filter=f;
+    $("glow").style.filter="blur(6px) brightness(1.25) saturate(1.1)";
+    $("glow").style.opacity=glow.toFixed(2);
+    $("dioTop").style.filter="blur(5px)";
+    $("dioTop").style.opacity=dio.toFixed(2);
+    $("dioBot").style.filter="blur(5px)";
+    $("dioBot").style.opacity=dio.toFixed(2);
+    $("vignette").style.opacity=vig.toFixed(2);
+    $("grain").style.opacity=grain.toFixed(2);
+
+    var tintEl=$("tint");
+    if(p.tint){
+      tintEl.style.background=p.tint;
+      tintEl.style.mixBlendMode=p.tintBlend||"multiply";
+      tintEl.style.opacity=tintOp.toFixed(2);
+    } else {
+      tintEl.style.opacity=0;
+    }
+
+    $("lInt").textContent=state.intensity+"%";
+    $("descBox").textContent=p.desc;
+    $("rec").textContent=p.name+" · cường độ "+state.intensity+"% · cảnh: "+
+      (state.scene==="forest"?"rừng":state.scene==="shade"?"bóng râm":"bảng màu chuẩn");
+  }
+
+  function buildPresetGrid(){
+    var grid=$("presetGrid");
+    PRESETS.forEach(function(p,i){
+      var btn=document.createElement("button");
+      btn.className="pbtn";
+      btn.textContent=p.name;
+      btn.setAttribute("aria-pressed", i===0?"true":"false");
+      btn.addEventListener("click",function(){
+        Array.prototype.forEach.call(grid.children,function(x){x.setAttribute("aria-pressed","false");});
+        btn.setAttribute("aria-pressed","true");
+        state.preset=p.key;
+        render();
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  $("sInt").addEventListener("input",function(){
+    state.intensity=parseInt(this.value,10);
+    render();
+  });
+
+  function group(attr,fn){
+    var list=document.querySelectorAll("[data-"+attr+"]");
+    Array.prototype.forEach.call(list,function(b){
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(list,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        fn(b.getAttribute("data-"+attr));
+      });
+    });
+  }
+  group("scene",function(v){
+    state.scene=v;
+    ["scene","glow","dioTop","dioBot"].forEach(function(id){
+      $(id).innerHTML='<use href="#'+v+'"/>';
+    });
+    render();
+  });
+
+  $("copyBtn").addEventListener("click",function(){
+    var txt=$("rec").textContent, btn=this;
+    function done(ok){ btn.textContent=ok?"Đã chép":"Không chép được — bôi đen để copy";
+      setTimeout(function(){btn.textContent="Sao chép";},1800); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});
+    } else { done(false); }
+  });
+
+  buildPresetGrid();
+  render();
+})();
+</script>
+</body>
+</html>

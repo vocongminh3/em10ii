@@ -2,26 +2,138 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sổ tay E-M10 II</title>
 <style>
-  body { font-family: system-ui, -apple-system, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; color: #222; background: #fafafa; }
-  h1 { font-size: 1.4rem; }
-  ul { list-style: none; padding: 0; }
-  li { margin: 12px 0; }
-  a { display: block; padding: 14px 18px; background: #fff; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #1a1a1a; }
-  a:hover { border-color: #999; }
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 22px;max-width:620px}
+
+  .search{width:100%;max-width:420px;padding:11px 16px;border:1px solid var(--line);border-radius:99px;
+          background:var(--card);font-family:var(--disp);font-size:15px;color:var(--ink)}
+  .search:focus-visible,.item:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  .group{margin-top:38px}
+  .ghead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .ghead h2{font-size:clamp(18px,3vw,22px);font-weight:800;letter-spacing:-.02em;margin:0}
+  .ghead span{font-size:13.5px;color:var(--dim)}
+  .bar{width:10px;height:10px;border-radius:50%;align-self:center}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.grid{grid-template-columns:1fr}}
+
+  .item{display:flex;flex-direction:column;gap:6px;padding:16px 18px;background:var(--card);
+        border:1px solid var(--line);border-radius:16px;text-decoration:none;color:var(--ink);
+        transition:border-color .15s,transform .15s}
+  .item[hidden]{display:none}
+  .item:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .item i{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+          text-transform:uppercase;color:var(--dim)}
+  .item b{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.25}
+  .item p{margin:0;font-size:13.5px;color:var(--dim)}
+  .item.new i::after{content:"mới";margin-left:8px;padding:1px 7px;border-radius:99px;
+                     background:var(--ink);color:#fff;letter-spacing:.04em}
+
+  .empty{margin-top:30px;color:var(--dim);font-size:15px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<h1>Sổ tay E-M10 II</h1>
-<ul>
-  <li><a href="so-tay-em10ii.html">Sổ tay E-M10 II — tổng hợp</a></li>
-  <li><a href="phoi-sang-cho-nguoi-moi.html">Phơi sáng — ba cái van ánh sáng</a></li>
-  <li><a href="14-42mm-cho-nguoi-moi.html">Ống kính 14-42mm — hiểu bằng mắt</a></li>
-  <li><a href="em10ii-mau.html">E-M10 II — Cài đặt màu, xem bằng mắt</a></li>
-  <li><a href="wb-shift-va-tham-so.html">Trục A–B / G–M và bộ tham số Picture Mode</a></li>
-  <li><a href="kiem-toan-va-lo-hong.html">Kiểm toán — năm trang đã dạy gì và bỏ sót gì</a></li>
-</ul>
+<div class="wrap">
+
+  <p class="eyebrow">Olympus OM-D E-M10 Mark II · JPEG</p>
+  <h1>Sổ tay E-M10 II</h1>
+  <p class="sub">Mười hai trang, mỗi trang một việc. Đi từ trên xuống nếu mới cầm máy; nhảy thẳng tới phần công thức nếu chỉ cần màu.</p>
+
+  <input class="search" id="q" type="search" placeholder="Tìm trang: 17mm, art filter, WB…" aria-label="Tìm trang">
+
+  <section class="group">
+    <div class="ghead"><i class="bar" style="background:var(--amber)"></i><h2>Bắt đầu</h2><span>Hiểu máy và ống trước khi chỉnh màu</span></div>
+    <div class="grid">
+      <a class="item" href="so-tay-em10ii.html"><i>Tổng hợp</i><b>Sổ tay E-M10 II</b>
+        <p>Mọi thứ cần nhớ về máy, gom vào một trang để tra nhanh.</p></a>
+      <a class="item" href="14-42mm-cho-nguoi-moi.html"><i>Ống kit</i><b>14-42mm — hiểu bằng mắt</b>
+        <p>Tiêu cự, khẩu độ, phông mờ và độ nét của ống kit, kéo thanh trượt là thấy.</p></a>
+      <a class="item" href="phoi-sang-cho-nguoi-moi.html"><i>Phơi sáng</i><b>Ba cái van ánh sáng</b>
+        <p>Khẩu độ, tốc độ, ISO: mỗi cái đổi lấy gì và mất gì.</p></a>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="ghead"><i class="bar" style="background:var(--blue)"></i><h2>Màu trong máy</h2><span>Từng núm vặn làm gì với ảnh</span></div>
+    <div class="grid">
+      <a class="item" href="em10ii-mau.html"><i>Cài đặt màu</i><b>Cài đặt màu, xem bằng mắt</b>
+        <p>Picture Mode, Contrast, Saturation và những thứ đi kèm.</p></a>
+      <a class="item" href="wb-shift-va-tham-so.html"><i>Tinh chỉnh</i><b>Trục A–B / G–M và bộ tham số</b>
+        <p>Bù cân bằng trắng theo hai trục, công cụ chính để tạo tông màu.</p></a>
+      <a class="item" href="art-filter-mo-phong.html"><i>Art Filter</i><b>12 Art Filter, mô phỏng bằng mắt</b>
+        <p>Pop Art, Grainy Film, Dramatic Tone… hợp cảnh nào và cẩn thận gì.</p></a>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="ghead"><i class="bar" style="background:var(--green)"></i><h2>Công thức màu</h2><span>Số cụ thể để đặt vào máy, theo từng ống</span></div>
+    <div class="grid">
+      <a class="item new" href="filter-cho-17mm-f18.html"><i>17mm f/1.8</i><b>Bộ lọc màu nào hợp 17mm</b>
+        <p>19 công thức xem cạnh nhau, có nguồn, vặn thử từng thông số.</p></a>
+      <a class="item new" href="filter-cho-14-42mm.html"><i>14-42mm</i><b>Bộ lọc màu nào hợp ống kit</b>
+        <p>Cùng bộ công thức, đánh giá lại cho khẩu nhỏ và ISO cao.</p></a>
+      <a class="item" href="cong-thuc-mau-chia-se.html"><i>Cộng đồng</i><b>Công thức màu đã được chia sẻ</b>
+        <p>Năm công thức giả phim đầu tiên: Chrome, Eterna, Velvia, Kodachrome, Mono.</p></a>
+      <a class="item" href="tu-duy-phoi-mau.html"><i>Tư duy</i><b>Phối màu cho chuyến đi có bạn bè</b>
+        <p>Chọn một tông neo và biết lúc nào được đổi, thay vì thử hết mọi công thức.</p></a>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="ghead"><i class="bar" style="background:var(--mag)"></i><h2>Phụ kiện và rà soát</h2><span>Ngoài thân máy, và nhìn lại</span></div>
+    <div class="grid">
+      <a class="item new" href="kinh-loc-46mm-cho-17mm.html"><i>Kính lọc 46mm</i><b>Kính lọc gắn trước ống 17mm</b>
+        <p>ND, CPL, Black Mist: loại nào đáng mua, kèm máy tính phơi sáng cho f/1.8.</p></a>
+      <a class="item" href="kiem-toan-va-lo-hong.html"><i>Kiểm toán</i><b>Năm trang đã dạy gì, bỏ sót gì</b>
+        <p>Rà lại các trang đầu để tìm chỗ thiếu và chỗ sai.</p></a>
+    </div>
+  </section>
+
+  <p class="empty" id="empty" hidden>Không có trang nào khớp.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var q=document.getElementById("q"),
+      groups=document.querySelectorAll(".group");
+
+  function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d"); }
+
+  q.addEventListener("input",function(){
+    var k=norm(q.value.trim()), any=false;
+    Array.prototype.forEach.call(groups,function(g){
+      var shown=0;
+      Array.prototype.forEach.call(g.querySelectorAll(".item"),function(a){
+        var hit=!k || norm(a.textContent).indexOf(k)>=0;
+        a.hidden=!hit;
+        if(hit) shown++;
+      });
+      g.hidden=!shown;
+      if(shown) any=true;
+    });
+    document.getElementById("empty").hidden=any;
+  });
+})();
+</script>
 </body>
 </html>

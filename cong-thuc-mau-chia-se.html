@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Công thức màu đã được chia sẻ</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 10px;max-width:640px}
+  .sub2{color:var(--dim);font-size:13.5px;margin:0 0 26px;max-width:640px}
+
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:660px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  .lab{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px}
+  @media(max-width:860px){.lab{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .view svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+  .layer{position:absolute;inset:0;pointer-events:none}
+
+  .scenes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .recipes{display:flex;flex-direction:column;gap:6px}
+  .rbtn{border:1px solid var(--line);background:var(--paper);border-radius:14px;
+        padding:12px 14px;font-size:14px;cursor:pointer;font-family:var(--disp);
+        color:var(--ink);text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .rbtn span{font-family:var(--mono);font-size:11.5px;color:var(--dim)}
+  .rbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .rbtn[aria-pressed=true] span{color:#CFC9D6}
+
+  .settings{margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .settings b.h{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;
+            text-transform:uppercase;color:var(--dim);margin-bottom:9px}
+  .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+  @media(max-width:480px){.sgrid{grid-template-columns:1fr}}
+  .sgrid div{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;border-bottom:1px dashed var(--line);padding:5px 0}
+  .sgrid div i{font-style:normal;color:var(--dim)}
+  .sgrid div b{font-family:var(--mono);font-weight:600;text-align:right}
+
+  .note2{margin-top:12px;font-size:13px;color:var(--dim)}
+  .src{margin-top:12px;font-size:12.5px;padding-top:10px;border-top:1px solid var(--line)}
+  .src a{color:var(--ink)}
+
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1.1fr .9fr 1.4fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px}
+  .row code{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .row p{margin:0;font-size:13px;color:var(--dim)}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:680px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Phần 6 · công thức cộng đồng</p>
+  <h1>Công thức màu đã được chia sẻ</h1>
+  <p class="sub">Olympus không có Film Simulation dựng sẵn như Fujifilm — nhưng cộng đồng đã tự ghép Picture Mode + bù trừ WB + đường cong để bắt chước Chrome, Eterna, Velvia, Kodachrome. Đây là 5 công thức thật, đã có người thử và đăng công khai, không phải mình tự bịa.</p>
+  <p class="sub2">Khung xem là mô phỏng bằng CSS filter — đúng hướng lệch màu, không phải ảnh JPEG thật do máy xử lý. Muốn biết chính xác, chỉnh số vào máy rồi chụp thử.</p>
+
+  <div class="card lab">
+    <div>
+      <div class="view">
+        <svg id="scene" viewBox="0 0 220 150"><use href="#forest"/></svg>
+        <div class="layer" id="tint" style="opacity:0"></div>
+        <div class="layer" id="grain" style="opacity:0;mix-blend-mode:overlay"></div>
+        <div class="layer" id="vignette" style="opacity:0;background:radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(0,0,0,.9) 100%)"></div>
+      </div>
+      <div class="scenes">
+        <button class="sbtn" data-scene="forest" aria-pressed="true">Dưới tán rừng</button>
+        <button class="sbtn" data-scene="shade" aria-pressed="false">Bóng râm trời xanh</button>
+        <button class="sbtn" data-scene="neutral" aria-pressed="false">Bảng màu chuẩn</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="recipes" id="recipeList"></div>
+      <div class="settings">
+        <b class="h">Đặt vào máy</b>
+        <div class="sgrid" id="sgrid"></div>
+        <p class="note2" id="rnote"></p>
+        <p class="src" id="rsrc"></p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Vì sao ghép được — và ghép thiếu gì</h2>
+  <p class="lead">Olympus không đặt tên "film simulation", nhưng bốn công cụ Picture Mode cộng lại tạo hiệu ứng tương đương ba trục mà phim thật có: gốc màu, độ tương phản, và bù trừ ám màu.</p>
+
+  <div class="rows">
+    <div class="row"><b>Picture Mode nền</b><code>Muted / Natural / Vivid</code>
+      <p>Đóng vai trò "gốc phim" — Muted gần với các dòng phim điện ảnh phẳng (Eterna, Chrome), Natural + Saturation dương gần Velvia hơn là bắt đầu từ Vivid.</p></div>
+    <div class="row"><b>WB Shift A–B / G–M</b><code>thay cho Color Chrome</code>
+      <p>Fujifilm dùng Color Chrome Effect nén màu bão hoà; Olympus không có, nên cộng đồng dùng lệch trục G–M để giả ám màu ấm/lạnh đặc trưng của từng phim.</p></div>
+    <div class="row"><b>Highlight / Shadow / Gradation</b><code>thay cho tone curve phim</code>
+      <p>Shadow âm sâu bắt chước phim slide (Velvia, Chrome); Shadow/Highlight gần 0 bắt chước phim âm bản phẳng (Eterna, Portra).</p></div>
+    <div class="row warnrow"><b>Color Creator</b><code>E-M10 II không có</code>
+      <p>Các công thức gốc cho Pen-F/E-P7/OM-3 chỉnh từng màu trên bánh xe 12 màu — sâu hơn nhiều so với 4 tham số Picture Mode. E-M10 II phải bỏ qua bước này, nên kết quả gần đúng chứ không giống hệt.</p></div>
+  </div>
+
+  <p class="note">
+    Nguồn công thức: Rob Trek (Chrome/Eterna/Velvia) qua blog Open Source Photography;
+    VideoPic blog (Kodachrome 64, gốc cho E-M5 II — cùng thế hệ xử lý ảnh với E-M10 II nên dùng được);
+    Ali O'Keefe / One Month Two Cameras (Mono, qua newsletter Liminal Frames trên Substack).
+    Giá trị WB Auto trong các công thức Chrome/Eterna/Velvia nghĩa là để máy tự đo rồi cộng thêm số A/G nêu trên,
+    không phải đặt Kelvin cố định.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC0DF"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="canopyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8FC49A"/><stop offset="1" stop-color="#2E5638"/></linearGradient>
+
+  <symbol id="forest" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#canopyG)"/>
+    <g fill="#2A5136"><rect x="10" y="8" width="14" height="126" rx="3"/>
+      <rect x="42" y="0" width="10" height="136" rx="3"/>
+      <rect x="182" y="4" width="15" height="130" rx="3"/>
+      <rect x="158" y="0" width="9" height="124" rx="3"/></g>
+    <g fill="#438554" opacity=".9"><ellipse cx="30" cy="24" rx="36" ry="16"/>
+      <ellipse cx="188" cy="18" rx="38" ry="17"/><ellipse cx="108" cy="10" rx="44" ry="15"/></g>
+    <g fill="#FFEFBC" opacity=".5"><ellipse cx="74" cy="42" rx="16" ry="7"/>
+      <ellipse cx="146" cy="34" rx="11" ry="6"/></g>
+    <path d="M0,150 L0,116 Q44,104 84,116 Q120,126 158,112 Q194,100 220,112 L220,150 Z" fill="#24462F"/>
+    <path d="M96,150 C100,132 86,124 94,112" stroke="#C9A272" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <circle cx="40" cy="128" r="3" fill="#FF5A4A"/><circle cx="176" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="shade" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="184" cy="24" r="10" fill="#FFF3CC"/>
+    <polygon points="0,92 36,44 66,72 92,38 126,92" fill="#93ABBA"/>
+    <polygon points="92,38 103,55 82,53" fill="#F3F8FA"/>
+    <polygon points="108,92 148,42 192,92" fill="#7E9BAD"/>
+    <path d="M0,86 Q56,66 112,84 T220,77 L220,150 L0,150 Z" fill="#4A7F59"/>
+    <path d="M0,104 Q60,94 130,106 T220,100 L220,150 L0,150 Z" fill="#35624392"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <g fill="#2F5C3C"><polygon points="24,80 34,104 14,104"/><polygon points="188,76 200,104 176,104"/></g>
+    <circle cx="46" cy="128" r="3" fill="#FF5A4A"/><circle cx="170" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="neutral" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <g><rect x="14" y="14" width="38" height="38" fill="#FFFFFF"/>
+       <rect x="56" y="14" width="38" height="38" fill="#C9C9C9"/>
+       <rect x="98" y="14" width="38" height="38" fill="#8C8C8C"/>
+       <rect x="140" y="14" width="38" height="38" fill="#4A4A4A"/>
+       <rect x="182" y="14" width="24" height="38" fill="#141414"/></g>
+    <g><rect x="14" y="60" width="38" height="30" fill="#C8352C"/>
+       <rect x="56" y="60" width="38" height="30" fill="#E0A038"/>
+       <rect x="98" y="60" width="38" height="30" fill="#4DA85E"/>
+       <rect x="140" y="60" width="38" height="30" fill="#4E7FD0"/>
+       <rect x="182" y="60" width="24" height="30" fill="#C455A0"/></g>
+    <rect x="14" y="98" width="192" height="38" rx="6" fill="#E9B58E"/>
+    <text x="18" y="122" font-family="ui-monospace,monospace" font-size="13" fill="#6B5A4E">tông da</text>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  var RECIPES=[
+    { key:"chrome", name:"Chrome", author:"Rob Trek",
+      source:"https://marcrphoto.wordpress.com/2022/01/03/recipe-update-three-fuji-simulations-for-olympus-camera-by-rob-trek/",
+      fields:[["Picture Mode","Muted"],["White Balance","Auto WB · A+1 G+2"],["Saturation","−2"],["Shadow","−4"]],
+      note:"Trục A+1 ấm nhẹ cộng G+2 ngả xanh lá — gần tông phim điện ảnh Chrome. Saturation −2 bệt màu lại, Shadow −4 xiết đen sâu.",
+      css:{c:1.08,s:.72,b:1.0}, tint:{color:"#8FAE6B",blend:"multiply",op:.10}, vig:.05, grain:0 },
+
+    { key:"eterna", name:"Eterna", author:"Rob Trek",
+      source:"https://marcrphoto.wordpress.com/2022/01/03/recipe-update-three-fuji-simulations-for-olympus-camera-by-rob-trek/",
+      fields:[["Picture Mode","Muted"],["White Balance","Auto WB · A+1 G+1"],["Saturation","−2"],["Shadow","−2"]],
+      note:"Cùng gốc Muted với Chrome nhưng lệch WB ít hơn và Shadow chỉ −2 — phẳng, êm, ít kịch tính hơn hẳn.",
+      css:{c:.97,s:.72,b:1.03}, tint:{color:"#C9A876",blend:"multiply",op:.08}, vig:0, grain:0 },
+
+    { key:"velvia", name:"Velvia", author:"Rob Trek",
+      source:"https://marcrphoto.wordpress.com/2022/01/03/recipe-update-three-fuji-simulations-for-olympus-camera-by-rob-trek/",
+      fields:[["Picture Mode","Natural"],["White Balance","Auto WB · A+2 G+1"],["Saturation","+1"],["Highlight","−2"],["Shadow","−4"]],
+      note:"Bắt đầu từ Natural (trung tính) rồi mới cộng Saturation +1 — lên màu rực nhưng không cháy giả tạo như đẩy thẳng từ Vivid.",
+      css:{c:1.22,s:1.55,b:1.0}, tint:{color:"#E0A038",blend:"multiply",op:.06}, vig:.08, grain:0 },
+
+    { key:"kodachrome", name:"Kodachrome 64", author:"VideoPic blog (gốc cho E-M5 II)",
+      source:"http://myolympusomd.blogspot.com/2019/03/a-practical-guide-to-olympus-color.html",
+      fields:[["Picture Mode","Muted"],["White Balance","Daylight · A0 G−7"],["Saturation","−1"],["Sharpness","+1"],["Highlight","+2"],["Shadow","−3"],["Midtone","−2"]],
+      note:"G−7 là mức lệch magenta tối đa của trục — cho tông đỏ/da ấm đặc trưng Kodachrome. Bản gốc còn dùng Color Creator (Pen-F/E-P7) để đẩy thêm; E-M10 II bỏ qua bước đó.",
+      css:{c:1.18,s:1.05,b:1.03}, tint:{color:"#C24B3E",blend:"multiply",op:.14}, vig:.04, grain:0 },
+
+    { key:"mono", name:"OMTC Mono", author:"Ali O'Keefe — One Month Two Cameras",
+      source:"https://omtc.substack.com/p/5-jpeg-recipes-for-the-om-system",
+      fields:[["Picture Mode","Monotone (Mono 2)"],["Contrast","0"],["Sharpness","+1"],["Highlight","−3"],["Midtone","−2"],["B&W Filter Effect","Blue +2"],["Grain","Low"]],
+      note:"Filter Effect = Blue làm da/tông ấm tối hơn, trời/nước sáng hơn khi chuyển đen trắng — CSS chỉ mô phỏng được phần tương phản và hạt, không mô phỏng đúng cách bộ lọc màu ảnh hưởng kênh sáng tối.",
+      css:{c:1.08,s:0,b:.97,g:1}, tint:null, vig:0, grain:.35 }
+  ];
+
+  var state={key:"chrome", scene:"forest"};
+
+  function current(){
+    for(var i=0;i<RECIPES.length;i++) if(RECIPES[i].key===state.key) return RECIPES[i];
+    return RECIPES[0];
+  }
+
+  function grainDataURI(){
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">'+
+      '<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>'+
+      '<feColorMatrix type="saturate" values="0"/></filter>'+
+      '<rect width="100%" height="100%" filter="url(#n)"/></svg>';
+    return "url(\"data:image/svg+xml;utf8,"+encodeURIComponent(svg)+"\")";
+  }
+  $("grain").style.backgroundImage=grainDataURI();
+  $("grain").style.backgroundSize="120px 120px";
+
+  function render(){
+    var r=current(), css=r.css;
+    var f="contrast("+css.c.toFixed(2)+") saturate("+css.s.toFixed(2)+") brightness("+css.b.toFixed(2)+")"+
+          (css.g?" grayscale("+css.g+")":"");
+    $("scene").style.filter=f;
+
+    var tintEl=$("tint");
+    if(r.tint){ tintEl.style.background=r.tint.color; tintEl.style.mixBlendMode=r.tint.blend; tintEl.style.opacity=r.tint.op; }
+    else { tintEl.style.opacity=0; }
+
+    $("vignette").style.opacity=r.vig||0;
+    $("grain").style.opacity=r.grain||0;
+
+    var grid=$("sgrid"); grid.innerHTML="";
+    r.fields.forEach(function(pair){
+      var d=document.createElement("div");
+      d.innerHTML="<i>"+pair[0]+"</i><b>"+pair[1]+"</b>";
+      grid.appendChild(d);
+    });
+    $("rnote").textContent=r.note;
+    $("rsrc").innerHTML="Nguồn: <a href=\""+r.source+"\" target=\"_blank\" rel=\"noopener\">"+r.author+"</a>";
+  }
+
+  function buildRecipeList(){
+    var box=$("recipeList");
+    RECIPES.forEach(function(r,i){
+      var b=document.createElement("button");
+      b.className="rbtn";
+      b.setAttribute("aria-pressed", i===0?"true":"false");
+      b.innerHTML="<span>"+r.name+"</span><span>"+r.fields[0][1]+"</span>";
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(box.children,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        state.key=r.key;
+        render();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function group(attr,fn){
+    var list=document.querySelectorAll("[data-"+attr+"]");
+    Array.prototype.forEach.call(list,function(b){
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(list,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        fn(b.getAttribute("data-"+attr));
+      });
+    });
+  }
+  group("scene",function(v){
+    state.scene=v;
+    $("scene").innerHTML='<use href="#'+v+'"/>';
+    render();
+  });
+
+  buildRecipeList();
+  render();
+})();
+</script>
+</body>
+</html>

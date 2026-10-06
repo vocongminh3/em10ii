@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tư duy phối màu — du lịch có bạn bè</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0; --red:#C8352C;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,46px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:640px}
+
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:660px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- verdict cards ---------- */
+  .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:860px){.vgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.vgrid{grid-template-columns:1fr}}
+  .vcard{padding:16px 16px 14px;border-top:4px solid var(--line)}
+  .vcard.safe{border-top-color:var(--green)}
+  .vcard.sun{border-top-color:var(--amber)}
+  .vcard.hero{border-top-color:var(--mag)}
+  .vcard.warn{border-top-color:var(--red)}
+  .vcard.mono{border-top-color:var(--dim)}
+  .vcard h3{margin:0 0 4px;font-size:17px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+       letter-spacing:.08em;padding:3px 8px;border-radius:99px;background:var(--paper);
+       color:var(--dim);margin-bottom:9px}
+  .vcard.safe .tag{color:#2E7D3C;background:#E7F4EA}
+  .vcard.sun .tag{color:#95610F;background:#FBEDD8}
+  .vcard.hero .tag{color:#953E78;background:#F8E7F1}
+  .vcard.warn .tag{color:#A32A21;background:#FBE4E2}
+  .vcard.mono .tag{color:var(--dim);background:var(--paper)}
+  .vcard p{margin:0;font-size:13.5px;color:var(--dim)}
+
+  /* ---------- two columns keep/avoid ---------- */
+  .kacols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:700px){.kacols{grid-template-columns:1fr}}
+  .kacol{padding:18px 20px}
+  .kacol h3{margin:0 0 12px;font-size:15px;font-family:var(--mono);text-transform:uppercase;
+            letter-spacing:.08em}
+  .kacol.keep h3{color:#2E7D3C}
+  .kacol.avoid h3{color:#A32A21}
+  .kalist{list-style:none;margin:0;padding:0}
+  .kalist li{padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .kalist li:last-child{border-bottom:none}
+  .kalist li b{display:block;font-size:14.5px}
+  .kalist li span{color:var(--dim);font-size:13px}
+
+  /* ---------- principles ---------- */
+  .prin{display:grid;gap:10px}
+  .prow{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:16px 18px;
+        background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:start}
+  .prow .n{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--dim)}
+  .prow b{display:block;font-size:15px;margin-bottom:3px}
+  .prow p{margin:0;font-size:13.5px;color:var(--dim)}
+
+  /* ---------- custom mode boxes ---------- */
+  .cmgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}
+  @media(max-width:700px){.cmgrid{grid-template-columns:1fr}}
+  .cmbox{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:var(--paper)}
+  .cmbox.c2{background:#FBF3E4;border-color:#E9D3A3}
+  .cmbox .clabel{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+  .cmbox h3{margin:6px 0 10px;font-size:19px}
+  .cmbox ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--dim)}
+  .cmbox ul li{margin:4px 0}
+
+  /* ---------- decision helper ---------- */
+  .helper{padding:20px}
+  .hrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .hbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:8px 16px;font-size:13.5px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .hbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .hresult{margin-top:6px;border-radius:14px;padding:18px 20px;background:var(--paper);
+           border:1px solid var(--line);transition:background .2s,border-color .2s;
+           display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
+  @media(max-width:520px){.hresult{grid-template-columns:1fr}}
+  .hresult b{display:block;font-size:19px;margin-bottom:6px}
+  .hresult p{margin:0;font-size:13.5px;color:var(--dim)}
+  input:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  /* ---------- thumbnails ---------- */
+  .thumb{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .thumb svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+  .thumb .tl{position:absolute;inset:0;pointer-events:none}
+
+  .pairgrid{display:grid;gap:16px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px;align-items:stretch}
+  @media(max-width:600px){.pair{grid-template-columns:1fr}}
+  .pcard{border-radius:14px;overflow:hidden;border:2px solid var(--line)}
+  .pcard.no{border-color:#E8B9B4}
+  .pcard.yes{border-color:#A9D6B4}
+  .pcard .thumb{aspect-ratio:220/150;border-radius:0}
+  .pcard .pcap{padding:10px 12px}
+  .pcard .pcap b{display:flex;align-items:center;gap:6px;font-size:14px}
+  .pcard.no .pcap b{color:#A32A21}
+  .pcard.yes .pcap b{color:#2E7D3C}
+  .pcard .pcap p{margin:4px 0 0;font-size:12.5px;color:var(--dim)}
+  .pairlabel{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+             color:var(--dim);padding:14px 16px 0}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:680px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Phần 7 · tư duy, không phải công thức</p>
+  <h1>Tư duy phối màu cho chuyến đi có bạn bè</h1>
+  <p class="sub">Gu: phong cảnh du lịch, có bạn bè trong khung, thích tông ấm hoài cổ. Vấn đề không phải "filter nào đẹp nhất" — mà là giữ được một bộ ảnh trông như cùng một chuyến đi, dù chụp núi buổi sáng và bạn bè giữa trưa.</p>
+
+  <!-- ===== DECISION HELPER ===== -->
+  <div class="card helper">
+    <p class="lead" style="margin-bottom:14px">Bấm thử — đang chụp gì, ánh sáng ra sao?</p>
+    <div class="hrow" id="lightRow">
+      <button class="hbtn" data-light="sun" aria-pressed="true">Nắng ấm rõ</button>
+      <button class="hbtn" data-light="shade" aria-pressed="false">Râm / trong nhà / nhiều mây</button>
+    </div>
+    <div class="hrow" id="subjRow">
+      <button class="hbtn" data-subj="people" aria-pressed="true">Có mặt bạn bè trong khung</button>
+      <button class="hbtn" data-subj="hero" aria-pressed="false">Toàn cảnh — ảnh bìa của điểm đến</button>
+      <button class="hbtn" data-subj="normal" aria-pressed="false">Phong cảnh thường, không phải hero-shot</button>
+    </div>
+    <div class="hresult" id="hres">
+      <div class="thumb" id="hthumb">
+        <svg id="hscene" viewBox="0 0 220 150"><use href="#neutral"/></svg>
+        <div class="tl" id="htint" style="opacity:0"></div>
+      </div>
+      <div>
+        <b id="hresTitle">—</b>
+        <p id="hresDesc">—</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VÍ DỤ TRỰC QUAN ===== -->
+  <h2>Ví dụ trực quan — sai và đúng cạnh nhau</h2>
+  <p class="lead">Ba tình huống hay gặp nhất. Khung mô phỏng bằng CSS filter, đúng hướng lệch màu chứ không phải ảnh JPEG thật.</p>
+
+  <div class="card pairgrid">
+    <p class="pairlabel">Râm / trong nhà + có bạn bè trong khung</p>
+    <div class="pair">
+      <div class="pcard no">
+        <div class="thumb"><svg viewBox="0 0 220 150"><use href="#neutral"/></svg>
+          <div class="tl" style="background:#C24B3E;mix-blend-mode:multiply;opacity:.14"></div></div>
+        <div class="pcap"><b>✗ Kodachrome trong râm</b><p>Ô "tông da" ngả hồng/đỏ không tự nhiên vì thiếu nắng ấm để cân lại G−7.</p></div>
+      </div>
+      <div class="pcard yes">
+        <div class="thumb"><svg viewBox="0 0 220 150"><use href="#neutral"/></svg>
+          <div class="tl" style="background:#C9A876;mix-blend-mode:multiply;opacity:.08"></div></div>
+        <div class="pcap"><b>✓ Eterna trong râm</b><p>Lệch màu nhẹ hơn nhiều — ô "tông da" vẫn gần đúng thật.</p></div>
+      </div>
+    </div>
+
+    <p class="pairlabel">Nắng ấm rõ + toàn cảnh (ảnh bìa điểm đến)</p>
+    <div class="pair">
+      <div class="pcard no">
+        <div class="thumb"><svg viewBox="0 0 220 150"><use href="#shade"/></svg>
+          <div class="tl" style="background:#C9A876;mix-blend-mode:multiply;opacity:.08"></div></div>
+        <div class="pcap"><b>✗ Eterna cho hero-shot</b><p>Có nắng đẹp mà vẫn dùng tông nhạt — phí ánh sáng, ảnh thiếu điểm nhấn.</p></div>
+      </div>
+      <div class="pcard yes">
+        <div class="thumb"><svg viewBox="0 0 220 150"><use href="#shade"/></svg>
+          <div class="tl" style="background:#E0A038;mix-blend-mode:multiply;opacity:.06"></div></div>
+        <div class="pcap"><b>✓ Velvia cho hero-shot</b><p>Nắng ấm + không có mặt người → đây đúng là lúc được phép rực.</p></div>
+      </div>
+    </div>
+
+    <p class="pairlabel">Nắng ấm rõ + có bạn bè trong khung</p>
+    <div class="pair">
+      <div class="pcard no">
+        <div class="thumb"><svg viewBox="0 0 220 150"><use href="#neutral"/></svg>
+          <div class="tl" style="background:#8FAE6B;mix-blend-mode:multiply;opacity:.10"></div></div>
+        <div class="pcap"><b>✗ Chrome khi có người</b><p>G+2 xanh lá hợp núi rừng hơn da người — ô "tông da" ngả xanh không đẹp.</p></div>
+      </div>
+      <div class="pcard yes">
+        <div class="thumb"><svg viewBox="0 0 220 150"><use href="#neutral"/></svg>
+          <div class="tl" style="background:#C24B3E;mix-blend-mode:multiply;opacity:.10"></div></div>
+        <div class="pcap"><b>✓ Kodachrome khi có nắng</b><p>Cùng là công thức ấm, nhưng nắng đủ mạnh để cân lại G−7 — da lên tông khoẻ, không hồng giả.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ĐÁNH GIÁ 5 CÔNG THỨC ===== -->
+  <h2>Đánh giá thẳng — 5 công thức màu</h2>
+  <p class="lead">Nhìn qua lăng kính "cả cảnh lẫn người, trong một chuyến đi", không phải nhìn từng công thức riêng lẻ.</p>
+
+  <div class="vgrid">
+    <div class="vcard safe">
+      <span class="tag">An toàn cả ngày</span>
+      <h3>Eterna</h3>
+      <p>Nhạt nhất trong 5 cái, nhưng chính vì nhạt nên không phản bạn khi trời đổi từ nắng sang râm. Chọn làm tông neo mặc định.</p>
+    </div>
+    <div class="vcard sun">
+      <span class="tag">Chỉ khi nắng ấm</span>
+      <h3>Kodachrome 64</h3>
+      <p>Hợp gu nhất trên giấy — nhưng G−7 rất nặng tay. Gặp bóng râm dễ ngả hồng trên mặt. Không phải chế độ "cắm là quên".</p>
+    </div>
+    <div class="vcard warn">
+      <span class="tag">Tránh mặt người</span>
+      <h3>Chrome</h3>
+      <p>G+2 xanh lá hợp núi/rừng/biển hơn là da người. Dùng cho landscape thuần, đừng dùng khi bạn bè đứng giữa khung.</p>
+    </div>
+    <div class="vcard hero">
+      <span class="tag">Dành cho hero-shot</span>
+      <h3>Velvia</h3>
+      <p>Đẹp cho 1-2 tấm "ảnh bìa" phong cảnh mỗi điểm đến. Lạm dụng cho ảnh người thì da dễ cam gắt, nhất là da rám nắng.</p>
+    </div>
+    <div class="vcard mono">
+      <span class="tag">Điểm nghỉ, không phải gu chính</span>
+      <h3>OMTC Mono</h3>
+      <p>Không phục vụ hướng ấm của bạn, nhưng 1-2 tấm đen trắng kiến trúc/kết cấu giữa album giúp mắt người xem đỡ ngán màu.</p>
+    </div>
+  </div>
+
+  <!-- ===== ART FILTER GIỮ / TRÁNH ===== -->
+  <h2>12 Art Filter — giữ gì, bỏ gì</h2>
+  <p class="lead">Phần lớn Art Filter không hợp hướng hoài cổ, êm của bạn — chúng thiên về hiệu ứng gây chú ý tức thời.</p>
+
+  <div class="card kacols">
+    <div class="kacol keep">
+      <h3>Giữ lại</h3>
+      <ul class="kalist">
+        <li><b>Gentle Sepia</b><span>Đúng gu, dùng được cho cả người lẫn cảnh, không gắt.</span></li>
+        <li><b>Vintage</b><span>Ấm, hạt nhẹ, tối góc — hợp cả chân dung bạn bè lẫn phố cũ.</span></li>
+        <li><b>Dramatic Tone</b><span>Chỉ dành cảnh trời/núi có kịch tính thật (bão, hoàng hôn gắt) — không bao giờ chĩa vào mặt người.</span></li>
+      </ul>
+    </div>
+    <div class="kacol avoid">
+      <h3>Tránh</h3>
+      <ul class="kalist">
+        <li><b>Pop Art, Cross Process, Key Line</b><span>Quá kịch, phá vỡ cảm giác hoài cổ liền mạch giữa các tấm.</span></li>
+        <li><b>Pale &amp; Light Color, Light Tone</b><span>Pastel nhạt không hợp tông ấm — kéo cả bộ ảnh lệch sang hướng khác.</span></li>
+        <li><b>Diorama, Pin Hole</b><span>Hiệu ứng đặc thù (tilt-shift, lỗ kim) — dùng sai ngữ cảnh sẽ trông gượng, không phải "hoài cổ" mà là "hiệu ứng app".</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== 6 NGUYÊN TẮC ===== -->
+  <h2>Sáu nguyên tắc</h2>
+  <p class="lead">Đây là phần quan trọng nhất — bí quyết không nằm ở việc thử hết 5 công thức trong một buổi chụp.</p>
+
+  <div class="prin">
+    <div class="prow"><div class="n">1</div><div>
+      <b>Một tông neo, không phải năm tông thay nhau</b>
+      <p>Chọn Eterna làm mặc định cả ngày. Đừng nhảy giữa các công thức theo cảm hứng từng tấm — ảnh cuối chuyến sẽ rối màu.</p></div></div>
+    <div class="prow"><div class="n">2</div><div>
+      <b>Ánh sáng quyết định, không phải chủ thể</b>
+      <p>Đừng nghĩ "cảnh → Velvia, người → khác". Hỏi: nắng hay râm? Nắng ấm mới được bật Kodachrome, kể cả đang chụp phong cảnh.</p></div></div>
+    <div class="prow"><div class="n">3</div><div>
+      <b>Dành hero-shot riêng, có chủ đích</b>
+      <p>Mỗi điểm đến chỉ 1-2 tấm "ảnh bìa" được phép bật Velvia hoặc Dramatic Tone. Còn lại đi theo tông neo.</p></div></div>
+    <div class="prow"><div class="n">4</div><div>
+      <b>Mặt người là phép thử, không phải phong cảnh</b>
+      <p>Trước khi khoá một công thức cho cả buổi, chụp thử một tấm có mặt bạn bè rồi nhìn màu da trước — đừng đợi về nhà mới xem.</p></div></div>
+    <div class="prow"><div class="n">5</div><div>
+      <b>Hai Custom Mode, không phải năm</b>
+      <p>Bớt lựa chọn thì tư duy lúc chụp mới nhanh — không đứng ngoài cảnh đẹp mà loay hoay chỉnh máy.</p></div></div>
+    <div class="prow"><div class="n">6</div><div>
+      <b>RAW+JPEG khi còn phân vân</b>
+      <p>Với Kodachrome — công thức dễ lệch nhất — cứ bật kèm RAW. Hỏng màu JPEG vẫn còn đường lùi.</p></div></div>
+  </div>
+
+  <!-- ===== CUSTOM MODE ===== -->
+  <h2>Bộ đôi Custom Mode trên bánh xoay</h2>
+  <div class="card cmgrid">
+    <div class="cmbox">
+      <span class="clabel">C1 · mặc định</span>
+      <h3>Eterna</h3>
+      <ul>
+        <li>Muted · Auto WB A+1 G+1</li>
+        <li>Saturation −2 · Shadow −2</li>
+        <li>Bật khi: không chắc ánh sáng, có mặt bạn bè, cả ngày nói chung</li>
+      </ul>
+    </div>
+    <div class="cmbox c2">
+      <span class="clabel">C2 · chỉ khi nắng ấm</span>
+      <h3>Kodachrome 64</h3>
+      <ul>
+        <li>Muted · Daylight A0 G−7</li>
+        <li>Saturation −1 · Sharpness +1 · Highlight +2 · Shadow −3</li>
+        <li>Bật khi: nắng rõ, golden hour — tắt ngay khi vào bóng râm</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="note">
+    Đây là góc nhìn cá nhân dựa trên 5 công thức và 12 Art Filter đã tổng hợp ở hai trang trước
+    (<a href="cong-thuc-mau-chia-se.html">công thức màu đã chia sẻ</a> ·
+    <a href="art-filter-mo-phong.html">Art Filter mô phỏng</a>), áp cho gu "phong cảnh du lịch có bạn bè,
+    tông ấm hoài cổ". Đổi gu thì thứ tự ưu tiên ở trên cũng đổi theo — đây không phải quy tắc cố định.
+  </p>
+</div>
+
+<!-- ===== HIDDEN SVG ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC0DF"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="canopyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8FC49A"/><stop offset="1" stop-color="#2E5638"/></linearGradient>
+
+  <symbol id="forest" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#canopyG)"/>
+    <g fill="#2A5136"><rect x="10" y="8" width="14" height="126" rx="3"/>
+      <rect x="42" y="0" width="10" height="136" rx="3"/>
+      <rect x="182" y="4" width="15" height="130" rx="3"/>
+      <rect x="158" y="0" width="9" height="124" rx="3"/></g>
+    <g fill="#438554" opacity=".9"><ellipse cx="30" cy="24" rx="36" ry="16"/>
+      <ellipse cx="188" cy="18" rx="38" ry="17"/><ellipse cx="108" cy="10" rx="44" ry="15"/></g>
+    <g fill="#FFEFBC" opacity=".5"><ellipse cx="74" cy="42" rx="16" ry="7"/>
+      <ellipse cx="146" cy="34" rx="11" ry="6"/></g>
+    <path d="M0,150 L0,116 Q44,104 84,116 Q120,126 158,112 Q194,100 220,112 L220,150 Z" fill="#24462F"/>
+    <path d="M96,150 C100,132 86,124 94,112" stroke="#C9A272" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <circle cx="40" cy="128" r="3" fill="#FF5A4A"/><circle cx="176" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="shade" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="184" cy="24" r="10" fill="#FFF3CC"/>
+    <polygon points="0,92 36,44 66,72 92,38 126,92" fill="#93ABBA"/>
+    <polygon points="92,38 103,55 82,53" fill="#F3F8FA"/>
+    <polygon points="108,92 148,42 192,92" fill="#7E9BAD"/>
+    <path d="M0,86 Q56,66 112,84 T220,77 L220,150 L0,150 Z" fill="#4A7F59"/>
+    <path d="M0,104 Q60,94 130,106 T220,100 L220,150 L0,150 Z" fill="#35624392"/>
+    <rect x="102" y="96" width="13" height="14" rx="4" fill="#D8382C"/>
+    <circle cx="108.5" cy="90" r="5" fill="#E9B58E"/>
+    <g fill="#2F5C3C"><polygon points="24,80 34,104 14,104"/><polygon points="188,76 200,104 176,104"/></g>
+    <circle cx="46" cy="128" r="3" fill="#FF5A4A"/><circle cx="170" cy="124" r="3" fill="#FFD24A"/>
+  </symbol>
+
+  <symbol id="neutral" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <g><rect x="14" y="14" width="38" height="38" fill="#FFFFFF"/>
+       <rect x="56" y="14" width="38" height="38" fill="#C9C9C9"/>
+       <rect x="98" y="14" width="38" height="38" fill="#8C8C8C"/>
+       <rect x="140" y="14" width="38" height="38" fill="#4A4A4A"/>
+       <rect x="182" y="14" width="24" height="38" fill="#141414"/></g>
+    <g><rect x="14" y="60" width="38" height="30" fill="#C8352C"/>
+       <rect x="56" y="60" width="38" height="30" fill="#E0A038"/>
+       <rect x="98" y="60" width="38" height="30" fill="#4DA85E"/>
+       <rect x="140" y="60" width="38" height="30" fill="#4E7FD0"/>
+       <rect x="182" y="60" width="24" height="30" fill="#C455A0"/></g>
+    <rect x="14" y="98" width="192" height="38" rx="6" fill="#E9B58E"/>
+    <text x="18" y="122" font-family="ui-monospace,monospace" font-size="13" fill="#6B5A4E">tông da</text>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var state={light:"sun", subj:"people"};
+
+  var PRESET_CSS={
+    chrome:    {c:1.08,s:.72,b:1.0,  tint:"#8FAE6B",op:.10},
+    eterna:    {c:.97, s:.72,b:1.03, tint:"#C9A876",op:.08},
+    velvia:    {c:1.22,s:1.55,b:1.0, tint:"#E0A038",op:.06},
+    kodachrome:{c:1.18,s:1.05,b:1.03,tint:"#C24B3E",op:.14}
+  };
+
+  var MATRIX={
+    "sun|people":  {t:"C2 · Kodachrome 64 — nhưng ngắm mặt trước",
+                    d:"Nắng ấm hợp Kodachrome, nhưng vẫn còn mặt người trong khung. Chụp thử một tấm, nhìn màu da: nếu ổn thì giữ C2, nếu hơi hồng thì lùi về C1 (Eterna).",
+                    scene:"neutral", preset:"kodachrome"},
+    "sun|hero":    {t:"Velvia (bật tay, không cần custom mode)",
+                    d:"Đây đúng là khoảnh khắc hero-shot: nắng đẹp + toàn cảnh không có mặt người. Đẩy Velvia thoải mái, đây là tấm được phép rực.",
+                    scene:"shade", preset:"velvia"},
+    "sun|normal":  {t:"C2 · Kodachrome 64",
+                    d:"Nắng ấm, phong cảnh thường không phải ảnh bìa — Kodachrome vẫn hợp và giữ được sự nhất quán ấm áp của cả bộ ảnh.",
+                    scene:"forest", preset:"kodachrome"},
+    "shade|people":{t:"C1 · Eterna",
+                    d:"Râm hoặc trong nhà + có mặt bạn bè là tình huống rủi ro nhất cho màu da. Ở lại Eterna, đừng thử nghiệm lúc này.",
+                    scene:"neutral", preset:"eterna"},
+    "shade|hero":  {t:"C1 · Eterna (hoặc Chrome nếu toàn cây/núi)",
+                    d:"Không có nắng ấm thì Velvia/Kodachrome mất lý do tồn tại. Nếu toàn cảnh là rừng núi không có trời, có thể thử Chrome cho tông xanh rêu điện ảnh.",
+                    scene:"shade", preset:"eterna"},
+    "shade|normal":{t:"C1 · Eterna",
+                    d:"Ánh sáng không ủng hộ tông ấm mạnh. Giữ tông neo, đừng ép máy lên màu nó không có.",
+                    scene:"forest", preset:"eterna"}
+  };
+
+  function render(){
+    var r=MATRIX[state.light+"|"+state.subj];
+    $("hresTitle").textContent=r.t;
+    $("hresDesc").textContent=r.d;
+
+    $("hscene").innerHTML='<use href="#'+r.scene+'"/>';
+    var p=PRESET_CSS[r.preset];
+    $("hscene").style.filter="contrast("+p.c+") saturate("+p.s+") brightness("+p.b+")";
+    var tint=$("htint");
+    tint.style.background=p.tint;
+    tint.style.mixBlendMode="multiply";
+    tint.style.opacity=p.op;
+  }
+
+  function group(attr,fn){
+    var list=document.querySelectorAll("[data-"+attr+"]");
+    Array.prototype.forEach.call(list,function(b){
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(list,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        fn(b.getAttribute("data-"+attr));
+      });
+    });
+  }
+  group("light",function(v){ state.light=v; render(); });
+  group("subj",function(v){ state.subj=v; render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>

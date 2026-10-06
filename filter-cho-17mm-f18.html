@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>17mm f/1.8 — bộ lọc màu trong máy</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0; --red:#C8352C;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:660px}
+
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:700px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- lab ---------- */
+  .lab{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;padding:20px}
+  @media(max-width:860px){.lab{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .view svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+  .divider{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);pointer-events:none}
+  .vlabel{position:absolute;top:8px;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:99px;
+          background:rgba(0,0,0,.55);color:#fff;pointer-events:none}
+
+  .cmp{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--dim)}
+  .cmp input{flex:1}
+
+  .scenes{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .rhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:18px 0 2px}
+  .rhead b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+  .rhead span{font-size:13px;color:var(--dim)}
+
+  .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  @media(max-width:480px){.sgrid{grid-template-columns:1fr 1fr}}
+  .sgrid div{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 11px}
+  .sgrid i{display:block;font-style:normal;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  .sgrid b{font-family:var(--mono);font-size:13.5px;font-weight:600}
+  .sgrid .wide{grid-column:1/-1}
+  .sgrid .chg{border-color:var(--amber);background:#FFF7E6}
+
+  .fit{margin-top:12px;border-radius:14px;padding:11px 14px;font-size:13.5px;border:1px solid var(--line);background:var(--paper)}
+  .fit b{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:3px}
+  .fit.hop b{color:#2F7D40} .fit.tuy b{color:#9A6A10} .fit.thu b{color:var(--dim)}
+  .rnote{margin:10px 0 0;font-size:13.5px;color:var(--dim)}
+  .rsrc{margin:6px 0 0;font-size:12.5px;color:var(--dim)}
+  .rsrc a,.lead a,.note a,.src a{color:var(--ink)}
+
+  /* ---------- tự vặn ---------- */
+  details{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+  summary{cursor:pointer;font-size:14px;font-weight:700}
+  .knobs{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:8px}
+  @media(max-width:480px){.knobs{grid-template-columns:1fr}}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline}
+  .ctl .top b{font-size:13px}
+  .ctl .top i{font-style:normal;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+  input[type=range]{width:100%;height:24px;accent-color:var(--ink)}
+  select{width:100%;padding:7px 10px;border:1px solid var(--line);border-radius:10px;
+         background:var(--paper);font-family:var(--disp);font-size:13.5px;color:var(--ink)}
+  .reset{margin-top:8px;border:1px solid var(--line);background:#fff;border-radius:99px;
+         padding:6px 14px;font-size:12.5px;cursor:pointer;font-family:var(--disp)}
+  input:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  /* ---------- thư viện ---------- */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:5px 12px;
+        font-size:12.5px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .chip[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .lib{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:760px;overflow:auto;padding:2px}
+  @media(max-width:860px){.lib{grid-template-columns:repeat(3,1fr);max-height:none}}
+  @media(max-width:520px){.lib{grid-template-columns:1fr 1fr}}
+  .tile{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:6px;cursor:pointer;
+        font-family:var(--disp);color:var(--ink);text-align:left}
+  .tile[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+  .tile svg{display:block;width:100%;aspect-ratio:220/150;border-radius:8px}
+  .tile span{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;margin:6px 2px 1px}
+  .tile small{display:block;font-size:11px;color:var(--dim);margin:0 2px 2px}
+  .dot{flex:none;width:8px;height:8px;border-radius:50%}
+  .dot.hop{background:var(--green)} .dot.tuy{background:var(--amber)} .dot.thu{background:#B9B1C2}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:10px}
+  .legend span{display:flex;align-items:center;gap:6px}
+
+  /* ---------- rows ---------- */
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1.1fr .9fr 1.5fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px}
+  .row code{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .row p{margin:0;font-size:13px;color:var(--dim)}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:720px}
+  .src{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--dim)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">M.Zuiko 17mm f/1.8 · bộ lọc màu trong máy</p>
+  <h1>17mm f/1.8 — bộ lọc màu nào hợp</h1>
+  <p class="sub">Toàn bộ công thức màu tìm được cho thân máy đời E-M10 II, gom về một chỗ. Mỗi khung hình được vẽ ra từ chính các con số cài đặt, nên vặn số nào là thấy màu đổi theo số đó. Dùng ống kit thì xem <a href="filter-cho-14-42mm.html" style="color:inherit">trang 14-42mm</a>.</p>
+
+  <!-- ===== LAB ===== -->
+  <div class="card lab">
+    <div>
+      <div class="view" id="view">
+        <svg id="svOrig" viewBox="0 0 220 150"><use href="#street"/></svg>
+        <svg id="svFx" viewBox="0 0 220 150" style="filter:url(#f-live)"><use href="#street"/></svg>
+        <div class="divider" id="divider" hidden></div>
+        <span class="vlabel" style="left:8px">công thức</span>
+        <span class="vlabel" id="lblOrig" style="right:8px" hidden>gốc</span>
+      </div>
+      <div class="cmp"><span>Kéo sang trái để lộ ảnh gốc</span>
+        <input type="range" id="sCmp" min="0" max="100" value="100" aria-label="So với ảnh gốc"></div>
+
+      <div class="scenes">
+        <button class="sbtn" data-scene="street" aria-pressed="true">Phố ban ngày</button>
+        <button class="sbtn" data-scene="portrait" aria-pressed="false">Người ở f/1.8</button>
+        <button class="sbtn" data-scene="night" aria-pressed="false">Phố đêm</button>
+        <button class="sbtn" data-scene="chart" aria-pressed="false">Bảng màu</button>
+      </div>
+
+      <div class="rhead"><b id="rname">—</b><span id="rgroup"></span></div>
+      <div class="sgrid" id="sgrid"></div>
+      <div class="fit" id="fitBox"><b id="fitT"></b><span id="fitD"></span></div>
+      <p class="rnote" id="rnote"></p>
+      <p class="rsrc" id="rsrc"></p>
+
+      <details>
+        <summary>Tự vặn thử từ công thức này</summary>
+        <div class="knobs">
+          <div class="ctl" style="grid-column:1/-1"><div class="top"><b>Picture Mode</b></div>
+            <select id="kMode"></select></div>
+          <div class="ctl"><div class="top"><b>Contrast</b><i id="vCon"></i></div>
+            <input type="range" id="kCon" min="-2" max="2" step="1"></div>
+          <div class="ctl"><div class="top"><b>Saturation</b><i id="vSat"></i></div>
+            <input type="range" id="kSat" min="-2" max="2" step="1"></div>
+          <div class="ctl"><div class="top"><b>Highlight</b><i id="vHl"></i></div>
+            <input type="range" id="kHl" min="-7" max="7" step="1"></div>
+          <div class="ctl"><div class="top"><b>Shadow</b><i id="vSh"></i></div>
+            <input type="range" id="kSh" min="-7" max="7" step="1"></div>
+          <div class="ctl"><div class="top"><b>WB trục A–B</b><i id="vA"></i></div>
+            <input type="range" id="kA" min="-7" max="7" step="1"></div>
+          <div class="ctl"><div class="top"><b>WB trục G–M</b><i id="vG"></i></div>
+            <input type="range" id="kG" min="-7" max="7" step="1"></div>
+        </div>
+        <button class="reset" id="resetBtn">Trả về công thức gốc</button>
+      </details>
+    </div>
+
+    <div>
+      <div class="chips" id="chips"></div>
+      <div class="lib" id="lib"></div>
+      <div class="legend">
+        <span><i class="dot hop"></i>hợp 17mm f/1.8</span>
+        <span><i class="dot tuy"></i>tuỳ cảnh</span>
+        <span><i class="dot thu"></i>trang tự đề xuất, chưa thử</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHỌN THEO TÌNH HUỐNG ===== -->
+  <h2>Chọn theo việc bạn hay làm với 17mm</h2>
+  <p class="lead">Góc nhìn tương đương 34mm gần như lúc nào cũng có người trong khung, nên màu da là thứ quyết định trước tiên. Mở f/1.8 thì bốn góc tối nhẹ, từ f/2.8 là hết.</p>
+
+  <div class="rows">
+    <div class="row"><b>Phố ban ngày, có người</b><code>Eterna · Classic Chrome 85%</code>
+      <p>Màu nhạt, lệch WB ít nên da không bị ám. Để máy cả buổi không phải đổi.</p></div>
+    <div class="row"><b>Người trong bối cảnh ở f/1.8</b><code>Robin Wong · OMTC Soft</code>
+      <p>Chọn công thức giữ màu da đúng. Tránh Shadow âm sâu vì ở f/1.8 nó cộng với tối góc.</p></div>
+    <div class="row"><b>Nắng gắt, kiến trúc, bóng đổ</b><code>Chrome · Mono kính đỏ</code>
+      <p>Shadow −4 hoặc Contrast +2 hợp nắng cứng. Khép về f/2.8 trở lên, hoặc bật Shading Comp., để bốn góc không tối thêm.</p></div>
+    <div class="row"><b>Giờ vàng, du lịch</b><code>Kodachrome 64 · OMTC Warm · Ấm bình minh</code>
+      <p>Ba công thức ấm mạnh, cần nắng thật để cân lại. Vào bóng râm là da ngả hồng hoặc cam.</p></div>
+    <div class="row"><b>Phố đêm, quán xá</b><code>Phố đêm đèn màu · Eterna</code>
+      <p>Đèn neon vốn đã bão hoà. Hạ Saturation và bù sáng âm để biển hiệu không bết thành mảng.</p></div>
+    <div class="row"><b>Phong cảnh không người</b><code>Velvia · Pop</code>
+      <p>Lúc được phép rực. Khép f/4–f/5.6 để nét đều và hết viền màu quanh cành cây ngược sáng.</p></div>
+  </div>
+
+  <!-- ===== MÁY CÓ GÌ ===== -->
+  <h2>E-M10 II vặn được gì, thiếu gì</h2>
+  <p class="lead">Nhiều công thức gốc viết cho PEN-F, E-P7 hoặc OM-3. Phần nào máy bạn không có thì trang này đã bỏ và ghi rõ ở từng công thức.</p>
+
+  <div class="rows">
+    <div class="row"><b>Có</b><code>Picture Mode · Contrast · Saturation · Sharpness · Gradation</code>
+      <p>Ba thông số chính chạy từ −2 đến +2. Gradation nên để Normal; Auto tự kéo sáng vùng tối và làm lộ nhiễu.</p></div>
+    <div class="row"><b>Có</b><code>WB shift A–B và G–M, mỗi trục ±7</code>
+      <p>Công cụ chính để giả tông phim. Số dương là ngả hổ phách (A) và xanh lá (G); số âm là xanh dương và hồng tím.</p></div>
+    <div class="row"><b>Có</b><code>Highlight &amp; Shadow, mỗi đầu ±7</code>
+      <p>Bấm Fn2 (nút đa năng), bánh trước chỉnh Highlight, bánh sau chỉnh Shadow. Máy đời này không có nấc Midtone, nên công thức nào có Midtone thì đổi sang bù sáng.</p></div>
+    <div class="row"><b>Có</b><code>Color Creator · Monotone + kính lọc màu</code>
+      <p>Color Creator ám cả ảnh theo một màu trên vòng màu, và tự khoá WB ở Auto. Monotone có kính Vàng, Cam, Đỏ, Lục — không có kính Lam.</p></div>
+    <div class="row"><b>Không có</b><code>Color Profile 12 màu · Mono Profile · Grain</code>
+      <p>Chỉnh riêng từng màu là thứ làm nên công thức OM-3 và PEN-F. Các bản "rút gọn" ở trên chỉ giữ được phần đường cong và WB. Hạt chỉ có trong Art Filter Grainy Film, không ghép được với Picture Mode.</p></div>
+  </div>
+
+  <!-- ===== CÀI ĐẶT NỀN ===== -->
+  <h2>Bốn cài đặt nên xem lại trước khi dùng công thức</h2>
+  <p class="lead">Mặc định của máy ảnh hưởng tới màu và nhiễu nhiều hơn chênh lệch giữa hai công thức gần nhau, kể cả với ống khẩu lớn.</p>
+
+  <div class="rows">
+    <div class="row"><b>Trần ISO-Auto</b><code>mặc định 1600</code>
+      <p>Với f/1.8 thì 1600 thường đủ. Phố đêm có người đi lại thì nâng lên 3200 để giữ tốc độ.</p></div>
+    <div class="row"><b>Noise Filter</b><code>mặc định Standard</code>
+      <p>Standard xoá nhiễu kèm cả chi tiết. Off cho ISO 1600 trở xuống, Low từ 3200. Đây là mục khác với Noise Reduct. dành cho phơi lâu.</p></div>
+    <div class="row"><b>Keep Warm Color</b><code>mặc định On</code>
+      <p>Dưới đèn vàng, WB Auto giữ lại ám cam. Mọi công thức dùng WB Auto trong nhà đều chịu ảnh hưởng; tắt đi nếu muốn da trung tính.</p></div>
+    <div class="row"><b>Shading Comp.</b><code>mặc định Off</code>
+      <p>Bật lên để máy tự bù tối góc khi mở f/1.8, nhất là khi dùng công thức có Shadow âm.</p></div>
+  </div>
+
+  <p class="note">
+    Khung xem là mô hình: mỗi nấc thông số được quy ra một lượng lệch màu, đường cong và độ bão hoà cố định, áp lên hình vẽ.
+    Nó cho thấy đúng hướng và độ mạnh tương đối giữa các công thức, không phải JPEG thật từ máy. Sharpness, Noise Filter, bù sáng, tối góc và viền màu của ống không được vẽ ra.
+    Đánh giá "hợp 17mm" và ba công thức nhóm "Gợi ý của trang" là suy luận từ đặc tính ống, chưa ai kiểm chứng — chụp thử rồi chỉnh.
+    Rob Trek không nêu chế độ WB; WB Auto ở ba công thức đó là giả định của trang. Thay Midtone bằng bù sáng chỉ là xấp xỉ thô: bù sáng dịch cả ảnh chứ không uốn riêng vùng giữa. Bật RAW+JPEG để luôn còn bản gốc.
+  </p>
+  <p class="note" style="margin-top:18px">Nguồn công thức</p>
+  <ul class="src">
+    <li><a href="https://marcrphoto.wordpress.com/2022/01/03/recipe-update-three-fuji-simulations-for-olympus-camera-by-rob-trek/">Rob Trek qua blog Open Source Photography</a> — Chrome, Eterna, Velvia, viết cho chính E-M10 II</li>
+    <li><a href="http://myolympusomd.blogspot.com/2019/03/a-practical-guide-to-olympus-color.html">VideoPic — A practical guide to Olympus color</a> — Kodachrome 64, Classic Chrome 85%</li>
+    <li><a href="http://myolympusomd.blogspot.com/p/how-to-create-and-save-profiles-for.html">VideoPic — General Olympus Profiles</a> — Ấm bình minh bằng Color Creator</li>
+    <li><a href="https://omtc.substack.com/p/5-jpeg-recipes-for-the-om-system">Ali O'Keefe — 5 JPEG recipes for the OM-3</a> — OMTC Warm, Cool, Soft, Chrome, Mono</li>
+    <li><a href="https://robinwong.blogspot.com/2019/11/robin-wongs-om-d-cheat-sheet-updated.html">Robin Wong — OM-D cheat sheet</a> — nền trung tính</li>
+    <li><a href="https://www.mu-43.com/threads/how-to-get-best-jpeg-on-e-m10.79284/">mu-43 — How to get best JPEG on E-M10</a> và <a href="https://www.mu-43.com/threads/which-settings-for-jpeg-film-simulation-on-om-1.118937/">JPEG film simulation on OM-1</a> — Pop, Phẳng, Ấm hằng ngày</li>
+    <li><a href="https://www.dpreview.com/forums/threads/em-1-monotone-settings.4037783/">DPReview — E-M1 Monotone settings</a> — Mono kính đỏ</li>
+    <li><a href="https://om-recipes.com/">om-recipes.com</a> — kho công thức lớn nhất, nhưng phần lớn cần Color Profile 12 màu nên không đưa vào đây</li>
+  </ul>
+</div>
+
+<!-- ===== DEFS ===== -->
+<svg id="defsSvg" width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs">
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#6FB4DC"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="cafeG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8E7A66"/><stop offset="1" stop-color="#4A3A30"/></linearGradient>
+  <filter id="bk"><feGaussianBlur stdDeviation="2.4"/></filter>
+
+  <symbol id="street" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <g fill="#FFFFFF"><ellipse cx="78" cy="24" rx="17" ry="6"/><ellipse cx="92" cy="19" rx="13" ry="6"/>
+      <ellipse cx="128" cy="38" rx="12" ry="4"/></g>
+    <polygon points="62,60 86,52 86,104 62,104" fill="#C9C2CC"/>
+    <polygon points="122,56 148,62 148,104 122,104" fill="#B8B4C2"/>
+    <g fill="#3F8752"><circle cx="100" cy="82" r="11"/><circle cx="112" cy="86" r="9"/></g>
+    <rect x="103" y="90" width="3" height="14" fill="#5A4636"/>
+    <polygon points="0,0 60,28 60,104 0,128" fill="#C2A47E"/>
+    <g fill="#6E5A46"><polygon points="8,26 22,31 22,52 8,49"/><polygon points="32,35 48,40 48,58 32,55"/></g>
+    <polygon points="6,66 50,68 50,92 6,96" fill="#C8352C"/>
+    <polygon points="12,74 44,75 44,84 12,86" fill="#F4E9D8"/>
+    <polygon points="220,0 150,24 150,104 220,130" fill="#8E8F9A"/>
+    <polygon points="160,60 212,54 212,114 160,101" fill="#2E3D4A"/>
+    <rect x="168" y="72" width="14" height="24" rx="3" fill="#E0A038"/>
+    <rect x="190" y="70" width="14" height="32" rx="3" fill="#2F8F8A"/>
+    <polygon points="158,46 214,36 214,50 158,57" fill="#F1C84B"/>
+    <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#77737A"/>
+    <polygon points="0,128 60,104 96,104 40,150 0,150" fill="#4E4B55"/>
+    <rect x="124" y="98" width="12" height="26" rx="4" fill="#2F5FA8"/>
+    <rect x="122" y="122" width="6" height="16" rx="2" fill="#3A3540"/><rect x="131" y="122" width="6" height="16" rx="2" fill="#3A3540"/>
+    <circle cx="130" cy="91" r="6" fill="#E3AE8B"/>
+    <path d="M124,90a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#2B1E1A"/>
+    <rect x="76" y="106" width="9" height="18" rx="3" fill="#D45A7A"/><circle cx="80.5" cy="101" r="4.4" fill="#C9906C"/>
+  </symbol>
+
+  <symbol id="portrait" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#cafeG)"/>
+    <g filter="url(#bk)">
+      <rect x="0" y="10" width="62" height="80" fill="#A9C6DA"/>
+      <rect x="150" y="0" width="70" height="60" fill="#5E4A3C"/>
+      <circle cx="170" cy="30" r="10" fill="#FFD98A"/><circle cx="198" cy="44" r="8" fill="#FFC56B"/>
+      <circle cx="140" cy="20" r="7" fill="#F2A65A"/><circle cx="84" cy="26" r="6" fill="#7FD0C8"/>
+      <circle cx="204" cy="86" r="9" fill="#E06A8C"/>
+      <ellipse cx="26" cy="112" rx="24" ry="30" fill="#3F8752"/>
+      <rect x="0" y="118" width="220" height="32" fill="#6B4E3A"/>
+    </g>
+    <path d="M58,150 Q62,108 96,102 L130,102 Q164,108 168,150 Z" fill="#4E6E8E"/>
+    <path d="M100,104 L113,122 L126,104 Z" fill="#F4EEE6"/>
+    <rect x="104" y="84" width="18" height="22" rx="6" fill="#D49C7A"/>
+    <ellipse cx="113" cy="64" rx="24" ry="29" fill="#E3AE8B"/>
+    <path d="M113,35 a24,29 0 0 1 0,58 Z" fill="#CF9670"/>
+    <path d="M88,62 Q86,30 113,30 Q142,30 138,64 Q134,44 113,44 Q94,44 88,62 Z" fill="#2B1E1A"/>
+    <g fill="#3A2A24"><ellipse cx="103" cy="64" rx="2.6" ry="1.8"/><ellipse cx="123" cy="64" rx="2.6" ry="1.8"/></g>
+    <path d="M106,79 Q113,84 120,79" stroke="#B4574F" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <rect x="160" y="118" width="22" height="24" rx="4" fill="#C8352C"/>
+    <ellipse cx="171" cy="118" rx="11" ry="3.5" fill="#F4EEE6"/>
+  </symbol>
+
+  <symbol id="night" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#0B1024"/>
+    <polygon points="0,0 60,22 60,104 0,128" fill="#1A2038"/>
+    <polygon points="220,0 150,20 150,104 220,130" fill="#1F2440"/>
+    <polygon points="62,48 86,42 86,104 62,104" fill="#141930"/>
+    <polygon points="122,46 148,52 148,104 122,104" fill="#161B36"/>
+    <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#1C1C26"/>
+    <g fill="#FFD98A"><polygon points="8,30 20,34 20,48 8,46"/><polygon points="32,62 46,63 46,78 32,79"/>
+      <rect x="68" y="60" width="6" height="8"/><rect x="128" y="64" width="6" height="8"/><rect x="138" y="76" width="6" height="8"/></g>
+    <polygon points="160,50 208,42 208,60 160,64" fill="#FF4FA3"/>
+    <polygon points="166,54 200,49 200,56 166,60" fill="#FFD1E6"/>
+    <polygon points="10,70 26,72 26,96 10,100" fill="#3FE0E8"/>
+    <rect x="170" y="74" width="30" height="24" fill="#FFB85A"/>
+    <circle cx="60" cy="40" r="5" fill="#FFF0BF"/><circle cx="150" cy="36" r="5" fill="#FFF0BF"/>
+    <g opacity=".45"><polygon points="168,116 202,124 206,146 164,134" fill="#FF4FA3"/>
+      <polygon points="8,122 26,116 30,138 6,146" fill="#3FE0E8"/><polygon points="92,108 128,108 136,150 84,150" fill="#FFB85A"/></g>
+    <rect x="104" y="92" width="13" height="26" rx="4" fill="#7A3B46"/>
+    <rect x="103" y="116" width="6" height="16" rx="2" fill="#262331"/><rect x="112" y="116" width="6" height="16" rx="2" fill="#262331"/>
+    <circle cx="110.5" cy="85" r="6" fill="#D9A07C"/>
+    <path d="M104.5,84a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#1E1614"/>
+  </symbol>
+
+  <symbol id="chart" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <rect x="14" y="14" width="38" height="34" fill="#FFFFFF"/><rect x="56" y="14" width="38" height="34" fill="#C9C9C9"/>
+    <rect x="98" y="14" width="38" height="34" fill="#8C8C8C"/><rect x="140" y="14" width="38" height="34" fill="#4A4A4A"/>
+    <rect x="182" y="14" width="24" height="34" fill="#141414"/>
+    <rect x="14" y="54" width="29" height="30" fill="#C8352C"/><rect x="47" y="54" width="29" height="30" fill="#E0A038"/>
+    <rect x="80" y="54" width="29" height="30" fill="#F1D94B"/><rect x="113" y="54" width="29" height="30" fill="#4DA85E"/>
+    <rect x="146" y="54" width="29" height="30" fill="#4E7FD0"/><rect x="179" y="54" width="27" height="30" fill="#C455A0"/>
+    <rect x="14" y="90" width="62" height="46" rx="6" fill="#F0C4A4"/><rect x="80" y="90" width="62" height="46" rx="6" fill="#D9A07C"/>
+    <rect x="146" y="90" width="60" height="46" rx="6" fill="#9A6A4C"/>
+    <text x="19" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#6B5A4E">da sáng</text>
+    <text x="85" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#5A4636">da ngăm</text>
+    <text x="151" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#F0E2D6">da nâu</text>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var NS="http://www.w3.org/2000/svg";
+
+  /* ---------- mô hình: thông số máy -> lượng lệch màu ---------- */
+  var MODES={
+    "i-Enhance":{sat:1.18,con:.4},
+    "Vivid":{sat:1.3,con:.6},
+    "Natural":{sat:1,con:0},
+    "Muted":{sat:.8,con:-.6},
+    "Portrait":{sat:.95,con:-.3,warm:.6},
+    "Color Creator":{sat:1.1,con:0,cc:[1.06,1,.9]},
+    "Monotone":{sat:0,con:.2}
+  };
+  var WBS={"Auto":0,"Auto, giữ màu ấm":0,"Nắng 5300K":0,"CWB 5600K":.4,"Auto hoặc Bóng râm":1.6};
+  var BW={"Không":[.30,.59,.11],"Vàng":[.38,.57,.05],"Cam":[.50,.46,.04],"Đỏ":[.66,.32,.02],"Lục":[.18,.74,.08]};
+
+  function clamp(x){ return Math.max(0,Math.min(1,x)); }
+
+  function model(p){
+    var m=MODES[p.mode], mono=p.mode==="Monotone",
+        w=(WBS[p.wb]||0)+(m.warm||0)+p.a,
+        r=(1+.018*w)*(1-.005*p.g), g=1+.013*p.g, b=(1-.028*w)*(1-.005*p.g), mat, i;
+    if(m.cc){ r*=m.cc[0]; g*=m.cc[1]; b*=m.cc[2]; }
+    var L=.3*r+.59*g+.11*b; r/=L; g/=L; b/=L;
+    if(mono){
+      var k=BW[p.bw||"Không"], row=k[0]+" "+k[1]+" "+k[2]+" 0 0 ";
+      mat=row+row+row+"0 0 0 1 0";
+    } else {
+      mat=r.toFixed(3)+" 0 0 0 0 0 "+g.toFixed(3)+" 0 0 0 0 0 "+b.toFixed(3)+" 0 0 0 0 0 1 0";
+    }
+    var a=.03*(m.con+p.con), tab=[];
+    for(i=0;i<=16;i++){
+      var x=i/16,
+          y=x-a*Math.sin(2*Math.PI*x)
+            +.032*p.sh*4*x*(1-x)*(1-x)
+            +.032*p.hl*4*x*x*(1-x);
+      tab.push(clamp(y).toFixed(3));
+    }
+    return {mat:mat, sat:mono?1:Math.max(0,m.sat*(1+.13*p.sat)), tab:tab.join(" ")};
+  }
+
+  function mk(name,attrs,parent){
+    var e=document.createElementNS(NS,name), k;
+    for(k in attrs) e.setAttribute(k,attrs[k]);
+    if(parent) parent.appendChild(e);
+    return e;
+  }
+
+  function makeFilter(id){
+    var f=mk("filter",{id:id,x:"0",y:"0",width:"100%",height:"100%","color-interpolation-filters":"sRGB"},$("defs")),
+        m1=mk("feColorMatrix",{type:"matrix"},f),
+        m2=mk("feColorMatrix",{type:"saturate"},f),
+        ct=mk("feComponentTransfer",{},f),
+        fn=["R","G","B"].map(function(c){ return mk("feFunc"+c,{type:"table"},ct); });
+    return function(p){
+      var o=model(p);
+      m1.setAttribute("values",o.mat);
+      m2.setAttribute("values",o.sat.toFixed(3));
+      fn.forEach(function(e){ e.setAttribute("tableValues",o.tab); });
+    };
+  }
+
+  /* ---------- công thức ---------- */
+  function R(key,name,group,p,fit,why,note,author,source,extra){
+    var d={mode:"Natural",con:0,sat:0,sharp:0,grad:"Normal",hl:0,sh:0,wb:"Auto",a:0,g:0,bw:"Không"}, k;
+    for(k in p) d[k]=p[k];
+    return {key:key,name:name,group:group,p:d,fit:fit,why:why,note:note,author:author,source:source,extra:extra||""};
+  }
+  var ROB="https://marcrphoto.wordpress.com/2022/01/03/recipe-update-three-fuji-simulations-for-olympus-camera-by-rob-trek/",
+      VP="http://myolympusomd.blogspot.com/2019/03/a-practical-guide-to-olympus-color.html",
+      VP2="http://myolympusomd.blogspot.com/p/how-to-create-and-save-profiles-for.html",
+      OMTC="https://omtc.substack.com/p/5-jpeg-recipes-for-the-om-system",
+      MU="https://www.mu-43.com/threads/how-to-get-best-jpeg-on-e-m10.79284/";
+
+  var GROUPS={film:"Giả phim",daily:"Hằng ngày",mono:"Đen trắng",om3:"Rút gọn từ OM-3",own:"Gợi ý của trang"};
+
+  var RECIPES=[
+    R("eterna","Eterna","film",{mode:"Muted",sat:-2,sh:-2,a:1,g:1},"hop",
+      "Nhạt và lệch WB ít nên da vẫn đúng khi trời đổi từ nắng sang râm. Tông neo để cả ngày.",
+      "Gốc Muted, Shadow chỉ −2: phẳng, êm kiểu phim điện ảnh.","Rob Trek",ROB),
+    R("chrome","Chrome","film",{mode:"Muted",sat:-2,sh:-4,a:1,g:2},"tuy",
+      "Đẹp cho phố và kiến trúc nắng cứng. G+2 làm da ngả xanh, và Shadow −4 cộng với tối góc ở f/1.8 khiến bốn góc sẫm hẳn; khép về f/2.8 là hết.",
+      "Cùng gốc với Eterna nhưng xiết đen sâu và ngả xanh lá nhiều hơn.","Rob Trek",ROB),
+    R("velvia","Velvia","film",{mode:"Natural",sat:1,hl:-2,sh:-4,a:2,g:1},"tuy",
+      "Dành cho cảnh không người. Da dễ cam gắt; Shadow −4 làm bốn góc sẫm thêm nếu mở f/1.8.",
+      "Đi từ Natural rồi mới cộng Saturation, nên rực mà không gắt như Vivid.","Rob Trek",ROB),
+    R("cc85","Classic Chrome 85%","film",{mode:"Muted",sat:-2,hl:2,sh:-3,a:-2,g:-2},"hop",
+      "Tông lạnh, hơi hồng tím hợp phố xá, bê tông, trời nhiều mây. Da nhạt đi nhưng không ám xanh.",
+      "Mức 85% là của bản gốc trên E-M5 II, có Midtone −2 và thêm Color Creator. Bản này thiếu cả hai nên xa hơn.","VideoPic",VP,
+      "Bản gốc có Midtone −2; E-M10 II không có, thay tạm bằng bù sáng −0,3 EV."),
+    R("koda","Kodachrome 64","film",{mode:"Muted",sat:-1,sharp:1,hl:2,sh:-3,wb:"Nắng 5300K",a:0,g:-7},"tuy",
+      "Chỉ dùng khi có nắng ấm thật. G−7 là hết trục; trong bóng râm hoặc ở f/1.8 trong nhà, da ngả hồng thấy rõ.",
+      "WB khoá ở Nắng thay vì Auto để máy không tự bù mất phần ám hồng.","VideoPic (gốc cho E-M5 II)",VP,
+      "Bù sáng 0 đến +0,7 EV. Bản gốc còn có Midtone −1 đến −2 và một lớp Color Creator; cả hai bị bỏ."),
+    R("sunset","Ấm bình minh","film",{mode:"Color Creator",hl:2,sh:-2,wb:"Auto"},"tuy",
+      "Hợp giờ vàng và hoàng hôn. Cả ảnh phủ một lớp cam nên ban trưa hoặc trong nhà trông giả.",
+      "Dùng Color Creator thay cho Picture Mode: Color 2, Vivid +1.","VideoPic",VP2,
+      "Color Creator: Color 2 · Vivid +1. Máy tự khoá WB ở Auto khi bật Color Creator. Có mặt trời trong khung thì bù sáng −0,3 đến −0,7 EV."),
+
+    R("robin","Nền trung tính","daily",{mode:"Natural"},"hop",
+      "Màu da đúng nhất trong cả bộ, theo chính tác giả. Điểm xuất phát an toàn khi mở f/1.8 chụp người.",
+      "Mọi thông số để 0; Gradation Normal, Noise Filter Off, Keep Warm Color Off.","Robin Wong",
+      "https://robinwong.blogspot.com/2019/11/robin-wongs-om-d-cheat-sheet-updated.html",
+      "Noise Filter Off · Keep Warm Color Off."),
+    R("pop","Pop","daily",{mode:"Natural",con:1,sat:1},"hop",
+      "Thêm độ nổi cho phố ban ngày mà chưa tới mức Vivid.",
+      "Cách đơn giản nhất để ảnh bớt nhạt.","Jfrader, mu-43",MU),
+    R("warmday","Ấm hằng ngày","daily",{mode:"Natural",con:1,wb:"Auto, giữ màu ấm",a:1,g:2},"tuy",
+      "Ấm và hơi xanh lá, hợp cảnh cây cối. Có người trong khung thì hạ G về +1.",
+      "Người dùng OM-1 chia sẻ; mọi thông số đều có trên E-M10 II.","yordanrhapsody, mu-43",
+      "https://www.mu-43.com/threads/which-settings-for-jpeg-film-simulation-on-om-1.118937/"),
+    R("flat","Phẳng để hậu kỳ","daily",{mode:"Natural",con:-1},"tuy",
+      "Giữ được nhiều chi tiết sáng tối cho cảnh nắng gắt, nhưng ra thẳng từ máy thì nhạt, nhất là ở f/1.8.",
+      "Nguồn chỉ nói \"hạ Contrast\"; mức −1 là do trang này chọn.","mu-43",MU),
+
+    R("monored","Mono kính đỏ","mono",{mode:"Monotone",con:2,sharp:1,bw:"Đỏ"},"tuy",
+      "Trời xanh sẫm lại, mây nổi, bóng đổ gắt. Da người sáng bệch đi, nên chỉ dùng khi người không phải chủ thể chính.",
+      "Kính đỏ làm tối màu lam và lục, làm sáng màu đỏ và da.","DPReview, chủ đề E-M1 Monotone",
+      "https://www.dpreview.com/forums/threads/em-1-monotone-settings.4037783/"),
+    R("omtcmono","OMTC Mono","mono",{mode:"Monotone",con:1,sharp:1,hl:-3},"hop",
+      "Giữ chi tiết vùng sáng, da người vẫn tự nhiên vì không dùng kính lọc. Hợp kết cấu, kiến trúc, phố có người.",
+      "Bản gốc đậm, gắt kiểu Tri-X nhờ kính Lam +2, Mono Profile 2 và hạt Low — E-M10 II không có cả ba, nên đây chỉ là bản gần hướng: không kính lọc, Contrast +1 do trang chọn.",
+      "Ali O'Keefe",OMTC,"Midtone −2 của bản gốc thay tạm bằng bù sáng −0,3 EV."),
+
+    R("omwarm","OMTC Warm","om3",{mode:"Natural",con:2,sharp:-1,hl:-2,sh:-1,a:4,g:-1},"tuy",
+      "Ấm rõ nhờ A+4. Hợp sáng sớm, biển, nắng lốm đốm; vào bóng râm hoặc trong nhà da dễ ngả cam.",
+      "Chỉ giữ đường cong và WB. Phần chỉnh 8 màu riêng lẻ của bản gốc không làm được trên máy này.",
+      "Ali O'Keefe",OMTC,"Midtone +2 của bản gốc thay tạm bằng bù sáng +0,3 EV. Keep Warm Color Off."),
+    R("omcool","OMTC Cool","om3",{mode:"Natural",con:2,sharp:-1,hl:-2,sh:-1,a:2,g:-1},"hop",
+      "Sạch và gần trung tính, bản đa dụng nhất của bộ OMTC cho du lịch cả ngày. Contrast +2 làm bóng mặt gắt khi nắng đứng bóng.",
+      "Giống hệt Warm, chỉ khác trục A từ +4 xuống +2.","Ali O'Keefe",OMTC,
+      "Midtone +2 của bản gốc thay tạm bằng bù sáng +0,3 EV. Keep Warm Color Off."),
+    R("omsoft","OMTC Soft","om3",{mode:"Natural",con:2,sharp:-2,hl:-6,sh:2,a:2},"hop",
+      "Vùng sáng dịu hẳn, vùng tối được nâng: hợp chân dung lúc trời râm hoặc chiều muộn.",
+      "Tác giả khuyên chụp dư sáng nhẹ để ảnh mềm hơn.","Ali O'Keefe",OMTC,"Bù sáng +0,3 đến +0,7 EV. Keep Warm Color Off."),
+    R("omchrome","OMTC Chrome","om3",{mode:"Natural",con:2,sharp:-1,hl:-3,sh:2,wb:"Nắng 5300K",a:1,g:-2},"tuy",
+      "Cho phố giờ vàng và hình khối mạnh. Thiếu phần đẩy riêng màu hồng, lam, lục nên bản rút gọn nhạt hơn bản gốc nhiều.",
+      "Bản gốc dùng CWB 5600K; E-M10 II không cho bù A/G ở CWB nên thay bằng preset Nắng 5300K. Tác giả khuyên chụp thiếu sáng nhẹ và nhìn histogram.","Ali O'Keefe",OMTC,
+      "Bù sáng −0,3 EV. Keep Warm Color Off."),
+
+    R("env","Người trong bối cảnh","own",{mode:"Natural",hl:-1,sh:1,a:1},"thu",
+      "Đi từ Natural vì đó là nền cho màu da đúng nhất; nén nhẹ vùng sáng, nâng nhẹ vùng tối để bối cảnh phía sau không chìm.",
+      "Chưa có nguồn. Điểm xuất phát để tự chỉnh.","Trang này","","A+1 dành cho ngoài trời râm; dưới đèn vàng trả về A0."),
+    R("neon","Phố đêm đèn màu","own",{mode:"Natural",sat:-1,hl:-1,a:-1},"thu",
+      "Hạ Saturation để đèn neon bớt bết, lệch nhẹ về lam cho bớt vàng đèn đường. Không nâng Shadow vì ISO cao sẽ lộ nhiễu.",
+      "Chưa có nguồn. Điểm xuất phát để tự chỉnh.","Trang này","","Bù sáng −0,3 đến −0,7 EV để biển hiệu không cháy. Keep Warm Color Off."),
+    R("monoye","Mono kính vàng","own",{mode:"Monotone",con:1,sharp:1,hl:-1,sh:-2,bw:"Vàng"},"thu",
+      "Nhẹ tay hơn kính đỏ: mây trắng rõ, trời sẫm vừa phải mà da người vẫn tự nhiên.",
+      "Chưa có nguồn. Điểm xuất phát để tự chỉnh.","Trang này","")
+  ];
+
+  var FIT={hop:"Hợp với 17mm f/1.8",tuy:"Tuỳ cảnh",thu:"Đề xuất của trang, chưa thử"};
+  var state={key:RECIPES[0].key, scene:"street", group:"all", p:null};
+  var live=makeFilter("f-live");
+
+  function current(){
+    for(var i=0;i<RECIPES.length;i++) if(RECIPES[i].key===state.key) return RECIPES[i];
+    return RECIPES[0];
+  }
+  function sg(n){ return n>0 ? "+"+n : (n<0 ? "−"+(-n) : "0"); }
+  function copy(o){ var c={},k; for(k in o) c[k]=o[k]; return c; }
+
+  function render(){
+    var r=current(), p=state.p, o=r.p, mono=p.mode==="Monotone";
+    live(p);
+
+    var cells=[
+      ["Picture Mode",p.mode,p.mode!==o.mode],
+      ["Contrast",sg(p.con),p.con!==o.con],
+      mono ? ["Kính lọc đen trắng",p.bw,false] : ["Saturation",sg(p.sat),p.sat!==o.sat],
+      ["Sharpness",sg(p.sharp),false],
+      ["Highlight",sg(p.hl),p.hl!==o.hl],
+      ["Shadow",sg(p.sh),p.sh!==o.sh],
+      ["Gradation",p.grad,false],
+      ["White Balance",p.wb,false],
+      ["WB shift","A"+sg(p.a)+" · G"+sg(p.g),p.a!==o.a||p.g!==o.g]
+    ];
+    var grid=$("sgrid"); grid.innerHTML="";
+    cells.forEach(function(c){
+      var d=document.createElement("div");
+      if(c[2]) d.className="chg";
+      d.innerHTML="<i>"+c[0]+"</i><b>"+c[1]+"</b>";
+      grid.appendChild(d);
+    });
+    if(r.extra){
+      var e=document.createElement("div");
+      e.className="wide";
+      e.innerHTML="<i>Thêm</i><b>"+r.extra+"</b>";
+      grid.appendChild(e);
+    }
+
+    $("rname").textContent=r.name;
+    $("rgroup").textContent=GROUPS[r.group];
+    $("fitBox").className="fit "+r.fit;
+    $("fitT").textContent=FIT[r.fit];
+    $("fitD").textContent=r.why;
+    $("rnote").textContent=r.note;
+    $("rsrc").innerHTML=r.source ? "Nguồn: <a href=\""+r.source+"\" target=\"_blank\" rel=\"noopener\">"+r.author+"</a>" : "Nguồn: "+r.author;
+
+    $("kMode").value=p.mode;
+    [["Con","con"],["Sat","sat"],["Hl","hl"],["Sh","sh"],["A","a"],["G","g"]].forEach(function(x){
+      $("k"+x[0]).value=p[x[1]];
+      $("v"+x[0]).textContent=sg(p[x[1]]);
+    });
+    $("kSat").disabled=mono; $("kA").disabled=mono; $("kG").disabled=mono;
+  }
+
+  function select(key){
+    state.key=key;
+    state.p=copy(current().p);
+    Array.prototype.forEach.call($("lib").children,function(t){
+      t.setAttribute("aria-pressed", t.getAttribute("data-key")===key ? "true" : "false");
+    });
+    render();
+  }
+
+  function buildLibrary(){
+    var lib=$("lib");
+    RECIPES.forEach(function(r){
+      makeFilter("f-"+r.key)(r.p);
+      var b=document.createElement("button");
+      b.className="tile";
+      b.setAttribute("data-key",r.key);
+      b.setAttribute("data-group",r.group);
+      b.setAttribute("data-fit",r.fit);
+      b.innerHTML='<svg viewBox="0 0 220 150" style="filter:url(#f-'+r.key+')"><use href="#'+state.scene+'"/></svg>'+
+        '<span><i class="dot '+r.fit+'"></i>'+r.name+'</span><small>'+GROUPS[r.group]+'</small>';
+      b.addEventListener("click",function(){ select(r.key); });
+      lib.appendChild(b);
+    });
+  }
+
+  function buildChips(){
+    var box=$("chips"), list=[["all","Tất cả"],["fit","Hợp 17mm"]], k;
+    for(k in GROUPS) list.push([k,GROUPS[k]]);
+    list.forEach(function(c,i){
+      var b=document.createElement("button");
+      b.className="chip";
+      b.textContent=c[1];
+      b.setAttribute("aria-pressed", i===0?"true":"false");
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(box.children,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        Array.prototype.forEach.call($("lib").children,function(t){
+          var show=c[0]==="all" || (c[0]==="fit" ? t.getAttribute("data-fit")==="hop" : t.getAttribute("data-group")===c[0]);
+          t.hidden=!show;
+        });
+      });
+      box.appendChild(b);
+    });
+  }
+
+  /* ---------- cảnh, so sánh, núm vặn ---------- */
+  var sceneBtns=document.querySelectorAll("[data-scene]");
+  Array.prototype.forEach.call(sceneBtns,function(b){
+    b.addEventListener("click",function(){
+      Array.prototype.forEach.call(sceneBtns,function(x){x.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true");
+      state.scene=b.getAttribute("data-scene");
+      var use='<use href="#'+state.scene+'"/>';
+      $("svOrig").innerHTML=use; $("svFx").innerHTML=use;
+      Array.prototype.forEach.call($("lib").querySelectorAll("svg"),function(s){ s.innerHTML=use; });
+    });
+  });
+
+  function compare(){
+    var v=parseInt($("sCmp").value,10);
+    $("svFx").style.clipPath="inset(0 "+(100-v)+"% 0 0)";
+    $("divider").hidden=v>=100;
+    $("divider").style.left=v+"%";
+    $("lblOrig").hidden=v>=100;
+  }
+  $("sCmp").addEventListener("input",compare);
+
+  Object.keys(MODES).forEach(function(m){
+    var o=document.createElement("option"); o.value=m; o.textContent=m; $("kMode").appendChild(o);
+  });
+  $("kMode").addEventListener("change",function(){ state.p.mode=this.value; render(); });
+  [["Con","con"],["Sat","sat"],["Hl","hl"],["Sh","sh"],["A","a"],["G","g"]].forEach(function(x){
+    $("k"+x[0]).addEventListener("input",function(){ state.p[x[1]]=parseInt(this.value,10); render(); });
+  });
+  $("resetBtn").addEventListener("click",function(){ select(state.key); });
+
+  buildChips();
+  buildLibrary();
+  select(state.key);
+  compare();
+})();
+</script>
+</body>
+</html>

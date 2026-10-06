@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>17mm f/1.8 — kính lọc gắn trước ống</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0; --red:#C8352C;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 26px;max-width:640px}
+
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:680px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  /* ---------- thông số ống ---------- */
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:760px){.facts{grid-template-columns:1fr 1fr}}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+  .fact b{display:block;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .fact span{font-size:12.5px;color:var(--dim)}
+
+  /* ---------- lab ---------- */
+  .lab{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;padding:20px}
+  @media(max-width:860px){.lab{grid-template-columns:1fr}}
+
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .view svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+  .layer{position:absolute;inset:0;pointer-events:none}
+  .scn{opacity:0}
+  .scn.on{opacity:1}
+
+  .scenes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .recipe{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:14px;
+          padding:12px 14px;font-family:var(--mono);font-size:13px;word-break:break-word}
+  .recipe b{display:block;font-family:var(--disp);font-size:11px;letter-spacing:.09em;
+            text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+
+  .presets{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:420px){.presets{grid-template-columns:1fr}}
+  .pbtn{border:1px solid var(--line);background:var(--paper);border-radius:12px;
+        padding:10px 12px;font-size:13.5px;cursor:pointer;font-family:var(--disp);
+        color:var(--ink);text-align:left}
+  .pbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .ctl{margin:16px 0 2px}
+  .ctl .top{display:flex;justify-content:space-between;align-items:baseline}
+  .ctl .top b{font-size:14px}
+  .ctl .top i{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--dim)}
+  input[type=range]{width:100%;height:26px;accent-color:var(--ink)}
+  input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  .desc{margin-top:14px;font-size:13.5px;color:var(--dim);min-height:76px}
+
+  /* ---------- máy tính phơi sáng ---------- */
+  .calc{display:grid;grid-template-columns:.9fr 1.1fr;gap:20px;padding:20px}
+  @media(max-width:860px){.calc{grid-template-columns:1fr}}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .fields label{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+  select{width:100%;margin-top:5px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;
+         background:var(--paper);font-family:var(--disp);font-size:14px;color:var(--ink)}
+  .big{font-size:clamp(30px,6vw,44px);font-weight:800;letter-spacing:-.03em;font-family:var(--mono)}
+  .verdict{display:inline-block;margin-top:6px;padding:5px 12px;border-radius:99px;font-size:13px;font-weight:700;color:#fff}
+  .ok{background:var(--green)} .warn{background:var(--amber);color:var(--ink)} .bad{background:var(--red)}
+  .why{margin:10px 0 0;font-size:13.5px;color:var(--dim)}
+  .mini{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:220/150;background:#000;max-width:260px;margin-top:14px}
+  .mini svg{position:absolute;inset:0;width:100%;height:100%}
+  .cap{font-size:12px;color:var(--dim);margin-top:6px}
+
+  /* ---------- rows ---------- */
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1.1fr .8fr 1.4fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px}
+  .row code{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .row p{margin:0;font-size:13px;color:var(--dim)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:99px;
+       margin-right:6px;vertical-align:1px;color:#fff}
+  .t1{background:var(--green)} .t2{background:var(--blue)} .t3{background:var(--dim)} .t4{background:var(--red)}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:700px}
+  .note a,.lead a{color:var(--ink)}
+  .src{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--dim)}
+  .src a{color:var(--ink)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">M.Zuiko 17mm f/1.8 · kính lọc &amp; Art Filter</p>
+  <h1>17mm f/1.8 — kính lọc gắn trước ống</h1>
+  <p class="sub">"Filter" với ống này có hai nghĩa: kính lọc vặn trước ống (ren 46mm) và Art Filter trong máy. Trang này dựng cả hai để thấy mỗi loại đổi được gì — và loại nào không đổi gì cả.</p>
+
+  <div class="facts">
+    <div class="fact"><b>46mm</b><span>cỡ ren filter — mua đúng số này</span></div>
+    <div class="fact"><b>≈34mm</b><span>góc nhìn quy đổi full-frame, tiêu cự đường phố</span></div>
+    <div class="fact"><b>f/1.8</b><span>giữa nắng gắt vượt màn trập cơ 1/4000</span></div>
+    <div class="fact"><b>LH-48B</b><span>hood kim loại bán rời, chống flare tốt hơn kính bảo vệ</span></div>
+  </div>
+
+  <!-- ===== LAB KÍNH LỌC ===== -->
+  <h2>Kính lọc gắn trước ống</h2>
+  <p class="lead">Chọn cảnh rồi đổi filter. Để ý: nhiều filter gần như không đổi gì ở cảnh không hợp — đó là lý do không nên mua hết.</p>
+
+  <div class="card lab">
+    <div>
+      <div class="view" id="view">
+        <!-- cảnh ngày -->
+        <svg class="scn on" id="sv-day" viewBox="0 0 220 150"><g id="g-day">
+          <rect width="220" height="150" fill="url(#skyG)"/>
+          <rect id="day-sky" width="220" height="104" fill="#17489A" opacity="0"/>
+          <g fill="#FFFFFF"><ellipse cx="78" cy="24" rx="17" ry="6"/><ellipse cx="92" cy="19" rx="13" ry="6"/>
+            <ellipse cx="128" cy="38" rx="12" ry="4"/></g>
+          <polygon points="62,60 86,52 86,104 62,104" fill="#C9C2CC"/>
+          <polygon points="122,56 148,62 148,104 122,104" fill="#B8B4C2"/>
+          <g fill="#3F8752"><circle cx="100" cy="82" r="11"/><circle cx="112" cy="86" r="9"/></g>
+          <rect x="103" y="90" width="3" height="14" fill="#5A4636"/>
+          <polygon points="0,0 60,28 60,104 0,128" fill="#BBA78E"/>
+          <g fill="#7A6A58"><polygon points="8,26 22,31 22,52 8,49"/><polygon points="32,35 48,40 48,58 32,55"/>
+            <polygon points="8,66 22,67 22,90 8,92"/><polygon points="32,69 48,70 48,88 32,89"/></g>
+          <polygon points="220,0 150,24 150,104 220,130" fill="#9D8F88"/>
+          <polygon points="160,60 212,54 212,114 160,101" fill="#27343F"/>
+          <rect x="170" y="74" width="9" height="22" rx="3" fill="#E0A038"/>
+          <circle cx="174.5" cy="69" r="4" fill="#E9B58E"/>
+          <rect x="190" y="72" width="12" height="30" rx="3" fill="#C8352C"/>
+          <circle cx="196" cy="66" r="4.5" fill="#E9B58E"/>
+          <g id="day-refl" opacity=".8"><polygon points="160,60 186,57 170,101 160,101" fill="#DCEEFA"/>
+            <polygon points="194,56 212,54 212,80 198,110 186,107" fill="#CFE6F6"/></g>
+          <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#6F6B72"/>
+          <ellipse cx="92" cy="135" rx="28" ry="6" fill="#39485A"/>
+          <ellipse cx="94" cy="135" rx="5" ry="2" fill="#6C7F6A"/><ellipse cx="80" cy="136" rx="4" ry="1.6" fill="#7B6E5E"/>
+          <ellipse id="day-glare" cx="92" cy="135" rx="25" ry="4.6" fill="#EAF4FB" opacity=".85"/>
+          <rect x="124" y="100" width="11" height="22" rx="4" fill="#2F5FA8"/>
+          <circle cx="129.5" cy="94" r="5" fill="#E9B58E"/>
+        </g></svg>
+
+        <!-- cảnh đêm -->
+        <svg class="scn" id="sv-night" viewBox="0 0 220 150">
+          <rect width="220" height="150" fill="#090D1E"/>
+          <polygon points="0,0 60,22 60,104 0,128" fill="#161B31"/>
+          <polygon points="220,0 150,20 150,104 220,130" fill="#1B1F38"/>
+          <polygon points="62,48 86,42 86,104 62,104" fill="#10142A"/>
+          <polygon points="122,46 148,52 148,104 122,104" fill="#121630"/>
+          <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#16161F"/>
+          <rect x="94" y="100" width="26" height="16" rx="4" fill="#23263A"/>
+          <rect x="130" y="98" width="10" height="22" rx="4" fill="#2A2E48"/><circle cx="135" cy="92" r="4.5" fill="#6E5A50"/>
+          <g id="g-nlights">
+            <g fill="#FFD98A"><polygon points="8,30 20,34 20,48 8,46"/><polygon points="32,62 46,63 46,78 32,79"/>
+              <rect x="68" y="60" width="6" height="8"/><rect x="128" y="64" width="6" height="8"/><rect x="138" y="76" width="6" height="8"/></g>
+            <polygon points="160,50 208,42 208,60 160,64" fill="none" stroke="#FF4FA3" stroke-width="2.4"/>
+            <polygon points="166,54 200,49 200,56 166,60" fill="#FF8CC4"/>
+            <polygon points="10,70 26,72 26,96 10,100" fill="none" stroke="#3FE0E8" stroke-width="2.2"/>
+            <rect x="170" y="74" width="30" height="24" fill="#FFC56B"/>
+            <circle cx="60" cy="40" r="4.5" fill="#FFF0BF"/><circle cx="150" cy="36" r="4.5" fill="#FFF0BF"/>
+            <circle cx="99" cy="110" r="3.4" fill="#FFFFFF"/><circle cx="115" cy="110" r="3.4" fill="#FFFFFF"/>
+            <g opacity=".5"><rect x="96" y="118" width="6" height="26" fill="#FFFFFF"/><rect x="112" y="118" width="6" height="26" fill="#FFFFFF"/>
+              <polygon points="168,116 202,124 206,146 164,134" fill="#FF4FA3"/><polygon points="8,122 26,116 30,138 6,146" fill="#3FE0E8"/></g>
+          </g>
+        </svg>
+
+        <!-- cảnh suối -->
+        <svg class="scn" id="sv-stream" viewBox="0 0 220 150">
+          <rect width="220" height="150" fill="url(#canopyG)"/>
+          <g fill="#2A5136"><rect x="14" y="0" width="12" height="96" rx="3"/><rect x="190" y="0" width="13" height="100" rx="3"/></g>
+          <g fill="#438554" opacity=".9"><ellipse cx="30" cy="16" rx="40" ry="16"/><ellipse cx="190" cy="14" rx="42" ry="17"/></g>
+          <polygon points="0,40 84,22 84,100 0,112" fill="#4B4F52"/>
+          <polygon points="220,36 136,20 136,100 220,114" fill="#3F4447"/>
+          <rect x="84" y="18" width="52" height="84" fill="#3B6C78"/>
+          <polygon points="0,104 84,96 136,96 220,106 220,150 0,150" fill="#2E5F6A"/>
+          <g fill="#75806E"><ellipse cx="58" cy="128" rx="13" ry="5"/><ellipse cx="150" cy="134" rx="16" ry="6"/>
+            <ellipse cx="104" cy="140" rx="10" ry="4"/><ellipse cx="184" cy="122" rx="9" ry="4"/></g>
+          <g id="st-glare" fill="#EAF6FA" opacity=".8"><ellipse cx="60" cy="124" rx="30" ry="6"/>
+            <ellipse cx="160" cy="130" rx="34" ry="7"/><ellipse cx="108" cy="142" rx="24" ry="4"/></g>
+          <g id="st-chop" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none">
+            <path d="M90,22v10M98,28v12M106,20v9M114,30v12M122,24v10M130,32v9M92,46v11M101,52v10M110,44v12M119,56v9M128,48v11M94,70v10M104,74v12M113,66v10M123,78v10M131,68v9M97,88v8M108,90v8M120,90v7"/>
+            <path d="M70,104q8,-4 16,0M96,108q10,-5 20,0M126,104q8,-4 18,0M82,114q10,-4 20,0M118,116q10,-4 20,0" stroke-width="1.8"/>
+          </g>
+          <g id="st-silk" opacity="0" filter="url(#bl)">
+            <rect x="88" y="16" width="44" height="86" fill="#FFFFFF" opacity=".9"/>
+            <ellipse cx="110" cy="106" rx="50" ry="10" fill="#FFFFFF" opacity=".8"/>
+          </g>
+          <ellipse cx="46" cy="100" rx="16" ry="7" fill="#3A3E41"/><ellipse cx="172" cy="102" rx="18" ry="8" fill="#34383B"/>
+        </svg>
+
+        <!-- lớp hiệu ứng -->
+        <svg id="glowDay" class="layer" viewBox="0 0 220 150" style="opacity:0;mix-blend-mode:screen;filter:blur(7px) brightness(1.2)"><use href="#g-day"/></svg>
+        <svg id="glowNight" class="layer" viewBox="0 0 220 150" style="opacity:0;mix-blend-mode:screen"><use href="#g-nlights"/></svg>
+        <svg id="ghost" class="layer" viewBox="0 0 220 150" style="opacity:0;mix-blend-mode:screen;filter:blur(1.2px) hue-rotate(60deg)"><use href="#g-nlights" transform="rotate(180 110 75)"/></svg>
+        <div class="layer" id="veil" style="opacity:0;background:#C9CFDA;mix-blend-mode:screen"></div>
+      </div>
+
+      <div class="scenes">
+        <button class="sbtn" data-scene="day" aria-pressed="true">Phố giữa trưa</button>
+        <button class="sbtn" data-scene="night" aria-pressed="false">Phố đêm đèn màu</button>
+        <button class="sbtn" data-scene="stream" aria-pressed="false">Suối trong rừng</button>
+      </div>
+
+      <div class="recipe">
+        <b>Thông số tại cảnh này</b>
+        <span id="rec">—</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="lead" style="margin:0 0 10px">Chọn kính lọc</p>
+      <div class="presets" id="presetGrid"></div>
+
+      <div class="ctl" id="cplCtl" hidden>
+        <div class="top"><b>Góc xoay vòng CPL</b><i id="lAng">90°</i></div>
+        <input type="range" id="sAng" min="0" max="90" step="5" value="90">
+      </div>
+
+      <p class="desc" id="descBox"></p>
+    </div>
+  </div>
+
+  <!-- ===== MÁY TÍNH PHƠI SÁNG ===== -->
+  <h2>Vì sao f/1.8 cần ND giữa ban ngày</h2>
+  <p class="lead">E-M10 II có ISO gốc 200, màn trập cơ nhanh nhất 1/4000, màn trập điện tử tới 1/16000. Mở f/1.8 dưới nắng là lượng sáng vượt cả ba giới hạn đó. Thử đổi từng ô.</p>
+
+  <div class="card calc">
+    <div>
+      <div class="fields">
+        <div><label for="cEv">Ánh sáng</label>
+          <select id="cEv">
+            <option value="15">Nắng gắt giữa trưa</option>
+            <option value="14">Nắng nhẹ, mây mỏng</option>
+            <option value="13">Trời nhiều mây</option>
+            <option value="12">Bóng râm</option>
+            <option value="8">Trong nhà sáng</option>
+            <option value="5">Phố đêm</option>
+          </select></div>
+        <div><label for="cN">Khẩu độ</label>
+          <select id="cN">
+            <option value="1.8">f/1.8</option><option value="2.8">f/2.8</option>
+            <option value="4">f/4</option><option value="5.6">f/5.6</option><option value="8">f/8</option>
+          </select></div>
+        <div><label for="cIso">ISO</label>
+          <select id="cIso">
+            <option value="100">LOW (≈100)</option><option value="200" selected>200 (gốc)</option>
+            <option value="800">800</option><option value="3200">3200</option>
+          </select></div>
+        <div><label for="cF">Kính lọc</label>
+          <select id="cF">
+            <option value="0">Không</option><option value="1.5">CPL (−1,5 stop)</option>
+            <option value="3">ND8 (−3 stop)</option><option value="6">ND64 (−6 stop)</option>
+          </select></div>
+      </div>
+      <div class="mini"><svg id="miniSvg" viewBox="0 0 220 150"><use href="#g-day"/></svg></div>
+      <p class="cap">Ảnh ra nếu chỉ dùng màn trập cơ, tối đa 1/4000.</p>
+    </div>
+    <div>
+      <p class="cap" style="margin:0">Tốc độ màn trập cần để đúng sáng</p>
+      <div class="big" id="cT">—</div>
+      <span class="verdict ok" id="cV">—</span>
+      <p class="why" id="cWhy"></p>
+      <p class="why" id="cTip"></p>
+    </div>
+  </div>
+
+  <!-- ===== NÊN MUA GÌ ===== -->
+  <h2>Thứ tự nên mua</h2>
+  <p class="lead">Tất cả cỡ 46mm. Ống kit 14-42mm dùng ren 37mm — thêm một vòng step-up 37→46 là dùng chung được cả bộ.</p>
+
+  <div class="rows">
+    <div class="row"><b><span class="tag t1">1</span>ND8 (3 stop)</b><code>f/1.8 ngoài nắng</code>
+      <p>Thứ duy nhất không thay được bằng hậu kỳ hay Art Filter. Cho phép mở hết khẩu với màn trập cơ, tránh méo hình và sọc đèn của màn trập điện tử.</p></div>
+    <div class="row"><b><span class="tag t1">2</span>Black Mist 1/8</b><code>phố đêm, đèn neon</code>
+      <p>Toả quầng quanh nguồn sáng, hạ tương phản kiểu phim. Ống góc rộng nên lấy mức nhẹ; 1/4 dễ loá quá tay khi khung có đèn xe, biển hiệu.</p></div>
+    <div class="row"><b><span class="tag t2">3</span>CPL mỏng</b><code>du lịch, kính, nước</code>
+      <p>Cắt phản xạ trên kính và mặt nước, trời đậm hơn. Mất khoảng 1,5 stop nên tháo ra khi vào chỗ tối. Ren trước của ống không xoay khi lấy nét nên chỉnh xong là giữ nguyên.</p></div>
+    <div class="row"><b><span class="tag t3">4</span>ND64 hoặc mạnh hơn</b><code>nước chảy, cần tripod</code>
+      <p>Chỉ đáng mua nếu thật sự chụp phơi lâu. Chống rung 5 trục giữ tay được tới khoảng 1/4–1/2 giây ở 17mm, dài hơn phải có chân máy.</p></div>
+    <div class="row"><b><span class="tag t3">5</span>Protect trong suốt</b><code>mưa, bụi, biển</code>
+      <p>Chỉ mua loại phủ đa lớp tốt. Loại rẻ thêm bóng ma và lớp mờ khi ngược sáng — đúng điểm yếu sẵn có của ống này. Hood LH-48B bảo vệ mặt kính mà không thêm mặt phản xạ nào.</p></div>
+    <div class="row"><b><span class="tag t4">×</span>Nên bỏ qua</b><code>UV · ND biến thiên rẻ · chồng 3 lớp</code>
+      <p>Cảm biến đã có lọc UV. ND biến thiên rẻ tiền dễ ám màu và hiện vệt chữ X khi vặn về phía đậm nhất. Chồng nhiều filter dày làm tối góc — vốn đã thấy ở f/1.8.</p></div>
+  </div>
+
+  <!-- ===== ART FILTER ===== -->
+  <h2>Art Filter trong máy hợp với 17mm</h2>
+  <p class="lead">Tiêu cự này thường chụp người trong bối cảnh, khung rộng, hay có trời. Xem từng filter trông ra sao ở trang <a href="art-filter-mo-phong.html">Art Filter — mô phỏng bằng mắt</a>.</p>
+
+  <div class="rows">
+    <div class="row"><b><span class="tag t1">hợp</span>Grainy Film II</b><code>đường phố hằng ngày</code>
+      <p>Đen trắng có hạt nhưng tương phản dịu hơn bản I, giữ được cả trời lẫn vùng tối. Lựa chọn an toàn nhất để để máy cả buổi.</p></div>
+    <div class="row"><b><span class="tag t1">hợp</span>Grainy Film I</b><code>nắng gắt, bóng đổ mạnh</code>
+      <p>Trời dễ cháy trắng, vùng tối dễ bết đen — phải chọn giữ một trong hai. Bù trừ sáng âm 0,3–0,7 nếu muốn giữ trời.</p></div>
+    <div class="row"><b><span class="tag t1">hợp</span>Dramatic Tone</b><code>trời mây, kiến trúc</code>
+      <p>Góc rộng lấy được nhiều trời nên hiệu ứng mây rất rõ. Tránh khi mặt người chiếm phần lớn khung.</p></div>
+    <div class="row"><b><span class="tag t2">tuỳ cảnh</span>Cross Process / Vintage</b><code>phố đêm, quán xá</code>
+      <p>Hợp đèn màu và biển hiệu. Nếu đã gắn Black Mist thì Vintage chồng thêm một lớp mờ nữa — chọn một trong hai.</p></div>
+    <div class="row"><b><span class="tag t4">kém hợp</span>Pin Hole</b><code>mở f/1.8</code>
+      <p>Ống đã tối góc sẵn ở f/1.8, cộng thêm Pin Hole thành đen kịt bốn góc. Muốn dùng thì khép về f/2.8 trở lên.</p></div>
+    <div class="row"><b><span class="tag t4">kém hợp</span>Diorama / Soft Focus</b><code>tầm mắt đường phố</code>
+      <p>Diorama cần nhìn từ trên cao xuống mới ra hiệu ứng mô hình. Soft Focus làm mất chi tiết nhỏ, mà khung 17mm thì toàn chi tiết nhỏ.</p></div>
+  </div>
+
+  <p class="note">
+    Mô phỏng dựng bằng SVG và CSS filter để thấy hướng thay đổi, không phải ảnh thật qua kính.
+    Tốc độ màn trập tính theo công thức phơi sáng chuẩn, thực tế lệch khoảng nửa stop tuỳ cảnh.
+    Bật RAW+JPEG khi dùng Art Filter để còn bản gốc.
+    Ý về chồng filter gây tối góc và giới hạn cầm tay 1/4–1/2 giây là ước lượng, nên thử trên máy của bạn.
+  </p>
+  <p class="note" style="margin-top:18px">Nguồn tham khảo</p>
+  <ul class="src">
+    <li><a href="https://www.mu-43.com/threads/olympus-17mm-1-8-mm-and-filters.47677/">mu-43.com — Olympus 17mm 1.8 and filters</a> (cỡ 46mm, ND 3 stop, kính UV rẻ gây mờ và bóng ma)</li>
+    <li><a href="https://toolsandtoys.net/reviews/the-olympus-m-zuiko-17mm-f1-8-micro-four-thirds-lens-review/">Tools and Toys — đánh giá 17mm f/1.8</a> (viền tím/xanh khi ngược sáng, tối góc hết ở f/2.8)</li>
+    <li><a href="https://www.photoreview.com.au/reviews/lenses/m4-3/olympus-mzuiko-digital-17mm-f18-lens/">Photo Review — M.Zuiko 17mm f/1.8</a> (lớp phủ ZERO, flare)</li>
+    <li><a href="https://alikgriffin.com/tiffen-black-pro-mist-review/">Alik Griffin — Tiffen Black Pro-Mist</a> và <a href="https://www.cinematography.net/edited-pages/black_promists.htm">cinematography.net</a> (1/8 so với 1/4 cho phố đêm)</li>
+    <li><a href="https://www.lukeptaylor.com/blog/olympus-om-system-art-filters-review-art-5-grainy-film-1">Luke Taylor — Grainy Film I</a> (trời cháy, tối bết; bản II dễ dùng hơn)</li>
+    <li><a href="https://en.wikipedia.org/wiki/Olympus_OM-D_E-M10_Mark_II">Wikipedia — E-M10 Mark II</a> (màn trập 1/4000 cơ, 1/16000 điện tử)</li>
+  </ul>
+</div>
+
+<!-- ===== DEFS ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#7CC0DF"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="canopyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8FC49A"/><stop offset="1" stop-color="#2E5638"/></linearGradient>
+  <filter id="bl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.2"/></filter>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  /* stops = lượng sáng filter lấy đi; mist = độ toả sáng 0..1 */
+  var FILTERS=[
+    {key:"none", name:"Không filter", stops:0, mist:0, desc:{
+      day:"Ảnh gốc. Kính cửa hàng phủ đầy phản xạ trời, vũng nước loá trắng.",
+      night:"Ảnh gốc. Nguồn sáng sắc gọn, tương phản cao — đúng chất ống 17mm.",
+      stream:"1/60 giây đóng băng từng giọt nước. Mặt hồ loá, không thấy đá bên dưới."}},
+    {key:"protect", name:"Protect / UV", stops:0, mist:0, desc:{
+      day:"Không khác gì. Kính bảo vệ không đổi màu hay tương phản của ảnh.",
+      night:"Thêm một mặt kính phẳng trước ống: mỗi nguồn sáng mạnh sinh một bóng ma đối xứng qua tâm khung. Kính rẻ thì rõ hơn nữa.",
+      stream:"Không khác gì — lợi ích duy nhất là chắn bụi nước bắn vào mặt kính."}},
+    {key:"cpl", name:"CPL (phân cực)", stops:1.5, mist:0, desc:{
+      day:"Xoay vòng để thấy phản xạ trên kính và vũng nước tắt dần, trời đậm lại. Ở 17mm trời vẫn khá đều; ống rộng hơn mới bị loang.",
+      night:"Gần như vô ích, lại mất 1,5 stop — ISO phải lên gấp ba. Tháo ra khi trời tối.",
+      stream:"Cắt lớp loá trên mặt nước nên thấy đá dưới đáy, lá xanh đậm hơn. Màn trập chậm lại 1,5 stop."}},
+    {key:"nd8", name:"ND8 · 3 stop", stops:3, mist:0, desc:{
+      day:"Ảnh trông y hệt — đó là mục đích. ND chỉ giảm sáng để mở được f/1.8 mà không cháy. Xem phần tính bên dưới.",
+      night:"Phản tác dụng: đã thiếu sáng còn lấy đi 3 stop. Không dùng.",
+      stream:"Màn trập xuống khoảng 1/8 giây: nước bắt đầu kéo sợi, vẫn cầm tay được nhờ chống rung."}},
+    {key:"nd64", name:"ND64 · 6 stop", stops:6, mist:0, desc:{
+      day:"Thừa cho việc mở khẩu; chỉ dùng khi muốn người đi đường nhoè thành vệt và máy đặt trên chân.",
+      night:"Không dùng, trừ khi cố ý kéo vệt đèn xe nhiều giây trên chân máy.",
+      stream:"Khoảng 1 giây: nước thành dải lụa, mặt hồ phẳng mờ. Cần chân máy hoặc tì máy lên đá."}},
+    {key:"mist8", name:"Black Mist 1/8", stops:0, mist:.5, desc:{
+      day:"Tương phản dịu đi một chút, vùng sáng hơi lan. Khó nhận ra nếu không so cạnh nhau.",
+      night:"Mỗi bóng đèn có một quầng mềm, vùng tối vẫn giữ được độ đen. Mức hợp nhất với khung rộng nhiều đèn.",
+      stream:"Nước trắng hơi toả, rừng bớt gắt. Hiệu ứng nhẹ."}},
+    {key:"mist4", name:"Black Mist 1/4", stops:0, mist:1, desc:{
+      day:"Thấy rõ lớp sương: trời và tường sáng lan sang vùng bên cạnh, ảnh mềm kiểu phim.",
+      night:"Quầng sáng lớn, đèn xe và biển hiệu loá chồng lên nhau, vùng tối xám lại. Đẹp khi chỉ có một hai nguồn sáng.",
+      stream:"Mơ màng rõ rệt, chi tiết lá mảnh bị nuốt bớt."}}
+  ];
+
+  /* f, ISO, EV của từng cảnh mẫu */
+  var SCENES={
+    day:{label:"phố giữa trưa", N:1.8, iso:200, ev:15},
+    night:{label:"phố đêm", N:1.8, iso:1600, ev:5},
+    stream:{label:"suối trong rừng", N:8, iso:200, ev:11}
+  };
+
+  var state={filter:"none", scene:"day", angle:90};
+
+  function shutter(N,ev,iso,stops){ return N*N/Math.pow(2,ev)*(100/iso)*Math.pow(2,stops); }
+
+  function fmt(t){
+    if(t>=1) return (Math.round(t*10)/10)+" giây";
+    var d=1/t, mag=Math.pow(10,Math.max(0,Math.floor(Math.log(d)/Math.LN10)-1));
+    return "1/"+(Math.round(d/mag)*mag);
+  }
+
+  function clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
+
+  function currentFilter(){
+    for(var i=0;i<FILTERS.length;i++) if(FILTERS[i].key===state.filter) return FILTERS[i];
+    return FILTERS[0];
+  }
+
+  function render(){
+    var f=currentFilter(), sc=SCENES[state.scene], m=f.mist,
+        e=f.key==="cpl" ? Math.pow(Math.sin(state.angle*Math.PI/180),2) : 0,
+        t=shutter(sc.N,sc.ev,sc.iso,f.stops);
+
+    ["day","night","stream"].forEach(function(k){
+      $("sv-"+k).setAttribute("class","scn"+(k===state.scene?" on":""));
+    });
+
+    var view="saturate("+(1+.28*e).toFixed(2)+") contrast("+(1-.13*m).toFixed(2)+") brightness("+(1+.05*m).toFixed(2)+")";
+    $("sv-"+state.scene).style.filter=view;
+
+    /* ngày */
+    $("day-sky").setAttribute("opacity",(.5*e).toFixed(2));
+    $("day-refl").setAttribute("opacity",(.8*(1-.9*e)).toFixed(2));
+    $("day-glare").setAttribute("opacity",(.85*(1-.92*e)).toFixed(2));
+    $("glowDay").style.opacity=state.scene==="day" ? (.38*m).toFixed(2) : 0;
+
+    /* đêm */
+    var night=state.scene==="night";
+    $("glowNight").style.opacity=night ? Math.min(1,m*1.5).toFixed(2) : 0;
+    $("glowNight").style.filter="blur("+(2+14*m).toFixed(1)+"px) brightness("+(1.3+.9*m).toFixed(2)+")";
+    $("ghost").style.opacity=night && f.key==="protect" ? .22 : 0;
+    $("veil").style.opacity=night ? (.1*m).toFixed(2) : (state.scene==="stream" ? (.07*m).toFixed(2) : 0);
+
+    /* suối: độ mượt của nước theo tốc độ màn trập */
+    var silk=clamp(Math.log(t*60)/Math.LN2/6,0,1);
+    $("st-chop").setAttribute("opacity",(1-silk).toFixed(2));
+    $("st-silk").setAttribute("opacity",silk.toFixed(2));
+    $("st-glare").setAttribute("opacity",(.8*(1-.9*e)).toFixed(2));
+
+    $("cplCtl").hidden=f.key!=="cpl";
+    $("lAng").textContent=state.angle+"°";
+    $("descBox").textContent=f.desc[state.scene];
+
+    var limit=t<1/16000 ? " — vượt cả màn trập điện tử" : (t<1/4000 ? " — vượt màn trập cơ 1/4000" : "");
+    $("rec").textContent=f.name+" · "+sc.label+" · f/"+sc.N+" · ISO "+sc.iso+" · cần "+fmt(t)+limit;
+  }
+
+  function buildPresetGrid(){
+    var grid=$("presetGrid");
+    FILTERS.forEach(function(p,i){
+      var btn=document.createElement("button");
+      btn.className="pbtn";
+      btn.textContent=p.name;
+      btn.setAttribute("aria-pressed", i===0?"true":"false");
+      btn.addEventListener("click",function(){
+        Array.prototype.forEach.call(grid.children,function(x){x.setAttribute("aria-pressed","false");});
+        btn.setAttribute("aria-pressed","true");
+        state.filter=p.key;
+        render();
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  $("sAng").addEventListener("input",function(){
+    state.angle=parseInt(this.value,10);
+    render();
+  });
+
+  var sceneBtns=document.querySelectorAll("[data-scene]");
+  Array.prototype.forEach.call(sceneBtns,function(b){
+    b.addEventListener("click",function(){
+      Array.prototype.forEach.call(sceneBtns,function(x){x.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true");
+      state.scene=b.getAttribute("data-scene");
+      render();
+    });
+  });
+
+  /* ---------- máy tính phơi sáng ---------- */
+  var MECH=1/4000, ELEC=1/16000;
+
+  function calc(){
+    var N=parseFloat($("cN").value), ev=parseFloat($("cEv").value),
+        iso=parseFloat($("cIso").value), st=parseFloat($("cF").value),
+        t=shutter(N,ev,iso,st),
+        over=Math.max(0,Math.log(MECH/t)/Math.LN2),
+        v=$("cV"), why, tip="";
+
+    $("cT").textContent=fmt(t);
+
+    if(t>=MECH){
+      v.className="verdict ok"; v.textContent="Màn trập cơ đủ";
+      if(t>1) why="Phơi lâu hơn 1 giây — cần chân máy.";
+      else if(t>1/30) why="Tốc độ chậm: máy đứng yên được nhờ chống rung 5 trục, nhưng người đang đi sẽ nhoè.";
+      else why="Trong giới hạn 1/4000, không cần thêm gì.";
+      if(st>0 && t>1/60) tip="Đang gắn filter trong khi tốc độ đã chậm — tháo ra sẽ lợi "+st+" stop.";
+    } else if(t>=ELEC){
+      v.className="verdict warn"; v.textContent="Dư "+over.toFixed(1)+" stop với màn trập cơ";
+      why="Phải bật màn trập điện tử (tới 1/16000). Đổi lại: vật chuyển động nhanh bị méo, đèn LED dễ in sọc.";
+    } else {
+      v.className="verdict bad"; v.textContent="Cháy sáng — dư "+over.toFixed(1)+" stop";
+      why="Vượt cả màn trập điện tử 1/16000. Phải giảm sáng bằng filter hoặc khép khẩu.";
+    }
+
+    if(over>0){
+      var need=Math.ceil(over-.05),
+          nd=need<=1?"ND2 (hoặc hạ ISO về LOW)":need<=2?"ND4":need<=3?"ND8":need<=4?"ND16":"ND32 trở lên";
+      tip="Để giữ f/"+N+" với màn trập cơ: cần filter "+need+" stop, tức "+nd+".";
+    }
+    $("cWhy").textContent=why;
+    $("cTip").textContent=tip;
+
+    $("miniSvg").style.filter="brightness("+(1+over*.55).toFixed(2)+") contrast("+Math.max(.5,1-over*.1).toFixed(2)+")";
+  }
+
+  ["cEv","cN","cIso","cF"].forEach(function(id){ $(id).addEventListener("change",calc); });
+
+  buildPresetGrid();
+  render();
+  calc();
+})();
+</script>
+</body>
+</html>
