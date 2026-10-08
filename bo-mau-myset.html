@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bộ màu Myset</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0; --red:#C8352C;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,48px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 22px;max-width:660px}
+  h2{font-size:clamp(19px,3.4vw,26px);font-weight:800;letter-spacing:-.02em;margin:52px 0 4px}
+  .lead{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:700px}
+  .lead a,.note a,.src a{color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;background:var(--card);padding:3px;margin-bottom:14px}
+  .seg button{border:0;background:none;border-radius:99px;padding:8px 18px;font-size:14px;font-weight:600;
+              cursor:pointer;font-family:var(--disp);color:var(--dim)}
+  .seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+
+  /* ---------- lab ---------- */
+  .lab{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;padding:20px}
+  @media(max-width:860px){.lab{grid-template-columns:1fr}}
+  .view{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .view svg{position:absolute;inset:0;display:block;width:100%;height:100%}
+  .divider{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);pointer-events:none}
+  .vlabel{position:absolute;top:8px;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:99px;
+          background:rgba(0,0,0,.55);color:#fff;pointer-events:none}
+  .cmp{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--dim)}
+  .cmp input{flex:1}
+  input[type=range]{height:24px;accent-color:var(--ink)}
+  .scenes{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .sbtn{border:1px solid var(--line);background:var(--paper);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  .picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pick{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:7px;cursor:pointer;
+        font-family:var(--disp);color:var(--ink);text-align:left}
+  .pick[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+  .pick svg{display:block;width:100%;aspect-ratio:220/150;border-radius:9px}
+  .pick b{display:block;font-size:15px;font-weight:800;margin:8px 3px 0}
+  .pick span{display:block;font-size:12px;color:var(--dim);margin:1px 3px 3px}
+  .key{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;
+       background:var(--ink);color:#fff;letter-spacing:.02em}
+
+  .rhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 2px}
+  .rhead b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+  .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  @media(max-width:480px){.sgrid{grid-template-columns:1fr 1fr}}
+  .sgrid div{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 11px}
+  .sgrid i{display:block;font-style:normal;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  .sgrid b{font-family:var(--mono);font-size:13.5px;font-weight:600}
+  .when{margin:12px 0 0;font-size:14px}
+  .base{margin:6px 0 0;font-size:12.5px;color:var(--dim)}
+  .tips{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+  .tips li{font-size:13px;color:var(--dim);padding-left:14px;border-left:3px solid var(--line)}
+  .tips b{color:var(--ink);font-weight:600}
+
+  /* ---------- art ---------- */
+  .arts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:700px){.arts{grid-template-columns:1fr}}
+  .art{padding:10px}
+  .aview{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:220/150;background:#000}
+  .aview svg,.aview div{position:absolute;inset:0;width:100%;height:100%}
+  .art b{display:block;font-size:16px;font-weight:800;margin:10px 4px 2px}
+  .art p{margin:0 4px 6px;font-size:13px;color:var(--dim)}
+
+  /* ---------- bảng ---------- */
+  .tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;background:var(--card);
+       border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .tbl th,.tbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:600;background:var(--paper)}
+  .tbl td code{font-family:var(--mono);font-size:12.5px}
+  .tbl mark{background:#FFF1CF;border-radius:4px;padding:0 3px;color:inherit}
+  .scroll{overflow-x:auto}
+
+  .rows{display:grid;gap:10px}
+  .row{display:grid;grid-template-columns:1fr .9fr 1.6fr;gap:14px;padding:13px 16px;
+       background:var(--card);border:1px solid var(--line);border-radius:14px;align-items:center}
+  @media(max-width:700px){.row{grid-template-columns:1fr;gap:5px}}
+  .row b{font-size:14.5px}
+  .row code{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .row p{margin:0;font-size:13px;color:var(--dim)}
+
+  .steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .warn{border-color:var(--amber);background:#FFF7E6}
+  @media(max-width:860px){.steps{grid-template-columns:1fr}}
+  .step{padding:16px 18px}
+  .step h3{font-size:16px;font-weight:800;margin:0 0 8px}
+  .step ol{margin:0;padding-left:18px;font-size:13.5px;color:var(--dim);display:grid;gap:5px}
+  .step ol b{color:var(--ink);font-weight:600}
+
+  /* ---------- thẻ bỏ túi ---------- */
+  .pocket{background:var(--ink);color:#fff;border-radius:20px;padding:20px;max-width:440px}
+  .pocket h3{margin:0 0 2px;font-size:18px;font-weight:800}
+  .pocket small{display:block;color:#B9B1C2;font-size:12px;margin-bottom:12px}
+  .pocket table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .pocket td{padding:7px 0;border-top:1px solid #3A3342;vertical-align:top}
+  .pocket td:first-child{width:92px;font-family:var(--mono);font-size:12px;color:#F1C84B}
+  .pocket td b{display:block}
+  .pocket td span{color:#B9B1C2;font-size:12.5px}
+
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:720px}
+  .src{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--dim)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">E-M10 II · bốn màu để sẵn trên nút bấm</p>
+  <h1>Bộ màu Myset</h1>
+  <p class="sub">Một màu để nguyên cả ngày, ba màu còn lại mỗi cái một nút bấm. Một bộ duy nhất cho cả ống 17mm lẫn 14-42mm EZ. Thêm ba Art Filter cho lúc muốn đổi gió. Chụp JPEG dùng luôn; cài một lần, sau đó đổi màu chỉ bằng một nút.</p>
+
+  <!-- ===== LAB ===== -->
+  <div class="card lab">
+    <div>
+      <div class="view">
+        <svg id="svOrig" viewBox="0 0 220 150"><use href="#land"/></svg>
+        <svg id="svFx" viewBox="0 0 220 150" style="filter:url(#f-live)"><use href="#land"/></svg>
+        <div class="divider" id="divider" hidden></div>
+        <span class="vlabel" style="left:8px" id="lblFx">Cảnh</span>
+        <span class="vlabel" id="lblOrig" style="right:8px" hidden>gốc</span>
+      </div>
+      <div class="cmp"><span>Kéo sang trái để lộ ảnh gốc</span>
+        <input type="range" id="sCmp" min="0" max="100" value="100" aria-label="So với ảnh gốc"></div>
+      <div class="scenes">
+        <button class="sbtn" data-scene="land" aria-pressed="true">Phong cảnh</button>
+        <button class="sbtn" data-scene="street" aria-pressed="false">Phố có người</button>
+        <button class="sbtn" data-scene="portrait" aria-pressed="false">Bạn bè</button>
+        <button class="sbtn" data-scene="chart" aria-pressed="false">Bảng màu và da</button>
+      </div>
+
+      <div class="rhead"><b id="rname"></b><span class="key" id="rkey"></span></div>
+      <div class="sgrid" id="sgrid"></div>
+      <p class="when" id="rwhen"></p>
+      <p class="base" id="rbase"></p>
+      <ul class="tips" id="rtips"></ul>
+    </div>
+
+    <div>
+      <div class="picks" id="picks"></div>
+    </div>
+  </div>
+
+  <!-- ===== ART FILTER ===== -->
+  <h2>Ba Art Filter cho lúc đổi gió</h2>
+  <p class="lead">Xoay vòng chế độ sang ART rồi chọn. Đây là ba thứ bốn màu trên không làm được: màu phai kiểu ảnh cũ, đen trắng có hạt và tông sáng nhẹ. Ở ART máy tự chọn khẩu và tốc, bạn vẫn bù sáng được; ảnh ghi thẳng ra JPEG, nên chụp vài tấm rồi xoay về A. Trong menu ART, bấm phím phải để chọn kiểu I hay II của mỗi filter.</p>
+
+  <div class="arts">
+    <div class="card art">
+      <div class="aview"><svg viewBox="0 0 220 150" style="filter:contrast(.88) saturate(.75) brightness(1.08) sepia(.4)"><use class="ause" href="#land"/></svg>
+        <div style="background:#C68A3D;mix-blend-mode:multiply;opacity:.12"></div>
+        <div class="grainL" style="mix-blend-mode:overlay;opacity:.3"></div>
+        <div style="background:radial-gradient(ellipse at 50% 50%,transparent 38%,rgba(0,0,0,.95) 100%);opacity:.28"></div></div>
+      <b>Vintage</b>
+      <p>Màu phai và ngả vàng nâu như ảnh in cũ. Đúng gu hoài cổ nhất trong ba cái; dùng được cho cả bạn bè lẫn phố cũ.</p>
+    </div>
+    <div class="card art">
+      <div class="aview"><svg viewBox="0 0 220 150" style="filter:contrast(1.18) grayscale(1) brightness(.96)"><use class="ause" href="#land"/></svg>
+        <div class="grainL" style="mix-blend-mode:overlay;opacity:.6"></div></div>
+      <b>Grainy Film II</b>
+      <p>Đen trắng có hạt. Theo người dùng, kiểu II dịu hơn kiểu I nên giữ được cả trời lẫn vùng tối. Bấm phím phải trong menu ART rồi chọn II.</p>
+    </div>
+    <div class="card art">
+      <div class="aview"><svg viewBox="0 0 220 150" style="filter:contrast(.6) saturate(.9) brightness(1.18)"><use class="ause" href="#land"/></svg></div>
+      <b>Light Tone</b>
+      <p>Tương phản phẳng, vùng tối được nâng, màu giữ gần thật. Nhẹ và êm, hợp ngày nắng gắt khi bóng đổ quá cứng.</p>
+    </div>
+  </div>
+
+  <!-- ===== BẢNG SỐ ===== -->
+  <h2>Bảng số để đặt vào máy</h2>
+  <p class="lead">Một bộ dùng chung cho cả hai ống, nên đổi ống không phải lưu lại gì.</p>
+
+  <div class="scroll"><table class="tbl" id="numTbl">
+    <tr><th>Ô · nút</th><th>Màu</th><th>Bộ số</th></tr>
+  </table></div>
+
+  <h2>Cài đặt nền, đặt một lần trước khi lưu</h2>
+  <p class="lead">Myset lưu gần hết cài đặt chụp chứ không riêng màu, gồm cả khẩu độ và bù sáng. Đặt các mục này trước, để bốn Myset không lệch nhau ở những chỗ không ai để ý.</p>
+
+  <div class="rows">
+    <div class="row"><b>Chế độ chụp</b><code>A · f/5.6 · bù sáng 0 · ISO Auto</code>
+      <p>Bấm nút Myset sẽ đưa máy về chế độ, khẩu độ và bù sáng lúc lưu. Lưu cả bốn ô với cùng các giá trị này để bấm nút không bị bất ngờ.</p></div>
+    <div class="row"><b>Gradation</b><code>Normal</code>
+      <p>Bắt buộc: Contrast chỉ có tác dụng khi Gradation để Normal. Gradation đặt riêng theo từng Picture Mode, nên kiểm ở cả Natural lẫn Muted.</p></div>
+    <div class="row"><b>Trần ISO-Auto</b><code>3200</code>
+      <p>Mặc định là 1600. Nâng lên 3200 để ống EZ khẩu nhỏ chụp lúc chiều muộn không bị nhoè; ống 17mm hiếm khi chạm tới mức này.</p></div>
+    <div class="row"><b>Noise Filter</b><code>Low</code>
+      <p>Mặc định Standard xoá cả chi tiết. Ngoài trời ban ngày thì Low và Off gần như không khác nhau.</p></div>
+    <div class="row"><b>Shading Comp.</b><code>On</code>
+      <p>Bù tối góc khi mở hết khẩu, ở cả 17mm f/1.8 lẫn 14mm f/3.5.</p></div>
+    <div class="row"><b>Keep Warm Color</b><code>On (mặc định)</code>
+      <p>Chỉ tác động dưới đèn vàng, nên ngoài trời ban ngày không ảnh hưởng gì. Để nguyên.</p></div>
+    <div class="row"><b>Chất lượng ảnh</b><code>L SF, hoặc ít nhất L F</code>
+      <p>Mặc định là L N. Muốn có L SF phải vào Custom Menu → G → mục đặt chất lượng JPEG, đổi một ô thành L SF, rồi chọn ô đó. Muốn có bản gốc để cứu ảnh thì bật RAW+JPEG.</p></div>
+  </div>
+
+  <!-- ===== CÁCH LÀM ===== -->
+  <h2>Lưu vào máy</h2>
+  <p class="lead">Làm lần đầu khoảng mười lăm phút. Thứ tự rất quan trọng: lưu Myset trước, gán nút sau, và không bao giờ lưu lại Myset khi nút còn đang gán.</p>
+
+  <div class="steps">
+    <div class="card step"><h3>1. Lưu bốn Myset</h3>
+      <ol>
+        <li>Đặt cài đặt nền, rồi đặt số của màu <b>Cảnh</b>.</li>
+        <li><b>MENU → Shooting Menu 1 → Reset/Myset</b>.</li>
+        <li>Chọn <b>Myset1</b>, bấm phải, chọn <b>Set</b>, bấm OK. (Bấm phải rồi Set là <b>ghi đè</b>; chọn ô rồi bấm thẳng OK là <b>gọi lại</b>.)</li>
+        <li>Đổi sang số của Ấm hoài cổ, lưu vào <b>Myset2</b>. Tương tự Lạnh vào <b>Myset3</b>, Cảnh rực vào <b>Myset4</b>.</li>
+        <li>Cuối cùng gọi lại Myset1 để máy nằm ở màu Cảnh.</li>
+      </ol></div>
+    <div class="card step"><h3>2. Gán ba nút</h3>
+      <ol>
+        <li><b>MENU → Custom Menu (bánh răng) → B Button/Dial → Button Function</b>.</li>
+        <li><b>Fn1 Function → Myset2</b>.</li>
+        <li><b>Fn3 Function → Myset3</b>.</li>
+        <li><b>Nút quay phim (chấm đỏ) → Myset4</b>.</li>
+        <li>Để nguyên Fn2: nó mở Highlight &amp; Shadow.</li>
+      </ol></div>
+    <div class="card step"><h3>3. Kiểm tra</h3>
+      <ol>
+        <li>Bấm Fn1, mở bảng điều khiển: Contrast, Saturation, WB shift có đúng số của Ấm hoài cổ không? Bấm Fn2 xem Highlight/Shadow.</li>
+        <li>Bấm Fn1 lần nữa: máy về lại Cảnh, với đúng số của Cảnh?</li>
+        <li>Làm tương tự với Fn3 và nút đỏ.</li>
+        <li>Bấm Fn1 rồi tắt bật máy: máy đang ở màu nào? Ghi lại để biết thói quen của máy.</li>
+      </ol></div>
+    <div class="card step warn"><h3>4. Khi muốn sửa một màu</h3>
+      <ol>
+        <li>Vào <b>Button Function</b>, <b>gỡ Myset khỏi cả ba nút</b> trước (đổi sang chức năng khác bất kỳ).</li>
+        <li>Gọi lại ô cần sửa từ menu, chỉnh số, rồi lưu đè lên chính ô đó.</li>
+        <li>Gọi lại Myset1 để máy về Cảnh.</li>
+        <li>Gán lại ba nút như bước 2.</li>
+        <li><b>Đừng bỏ bước đầu:</b> theo sách hướng dẫn (tr. 151), lưu Myset khi nút còn gán Myset sẽ huỷ phép gán và đưa cả bốn ô về mặc định. Khi đó nhập lại theo bảng số.</li>
+      </ol></div>
+  </div>
+
+  <!-- ===== THẺ BỎ TÚI ===== -->
+  <h2>Thẻ bỏ túi</h2>
+  <p class="lead">Chụp màn hình phần này để mở lại trên điện thoại lúc đi chụp.</p>
+
+  <div class="pocket">
+    <h3>E-M10 II · bộ màu Myset</h3>
+    <small>Chế độ A · bấm nút lần nữa để về Cảnh · vừa bấm xong thì nhìn lại khẩu và bù sáng</small>
+    <table>
+      <tr><td>bật máy</td><td><b>Cảnh</b><span>Để cả ngày. Cảnh, phố, và cả khi chụp bạn bè.</span></td></tr>
+      <tr><td>Fn1</td><td><b>Ấm hoài cổ</b><span>Nắng chiều, phố cũ, bạn bè. Màu dịu, ấm, vùng tối mềm.</span></td></tr>
+      <tr><td>Fn3</td><td><b>Lạnh</b><span>Trời xám, phố, bê tông. Không dùng cho chân dung.</span></td></tr>
+      <tr><td>nút đỏ</td><td><b>Cảnh rực</b><span>Cảnh thật đẹp, nắng, không có người. Chụp xong bấm lại.</span></td></tr>
+      <tr><td>vòng ART</td><td><b>Vintage · Grainy Film II · Light Tone</b><span>Vài tấm đổi gió, rồi xoay về A.</span></td></tr>
+      <tr><td>đang ở màu nào</td><td><b>Nhìn ô Picture Mode và WB trên bảng điều khiển</b><span>Máy ngủ hoặc tắt bật có thể tự về Cảnh.</span></td></tr>
+      <tr><td>luôn nhớ</td><td><b>Bật cảnh báo cháy sáng, bù sáng theo cảnh</b><span>Vùng nháy trên màn hình là vùng đã cháy; trong JPEG không kéo lại được.</span></td></tr>
+      <tr><td>nhập lại</td><td><span>Cảnh Natural · C0 S+1 · H−2 S0 · A+2 G0<br>Ấm Muted · C0 S0 · H−2 S+2 · A+3 G−1<br>Lạnh Muted · C0 S−1 · H0 S−2 · A−2 G0<br>Rực Natural · C+1 S+2 · H−2 S−1 · A+2 G0</span></td></tr>
+    </table>
+  </div>
+
+  <p class="note">
+    Ba bộ số là công thức có nguồn đã được chỉnh cho gu ấm và cho việc chỉ chụp JPEG; riêng Ấm hoài cổ là đề xuất mới, không có nguồn. Chưa ai chụp thử bộ nào trong bốn bộ này.
+    Coi chúng là điểm xuất phát, chụp vài tấm rồi vặn theo gợi ý dưới mỗi màu.
+    Khung xem là mô hình quy từ con số ra màu, cho thấy đúng hướng và độ mạnh tương đối, không phải JPEG thật từ máy;
+    ba Art Filter được dựng gần đúng bằng CSS.
+    Việc Myset có lưu riêng Contrast, Saturation và Highlight/Shadow cho từng ô khi ba màu cùng dùng Picture Mode Natural là điều sách hướng dẫn không nói rõ,
+    nên bước kiểm tra ở trên là bắt buộc. Rủi ro này giờ chỉ còn ở hai cặp: Cảnh với Cảnh rực (cùng Natural), và Ấm hoài cổ với Lạnh (cùng Muted). Nếu máy không giữ riêng thì phải chia lại để mỗi màu một Picture Mode khác nhau.
+    Chuyện máy ngủ hoặc tắt bật làm mất trạng thái của nút là kinh nghiệm người dùng trên máy E-M1, chưa xác minh trên E-M10 II.
+    Hình vẽ là các mảng màu phẳng nên không cho thấy được cháy sáng hay bết màu, tức đúng những rủi ro lớn nhất khi chỉ chụp JPEG.
+    Gán Myset cho nút đỏ thì mất nút quay phim nhanh khi đang ở chế độ chụp ảnh.
+  </p>
+  <p class="note" style="margin-top:18px">Gốc của từng màu</p>
+  <ul class="src">
+    <li>Cảnh: bù WB A+2 của Provia, Rob Trek (<a href="https://www.robtrek.com/forum/viewtopic.php?t=250">robtrek.com</a>), cộng Saturation +1 của Pop, Jfrader (<a href="https://www.mu-43.com/threads/how-to-get-best-jpeg-on-e-m10.79284/">mu-43</a>). Bỏ G+1 để da không ngả xanh, bỏ Contrast +1 để chụp người vẫn êm, thêm Highlight −2 để giữ trời.</li>
+    <li>Ấm hoài cổ: đề xuất của lượt phản biện chuyên gia, không có nguồn. Cùng họ với Eterna của Rob Trek (Muted, lệch ấm) nhưng ấm hơn và nâng vùng tối thay vì ép xuống.</li>
+    <li>Lạnh: Classic Chrome 85% của <a href="http://myolympusomd.blogspot.com/2019/03/a-practical-guide-to-olympus-color.html">VideoPic</a>. Highlight +2 về 0, Saturation −2 về −1, Shadow −3 về −2, và G−2 về 0 để bỏ sắc tím.</li>
+    <li>Cảnh rực: Velvia của Rob Trek (<a href="https://marcrphoto.wordpress.com/2022/01/03/recipe-update-three-fuji-simulations-for-olympus-camera-by-rob-trek/">bản chép</a>). Saturation +1 lên +2, Contrast 0 lên +1, Shadow −4 về −1, G+1 về 0.</li>
+    <li>Cách lưu Myset và gán nút: sách hướng dẫn E-M10 Mark II, trang 64–66 và 84.</li>
+    <li>Toàn bộ 23 công thức để so sánh: <a href="filter-cho-14-42mm.html">trang 14-42mm</a> và <a href="filter-cho-17mm-f18.html">trang 17mm</a>.</li>
+  </ul>
+</div>
+
+<!-- ===== DEFS ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs">
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#6FB4DC"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="cafeG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8E7A66"/><stop offset="1" stop-color="#4A3A30"/></linearGradient>
+  <filter id="bk"><feGaussianBlur stdDeviation="1"/></filter>
+
+  <symbol id="land" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="186" cy="24" r="9" fill="#FFF3CC"/>
+    <g fill="#FFFFFF"><ellipse cx="52" cy="22" rx="20" ry="6"/><ellipse cx="68" cy="17" rx="14" ry="6"/>
+      <ellipse cx="128" cy="32" rx="14" ry="4"/></g>
+    <polygon points="0,88 34,44 62,70 90,34 128,88" fill="#8FA7B8"/>
+    <polygon points="90,34 101,52 80,50" fill="#F3F8FA"/>
+    <polygon points="104,88 150,40 198,88" fill="#7A97AA"/>
+    <polygon points="150,40 160,54 141,53" fill="#F3F8FA"/>
+    <path d="M0,84 Q56,70 112,82 T220,76 L220,150 L0,150 Z" fill="#4E8A5C"/>
+    <path d="M60,96 Q110,86 170,96 Q196,104 160,112 Q100,120 56,110 Q36,102 60,96 Z" fill="#4E7FD0"/>
+    <path d="M70,100 Q110,94 160,100" stroke="#CFE6F6" stroke-width="2" fill="none"/>
+    <path d="M0,116 Q60,104 130,118 T220,112 L220,150 L0,150 Z" fill="#35643F"/>
+    <g fill="#2B5234"><polygon points="20,84 31,112 9,112"/><polygon points="38,90 47,114 29,114"/>
+      <polygon points="192,80 205,112 179,112"/></g>
+    <g fill="#F1D94B"><circle cx="24" cy="134" r="3"/><circle cx="52" cy="140" r="3"/><circle cx="180" cy="136" r="3"/></g>
+    <g fill="#C455A0"><circle cx="38" cy="142" r="2.6"/><circle cx="196" cy="142" r="2.6"/></g>
+    <rect x="112" y="112" width="12" height="20" rx="4" fill="#C8352C"/>
+    <rect x="111" y="130" width="6" height="14" rx="2" fill="#3A3540"/><rect x="119" y="130" width="6" height="14" rx="2" fill="#3A3540"/>
+    <circle cx="118" cy="105" r="6" fill="#E3AE8B"/>
+    <path d="M112,104a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#2B1E1A"/>
+  </symbol>
+
+  <symbol id="street" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <g fill="#FFFFFF"><ellipse cx="78" cy="24" rx="17" ry="6"/><ellipse cx="92" cy="19" rx="13" ry="6"/>
+      <ellipse cx="128" cy="38" rx="12" ry="4"/></g>
+    <polygon points="62,60 86,52 86,104 62,104" fill="#C9C2CC"/>
+    <polygon points="122,56 148,62 148,104 122,104" fill="#B8B4C2"/>
+    <g fill="#3F8752"><circle cx="100" cy="82" r="11"/><circle cx="112" cy="86" r="9"/></g>
+    <rect x="103" y="90" width="3" height="14" fill="#5A4636"/>
+    <polygon points="0,0 60,28 60,104 0,128" fill="#C2A47E"/>
+    <g fill="#6E5A46"><polygon points="8,26 22,31 22,52 8,49"/><polygon points="32,35 48,40 48,58 32,55"/></g>
+    <polygon points="6,66 50,68 50,92 6,96" fill="#C8352C"/>
+    <polygon points="12,74 44,75 44,84 12,86" fill="#F4E9D8"/>
+    <polygon points="220,0 150,24 150,104 220,130" fill="#8E8F9A"/>
+    <polygon points="160,60 212,54 212,114 160,101" fill="#2E3D4A"/>
+    <rect x="168" y="72" width="14" height="24" rx="3" fill="#E0A038"/>
+    <rect x="190" y="70" width="14" height="32" rx="3" fill="#2F8F8A"/>
+    <polygon points="158,46 214,36 214,50 158,57" fill="#F1C84B"/>
+    <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#77737A"/>
+    <polygon points="0,128 60,104 96,104 40,150 0,150" fill="#4E4B55"/>
+    <rect x="124" y="98" width="12" height="26" rx="4" fill="#2F5FA8"/>
+    <rect x="122" y="122" width="6" height="16" rx="2" fill="#3A3540"/><rect x="131" y="122" width="6" height="16" rx="2" fill="#3A3540"/>
+    <circle cx="130" cy="91" r="6" fill="#E3AE8B"/>
+    <path d="M124,90a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#2B1E1A"/>
+    <rect x="76" y="106" width="9" height="18" rx="3" fill="#D45A7A"/><circle cx="80.5" cy="101" r="4.4" fill="#C9906C"/>
+  </symbol>
+
+  <symbol id="portrait" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#cafeG)"/>
+    <g filter="url(#bk)">
+      <rect x="0" y="10" width="62" height="80" fill="#A9C6DA"/>
+      <rect x="150" y="0" width="70" height="60" fill="#5E4A3C"/>
+      <circle cx="170" cy="30" r="10" fill="#FFD98A"/><circle cx="198" cy="44" r="8" fill="#FFC56B"/>
+      <circle cx="140" cy="20" r="7" fill="#F2A65A"/><circle cx="84" cy="26" r="6" fill="#7FD0C8"/>
+      <circle cx="204" cy="86" r="9" fill="#E06A8C"/>
+      <ellipse cx="26" cy="112" rx="24" ry="30" fill="#3F8752"/>
+      <rect x="0" y="118" width="220" height="32" fill="#6B4E3A"/>
+    </g>
+    <path d="M58,150 Q62,108 96,102 L130,102 Q164,108 168,150 Z" fill="#4E6E8E"/>
+    <path d="M100,104 L113,122 L126,104 Z" fill="#F4EEE6"/>
+    <rect x="104" y="84" width="18" height="22" rx="6" fill="#D49C7A"/>
+    <ellipse cx="113" cy="64" rx="24" ry="29" fill="#E3AE8B"/>
+    <path d="M113,35 a24,29 0 0 1 0,58 Z" fill="#CF9670"/>
+    <path d="M88,62 Q86,30 113,30 Q142,30 138,64 Q134,44 113,44 Q94,44 88,62 Z" fill="#2B1E1A"/>
+    <g fill="#3A2A24"><ellipse cx="103" cy="64" rx="2.6" ry="1.8"/><ellipse cx="123" cy="64" rx="2.6" ry="1.8"/></g>
+    <path d="M106,79 Q113,84 120,79" stroke="#B4574F" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <rect x="160" y="118" width="22" height="24" rx="4" fill="#C8352C"/>
+    <ellipse cx="171" cy="118" rx="11" ry="3.5" fill="#F4EEE6"/>
+  </symbol>
+
+
+  <symbol id="chart" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <rect x="14" y="14" width="38" height="34" fill="#FFFFFF"/><rect x="56" y="14" width="38" height="34" fill="#C9C9C9"/>
+    <rect x="98" y="14" width="38" height="34" fill="#8C8C8C"/><rect x="140" y="14" width="38" height="34" fill="#4A4A4A"/>
+    <rect x="182" y="14" width="24" height="34" fill="#141414"/>
+    <rect x="14" y="54" width="29" height="30" fill="#C8352C"/><rect x="47" y="54" width="29" height="30" fill="#E0A038"/>
+    <rect x="80" y="54" width="29" height="30" fill="#F1D94B"/><rect x="113" y="54" width="29" height="30" fill="#4DA85E"/>
+    <rect x="146" y="54" width="29" height="30" fill="#4E7FD0"/><rect x="179" y="54" width="27" height="30" fill="#C455A0"/>
+    <rect x="14" y="90" width="62" height="46" rx="6" fill="#F0C4A4"/><rect x="80" y="90" width="62" height="46" rx="6" fill="#D9A07C"/>
+    <rect x="146" y="90" width="60" height="46" rx="6" fill="#9A6A4C"/>
+    <text x="19" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#6B5A4E">da sáng</text>
+    <text x="85" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#5A4636">da ngăm</text>
+    <text x="151" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#F0E2D6">da nâu</text>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var NS="http://www.w3.org/2000/svg";
+
+  /* ---------- mô hình: thông số máy -> lượng lệch màu (cùng hệ số với hai trang filter) ---------- */
+  var MODES={"Natural":{sat:1,con:0},"Muted":{sat:.8,con:-.6}};
+
+  function clamp(x){ return Math.max(0,Math.min(1,x)); }
+
+  function model(p){
+    var m=MODES[p.mode], w=p.a,
+        r=(1+.018*w)*(1-.005*p.g), g=1+.013*p.g, b=(1-.028*w)*(1-.005*p.g), i, tab=[];
+    var L=.3*r+.59*g+.11*b; r/=L; g/=L; b/=L;
+    var a=.03*(m.con+p.con);
+    for(i=0;i<=16;i++){
+      var x=i/16,
+          y=x-a*Math.sin(2*Math.PI*x)
+            +.032*p.sh*4*x*(1-x)*(1-x)
+            +.032*p.hl*4*x*x*(1-x);
+      tab.push(clamp(y).toFixed(3));
+    }
+    return {mat:r.toFixed(3)+" 0 0 0 0 0 "+g.toFixed(3)+" 0 0 0 0 0 "+b.toFixed(3)+" 0 0 0 0 0 1 0",
+            sat:Math.max(0,m.sat*(1+.13*p.sat)), tab:tab.join(" ")};
+  }
+
+  function mk(name,attrs,parent){
+    var e=document.createElementNS(NS,name), k;
+    for(k in attrs) e.setAttribute(k,attrs[k]);
+    if(parent) parent.appendChild(e);
+    return e;
+  }
+  function makeFilter(id){
+    var f=mk("filter",{id:id,x:"0",y:"0",width:"100%",height:"100%","color-interpolation-filters":"sRGB"},$("defs")),
+        m1=mk("feColorMatrix",{type:"matrix"},f),
+        m2=mk("feColorMatrix",{type:"saturate"},f),
+        ct=mk("feComponentTransfer",{},f),
+        fn=["R","G","B"].map(function(c){ return mk("feFunc"+c,{type:"table"},ct); });
+    return function(p){
+      var o=model(p);
+      m1.setAttribute("values",o.mat);
+      m2.setAttribute("values",o.sat.toFixed(3));
+      fn.forEach(function(e){ e.setAttribute("tableValues",o.tab); });
+    };
+  }
+
+  /* ---------- bốn màu, một bộ cho cả hai ống ---------- */
+  var LOOKS=[
+    { key:"canh", name:"Cảnh", slot:"Myset1", btn:"bật máy",
+      p:{mode:"Natural",con:0,sat:1,hl:-2,sh:0,a:2,g:0},
+      when:"Màu mặc định, để cả ngày, kể cả khi chụp bạn bè. Ấm nhẹ, màu đậm hơn mặc định một nấc, vùng sáng được nén để giữ trời và mây.",
+      tips:[["Thấy quá ấm","A về +1."],["Trời vẫn cháy trắng","bù sáng −0,3 đến −0,7 EV, tới khi hết vùng nháy cảnh báo; Highlight không cứu được vùng đã cháy."],["Mây và áo trắng hơi xám khi trời đục","Highlight về −1."],["Muốn đậm hơn","đừng tăng Saturation ở đây, bấm nút đỏ sang Cảnh rực."]] },
+    { key:"am", name:"Ấm hoài cổ", slot:"Myset2", btn:"Fn1",
+      p:{mode:"Muted",con:0,sat:0,hl:-2,sh:2,a:3,g:-1},
+      when:"Màu đúng gu nhất của bộ: dịu, ấm rõ, vùng tối được nâng cho mềm như ảnh in cũ. Hợp nắng chiều, phố cũ, bạn bè ngoài trời.",
+      tips:[["Da ngả cam hoặc hồng","A về +2, G về 0."],["Ảnh xám, thiếu sức sống lúc trời râm","Shadow về +1; màu này cần nắng."],["Trông như phủ sương","Contrast +1."]] },
+    { key:"lanh", name:"Lạnh", slot:"Myset3", btn:"Fn3",
+      p:{mode:"Muted",con:0,sat:-1,hl:0,sh:-2,a:-2,g:0},
+      when:"Đổi không khí khi tông ấm trông giả: trời xám, phố, bê tông, biển ngày nhiều mây. Màu nhạt, vùng tối sâu, ngả lam.",
+      tips:[["Muốn hơi xanh lục kiểu phim","G lên +1."],["Thấy quá nhạt","Saturation về 0."],["Da bạn bè xám","màu này không dành cho chân dung, bấm lại để về Cảnh."]] },
+    { key:"ruc", name:"Cảnh rực", slot:"Myset4", btn:"nút quay phim",
+      p:{mode:"Natural",con:1,sat:2,hl:-2,sh:-1,a:2,g:0},
+      when:"Vài tấm đinh của chuyến đi: cảnh thật đẹp, có nắng, không có người. Chụp xong bấm nút lần nữa để về Cảnh.",
+      tips:[["Vùng tối bết đen","Shadow về 0."],["Hoa đỏ hoặc hoàng hôn bết thành mảng","Saturation về +1 và bù sáng −0,3 EV; histogram không báo được lỗi này."],["Có người trong khung","đừng dùng, da sẽ cam."]] }
+  ];
+  var BASE="Nền: A · f/5.6 · ISO-Auto tới 3200 · Noise Filter Low · Shading Comp. On";
+  var FIELDS=[["Picture Mode","mode"],["Contrast","con"],["Saturation","sat"],["Highlight","hl"],["Shadow","sh"]];
+
+  var state={key:"canh", scene:"land"};
+  var live=makeFilter("f-live"), thumbs={};
+
+  function sg(n){ return n>0 ? "+"+n : (n<0 ? "−"+(-n) : "0"); }
+  function current(){ for(var i=0;i<LOOKS.length;i++) if(LOOKS[i].key===state.key) return LOOKS[i]; return LOOKS[0]; }
+  function line(p){
+    return "<code>"+[p.mode,"Con "+sg(p.con),"Sat "+sg(p.sat),"HL "+sg(p.hl),"SH "+sg(p.sh),"A "+sg(p.a),"G "+sg(p.g)].join(" · ")+"</code>";
+  }
+
+  function render(){
+    var L=current(), p=L.p;
+    live(p);
+
+    var grid=$("sgrid"); grid.innerHTML="";
+    FIELDS.forEach(function(f){
+      var d=document.createElement("div"), v=p[f[1]];
+      d.innerHTML="<i>"+f[0]+"</i><b>"+(typeof v==="number" ? sg(v) : v)+"</b>";
+      grid.appendChild(d);
+    });
+    var w=document.createElement("div");
+    w.innerHTML="<i>WB Auto · shift</i><b>A"+sg(p.a)+" · G"+sg(p.g)+"</b>";
+    grid.appendChild(w);
+
+    $("rname").textContent=L.name;
+    $("rkey").textContent=L.slot+" · "+L.btn;
+    $("lblFx").textContent=L.name;
+    $("rwhen").textContent=L.when;
+    $("rbase").textContent=BASE;
+    var tips=$("rtips"); tips.innerHTML="";
+    L.tips.forEach(function(t){
+      var li=document.createElement("li");
+      li.innerHTML="<b>"+t[0]+":</b> "+t[1];
+      tips.appendChild(li);
+    });
+    Array.prototype.forEach.call($("picks").children,function(b){
+      b.setAttribute("aria-pressed", b.getAttribute("data-key")===state.key ? "true" : "false");
+    });
+  }
+
+  function build(){
+    var box=$("picks"), tbl=$("numTbl").tBodies[0];
+    LOOKS.forEach(function(L){
+      thumbs[L.key]=makeFilter("f-"+L.key);
+      thumbs[L.key](L.p);
+      var b=document.createElement("button");
+      b.className="pick";
+      b.setAttribute("data-key",L.key);
+      b.innerHTML='<svg viewBox="0 0 220 150" style="filter:url(#f-'+L.key+')"><use href="#'+state.scene+'"/></svg>'+
+        "<b>"+L.name+"</b><span><i class=\"key\" style=\"font-style:normal\">"+L.btn+"</i> "+L.slot+"</span>";
+      b.addEventListener("click",function(){ state.key=L.key; render(); });
+      box.appendChild(b);
+
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td><code>"+L.slot+"</code><br>"+L.btn+"</td><td><b>"+L.name+"</b></td><td>"+line(L.p)+"</td>";
+      tbl.appendChild(tr);
+    });
+  }
+
+  function group(sel,attr,fn){
+    var list=document.querySelectorAll(sel);
+    Array.prototype.forEach.call(list,function(b){
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(list,function(x){x.setAttribute("aria-pressed","false");});
+        b.setAttribute("aria-pressed","true");
+        fn(b.getAttribute(attr));
+      });
+    });
+  }
+  group("[data-scene]","data-scene",function(v){
+    state.scene=v;
+    var use='<use href="#'+v+'"/>';
+    $("svOrig").innerHTML=use; $("svFx").innerHTML=use;
+    Array.prototype.forEach.call($("picks").querySelectorAll("svg"),function(s){ s.innerHTML=use; });
+    Array.prototype.forEach.call(document.querySelectorAll(".ause"),function(u){ u.setAttribute("href","#"+v); });
+  });
+
+  function compare(){
+    var v=parseInt($("sCmp").value,10);
+    $("svFx").style.clipPath="inset(0 "+(100-v)+"% 0 0)";
+    $("divider").hidden=v>=100;
+    $("divider").style.left=v+"%";
+    $("lblOrig").hidden=v>=100;
+  }
+  $("sCmp").addEventListener("input",compare);
+
+  var grain="url(\"data:image/svg+xml;utf8,"+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>')+"\")";
+  Array.prototype.forEach.call(document.querySelectorAll(".grainL"),function(d){ d.style.backgroundImage=grain; });
+
+  build();
+  render();
+  compare();
+})();
+</script>
+</body>
+</html>

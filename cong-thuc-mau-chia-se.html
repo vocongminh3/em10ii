@@ -78,7 +78,7 @@
 
   <p class="eyebrow">Phần 6 · công thức cộng đồng</p>
   <h1>Công thức màu đã được chia sẻ</h1>
-  <p class="sub">Olympus không có Film Simulation dựng sẵn như Fujifilm — nhưng cộng đồng đã tự ghép Picture Mode + bù trừ WB + đường cong để bắt chước Chrome, Eterna, Velvia, Kodachrome. Đây là 5 công thức thật, đã có người thử và đăng công khai, không phải mình tự bịa.</p>
+  <p class="sub">Olympus không có Film Simulation dựng sẵn như Fujifilm — nhưng cộng đồng đã tự ghép Picture Mode + bù trừ WB + đường cong để bắt chước Chrome, Eterna, Velvia, Kodachrome. Đây là 5 công thức đã đăng công khai, không phải mình tự bịa. Bốn công thức màu đặt được gần như nguyên vẹn; Mono là bản rút gọn vì máy thiếu vài thứ của bản gốc.</p>
   <p class="sub2">Khung xem là mô phỏng bằng CSS filter — đúng hướng lệch màu, không phải ảnh JPEG thật do máy xử lý. Muốn biết chính xác, chỉnh số vào máy rồi chụp thử.</p>
 
   <div class="card lab">
@@ -117,8 +117,8 @@
       <p>Fujifilm dùng Color Chrome Effect nén màu bão hoà; Olympus không có, nên cộng đồng dùng lệch trục G–M để giả ám màu ấm/lạnh đặc trưng của từng phim.</p></div>
     <div class="row"><b>Highlight / Shadow / Gradation</b><code>thay cho tone curve phim</code>
       <p>Shadow âm sâu bắt chước phim slide (Velvia, Chrome); Shadow/Highlight gần 0 bắt chước phim âm bản phẳng (Eterna, Portra).</p></div>
-    <div class="row warnrow"><b>Color Creator</b><code>E-M10 II không có</code>
-      <p>Các công thức gốc cho Pen-F/E-P7/OM-3 chỉnh từng màu trên bánh xe 12 màu — sâu hơn nhiều so với 4 tham số Picture Mode. E-M10 II phải bỏ qua bước này, nên kết quả gần đúng chứ không giống hệt.</p></div>
+    <div class="row warnrow"><b>Color Profile 12 màu</b><code>E-M10 II không có</code>
+      <p>Các công thức gốc cho Pen-F/E-P7/OM-3 chỉnh từng màu trên bánh xe 12 màu — sâu hơn nhiều so với 4 tham số Picture Mode. E-M10 II phải bỏ qua bước này, nên kết quả gần đúng chứ không giống hệt. Máy vẫn có Color Creator, nhưng nó chỉ ám một màu cho cả ảnh, khoá WB ở Auto, và là Picture Mode riêng nên không chồng lên Muted hay Natural được.</p></div>
   </div>
 
   <p class="note">
@@ -126,7 +126,9 @@
     VideoPic blog (Kodachrome 64, gốc cho E-M5 II — cùng thế hệ xử lý ảnh với E-M10 II nên dùng được);
     Ali O'Keefe / One Month Two Cameras (Mono, qua newsletter Liminal Frames trên Substack).
     Giá trị WB Auto trong các công thức Chrome/Eterna/Velvia nghĩa là để máy tự đo rồi cộng thêm số A/G nêu trên,
-    không phải đặt Kelvin cố định.
+    không phải đặt Kelvin cố định. Bản đầy đủ hơn, 23 công thức, nằm ở trang
+    <a href="filter-cho-17mm-f18.html" style="color:inherit">bộ lọc màu cho 17mm</a> và
+    <a href="filter-cho-14-42mm.html" style="color:inherit">cho 14-42mm</a>.
   </p>
 </div>
 
@@ -211,15 +213,15 @@
 
     { key:"kodachrome", name:"Kodachrome 64", author:"VideoPic blog (gốc cho E-M5 II)",
       source:"http://myolympusomd.blogspot.com/2019/03/a-practical-guide-to-olympus-color.html",
-      fields:[["Picture Mode","Muted"],["White Balance","Daylight · A0 G−7"],["Saturation","−1"],["Sharpness","+1"],["Highlight","+2"],["Shadow","−3"],["Midtone","−2"]],
-      note:"G−7 là mức lệch magenta tối đa của trục — cho tông đỏ/da ấm đặc trưng Kodachrome. Bản gốc còn dùng Color Creator (Pen-F/E-P7) để đẩy thêm; E-M10 II bỏ qua bước đó.",
+      fields:[["Picture Mode","Muted"],["White Balance","Daylight · A0 G−7"],["Saturation","−1"],["Sharpness","+1"],["Highlight","+2"],["Shadow","−3"],["Bù sáng","0 đến +0,7 EV"]],
+      note:"G−7 là mức lệch magenta tối đa của trục — cho tông đỏ/da ấm đặc trưng Kodachrome. Bản gốc trên E-M5 II còn có Midtone −2 (E-M10 II không có nấc này) và một lớp Color Creator; trên máy này Color Creator là Picture Mode riêng nên không chồng lên Muted được.",
       css:{c:1.18,s:1.05,b:1.03}, tint:{color:"#C24B3E",blend:"multiply",op:.14}, vig:.04, grain:0 },
 
     { key:"mono", name:"OMTC Mono", author:"Ali O'Keefe — One Month Two Cameras",
       source:"https://omtc.substack.com/p/5-jpeg-recipes-for-the-om-system",
-      fields:[["Picture Mode","Monotone (Mono 2)"],["Contrast","0"],["Sharpness","+1"],["Highlight","−3"],["Midtone","−2"],["B&W Filter Effect","Blue +2"],["Grain","Low"]],
-      note:"Filter Effect = Blue làm da/tông ấm tối hơn, trời/nước sáng hơn khi chuyển đen trắng — CSS chỉ mô phỏng được phần tương phản và hạt, không mô phỏng đúng cách bộ lọc màu ảnh hưởng kênh sáng tối.",
-      css:{c:1.08,s:0,b:.97,g:1}, tint:null, vig:0, grain:.35 }
+      fields:[["Picture Mode","Monotone"],["Contrast","+1"],["Sharpness","+1"],["Highlight","−3"],["B&W Filter","Không"],["Bù sáng","−0,3 EV"]],
+      note:"Bản rút gọn. Bản gốc cho OM-3 dùng Mono Profile 2, kính Blue +2, Grain Low, Midtone −2 và Contrast 0 — E-M10 II không có bốn thứ đầu (kính lọc của máy chỉ có Vàng, Cam, Đỏ, Lục), nên Contrast +1 và bù sáng −0,3 EV là phần trang tự bù. Muốn da sẫm kiểu kính Blue thì thử kính Lục.",
+      css:{c:1.14,s:0,b:.95,g:1}, tint:null, vig:0, grain:0 }
   ];
 
   var state={key:"chrome", scene:"forest"};

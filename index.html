@@ -44,6 +44,8 @@
           text-transform:uppercase;color:var(--dim)}
   .item b{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.25}
   .item p{margin:0;font-size:13.5px;color:var(--dim)}
+  .item.hero{grid-column:1/-1;border-color:var(--ink);padding:20px 22px}
+  .item.hero b{font-size:21px}
   .item.new i::after{content:"mới";margin-left:8px;padding:1px 7px;border-radius:99px;
                      background:var(--ink);color:#fff;letter-spacing:.04em}
 
@@ -56,12 +58,20 @@
 
   <p class="eyebrow">Olympus OM-D E-M10 Mark II · JPEG</p>
   <h1>Sổ tay E-M10 II</h1>
-  <p class="sub">Mười hai trang, mỗi trang một việc. Đi từ trên xuống nếu mới cầm máy; nhảy thẳng tới phần công thức nếu chỉ cần màu.</p>
+  <p class="sub">Nếu chỉ đọc một trang, đọc Bộ màu Myset. Các trang còn lại là nền tảng và thư viện để tra khi cần.</p>
 
   <input class="search" id="q" type="search" placeholder="Tìm trang: 17mm, art filter, WB…" aria-label="Tìm trang">
 
   <section class="group">
-    <div class="ghead"><i class="bar" style="background:var(--amber)"></i><h2>Bắt đầu</h2><span>Hiểu máy và ống trước khi chỉnh màu</span></div>
+    <div class="ghead"><i class="bar" style="background:var(--ink)"></i><h2>Dùng ngay</h2><span>Cài một lần, đổi màu bằng một nút</span></div>
+    <div class="grid">
+      <a class="item new hero" href="bo-mau-myset.html"><i>Myset</i><b>Bộ màu Myset: bốn màu trên nút bấm</b>
+        <p>Cảnh, Ấm hoài cổ, Lạnh, Cảnh rực. Một bộ cho cả hai ống, kèm ba Art Filter, cách lưu vào máy và thẻ bỏ túi.</p></a>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="ghead"><i class="bar" style="background:var(--amber)"></i><h2>Nền tảng</h2><span>Hiểu máy và ống trước khi chỉnh màu</span></div>
     <div class="grid">
       <a class="item" href="so-tay-em10ii.html"><i>Tổng hợp</i><b>Sổ tay E-M10 II</b>
         <p>Mọi thứ cần nhớ về máy, gom vào một trang để tra nhanh.</p></a>
@@ -85,14 +95,12 @@
   </section>
 
   <section class="group">
-    <div class="ghead"><i class="bar" style="background:var(--green)"></i><h2>Công thức màu</h2><span>Số cụ thể để đặt vào máy, theo từng ống</span></div>
+    <div class="ghead"><i class="bar" style="background:var(--green)"></i><h2>Thư viện công thức</h2><span>Tra khi muốn thử màu khác ngoài bộ Myset</span></div>
     <div class="grid">
       <a class="item new" href="filter-cho-17mm-f18.html"><i>17mm f/1.8</i><b>Bộ lọc màu nào hợp 17mm</b>
-        <p>19 công thức xem cạnh nhau, có nguồn, vặn thử từng thông số.</p></a>
+        <p>23 công thức xem cạnh nhau, có nguồn, vặn thử từng thông số.</p></a>
       <a class="item new" href="filter-cho-14-42mm.html"><i>14-42mm</i><b>Bộ lọc màu nào hợp ống kit</b>
         <p>Cùng bộ công thức, đánh giá lại cho khẩu nhỏ và ISO cao.</p></a>
-      <a class="item" href="cong-thuc-mau-chia-se.html"><i>Cộng đồng</i><b>Công thức màu đã được chia sẻ</b>
-        <p>Năm công thức giả phim đầu tiên: Chrome, Eterna, Velvia, Kodachrome, Mono.</p></a>
       <a class="item" href="tu-duy-phoi-mau.html"><i>Tư duy</i><b>Phối màu cho chuyến đi có bạn bè</b>
         <p>Chọn một tông neo và biết lúc nào được đổi, thay vì thử hết mọi công thức.</p></a>
     </div>
