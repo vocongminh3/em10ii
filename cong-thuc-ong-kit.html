@@ -21,7 +21,7 @@
            color:var(--dim);margin-bottom:8px}
   h1{font-size:clamp(28px,6vw,46px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
   .sub{color:var(--dim);font-size:16px;margin:0 0 20px;max-width:680px}
-  h2{font-size:clamp(19px,3.4vw,24px);font-weight:800;letter-spacing:-.02em;margin:44px 0 4px}
+  h2{font-size:clamp(19px,3.4vw,24px);font-weight:800;letter-spacing:-.02em;margin:44px 0 4px;scroll-margin-top:64px}
   .lead{color:var(--dim);font-size:14.5px;margin:0 0 14px;max-width:700px}
   .lead a,.note a,.src a{color:var(--ink)}
 
@@ -57,6 +57,14 @@
   .kit{margin:0;font-size:12.5px;color:var(--dim);border-left:3px solid var(--line);padding-left:9px}
   .from{margin:auto 0 0;font-size:11.5px;color:var(--dim)}
 
+  .steps{margin:0;padding:0;list-style:none;counter-reset:st;display:grid;gap:8px}
+  .steps li{counter-increment:st;background:var(--card);border:1px solid var(--line);border-radius:12px;
+            padding:11px 14px 11px 46px;position:relative;display:flex;flex-direction:column;gap:2px}
+  .steps li::before{content:counter(st);position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;
+            background:var(--ink);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .steps b{font-size:14px}
+  .steps span{font-size:13px;color:var(--dim)}
+  .steps a{color:var(--ink)}
   .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
         color:var(--dim);font-size:13px;max-width:740px}
   .src{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--dim)}
@@ -74,7 +82,7 @@
   <div class="base">
     <b>Đặt một lần cho mọi công thức</b>
     <span>Chế độ A</span><span>Gradation Normal</span><span>WB Auto</span>
-    <span>ISO-Auto tới 3200</span><span>Noise Filter Low</span><span>Shading Comp. On</span>
+    <span>ISO-Auto tới 3200</span><span>Noise Filter Low</span><span>Shading Comp. On</span><span>Sharpness 0, trừ khi thẻ ghi khác</span>
   </div>
 
   <div class="bar" id="bar">
@@ -98,10 +106,20 @@
   <p class="lead">Ống kit khẩu nhỏ nên trong nhà và buổi tối ISO lên cao. Hai công thức này không nâng vùng tối để nhiễu khỏi lộ.</p>
   <div class="grid" id="g-low"></div>
 
+  <h2>Đặt một màu vào máy</h2>
+  <p class="lead">Làm theo thứ tự, mất khoảng hai phút cho mỗi màu. Đặt xong thì chụp thử một tấm rồi mới chỉnh tiếp.</p>
+  <ol class="steps">
+    <li><b>Picture Mode và ba thông số</b><span>MENU → Shooting Menu 1 → Picture Mode → chọn mode (Natural, Muted…) → bấm phím phải → chỉnh Contrast, Sharpness, Saturation, và để Gradation Normal.</span></li>
+    <li><b>WB và bù A/G</b><span>Để WB ở Auto, rồi vào phần bù WB trong Custom Menu (bánh răng): chọn Auto, bấm phải, chỉnh A và G. Riêng Kodachrome dùng preset nắng 5300K.</span></li>
+    <li><b>Highlight và Shadow</b><span>Bấm Fn2, chọn Highlight &amp; Shadow: bánh trước chỉnh Highlight, bánh sau chỉnh Shadow.</span></li>
+    <li><b>Bù sáng</b><span>Chỉ khi thẻ có ghi, chỉnh bằng bánh xe bù sáng như bình thường.</span></li>
+    <li><b>Lưu lại nếu ưng</b><span>Lưu vào Myset để lần sau bấm một nút là có. Cách lưu và gán nút, cùng bẫy cần tránh, ở trang <a href="bo-mau-myset.html">Bộ màu Myset</a>.</span></li>
+  </ol>
+
   <p class="note">
     Ảnh trên mỗi thẻ được tính từ các con số bằng mô hình màu của trang, cho thấy đúng hướng và độ mạnh tương đối, không phải ảnh thật từ máy.
     Nhãn xanh là công thức có nguồn, đặt được nguyên vẹn; nhãn vàng là bản rút gọn vì máy thiếu một tính năng của bản gốc; nhãn lam là bộ số trang tự khớp từ ảnh mẫu của om10mi-mods; nhãn xám là trang tự đề xuất. Nhãn lam và xám đều chưa ai chụp thử.
-    Muốn lưu vài màu vào nút bấm, xem <a href="bo-mau-myset.html">Bộ màu Myset</a>. Muốn xem đủ 27 công thức và đánh giá cho từng ống, xem <a href="filter-cho-14-42mm.html">thư viện cho 14-42mm</a>.
+    Muốn lưu vài màu vào nút bấm, xem <a href="bo-mau-myset.html">Bộ màu Myset</a>. Muốn xem đủ 27 công thức và đánh giá cho từng ống, xem <a href="filter-cho-14-42mm.html">thư viện cho 14-42mm</a>. Muốn chọn theo biển, kiến trúc, bạn bè, xem <a href="bo-mau-da-dung-phim.html">Sáu màu cảnh và người</a>.
   </p>
   <p class="note" style="margin-top:18px">Nguồn</p>
   <ul class="src">
@@ -306,23 +324,24 @@
     {grp:"g-film", key:"chrome", name:"Classic Chrome", tag:CUT, p:P({mode:"Muted",sat:-2,hl:2,sh:-3,a:-2,g:-2}),
      use:"Lạnh, phai màu, vùng tối sâu. Phố xá, bê tông, trời xám.",
      kit:"Highlight +2 dễ làm cháy trời ở 14mm; bù sáng −0,3 EV.", from:"VideoPic, bỏ Midtone −2 và lớp Color Creator"},
-    {grp:"g-film", key:"koda", name:"Kodachrome 64", tag:CUT, p:P({mode:"Muted",sat:-1,sharp:1,hl:2,sh:-3,wb:"Daylight",g:-7}),
+    {grp:"g-film", key:"koda", name:"Kodachrome 64", tag:CUT, p:P({mode:"Muted",sat:-1,sharp:1,hl:2,sh:-3,wb:"5300K (nắng)",g:-7}),
      use:"Đỏ ấm, hơi hồng, kiểu phim dương bản cũ. Chỉ khi có nắng thật.",
-     kit:"Dưới đèn vàng trong nhà ảnh ám cam nặng; đừng dùng.", from:"VideoPic, bỏ Midtone −2 và lớp Color Creator"},
+     kit:"Bù sáng 0 đến +0,7 EV, Noise Filter Off. Dưới đèn vàng trong nhà ảnh ám cam nặng; đừng dùng.", from:"VideoPic, bỏ Midtone −2 và lớp Color Creator"},
 
     {grp:"g-low", key:"indoor", name:"Trong nhà ISO cao", tag:OWN, p:P({sat:-1,sharp:-1,hl:-1,sh:-1}),
      use:"Hạ độ đậm để đốm nhiễu màu bớt lộ, không nâng vùng tối. Quán xá, buổi tối.",
      kit:"Ở 42mm f/5.6 chụp người, ISO dễ lên 3200–6400.", from:"Trang tự đề xuất"},
     {grp:"g-low", key:"mono", name:"OMTC Mono", tag:CUT, p:P({mode:"Monotone",con:1,sharp:1,hl:-3}),
      use:"Đen trắng, giữ chi tiết vùng sáng. Nhiễu thành hạt xám thay vì đốm màu.",
-     kit:"Cứu được những tấm thiếu sáng mà màu không đẹp.", from:"Ali O'Keefe, bỏ Mono Profile, kính Lam và hạt"}
+     kit:"Bù sáng −0,3 EV (thay cho Midtone −2 của bản gốc). Cứu được những tấm thiếu sáng mà màu không đẹp.", from:"Ali O'Keefe, bỏ Mono Profile, kính Lam và hạt"}
   ];
 
   function sg(n){ return n>0 ? "+"+n : (n<0 ? "−"+(-n) : "0"); }
   function rows(p){
     var r=[["Picture Mode",p.mode],["Contrast",sg(p.con)]];
     if(p.mode!=="Monotone") r.push(["Saturation",sg(p.sat)]);
-    if(p.sharp) r.push(["Sharpness",sg(p.sharp)]);
+    else r.push(["B&amp;W Filter","Neutral"]);
+    r.push(["Sharpness",sg(p.sharp)]);
     r.push(["Highlight",sg(p.hl)],["Shadow",sg(p.sh)]);
     if(p.mode!=="Monotone") r.push(["WB",p.wb+" · A"+sg(p.a)+" G"+sg(p.g)]);
     return r.map(function(x){ return "<dt>"+x[0]+"</dt><dd>"+x[1]+"</dd>"; }).join("");
@@ -335,7 +354,7 @@
     makeFilter("f-"+R.key,R.p);
     var c=document.createElement("article");
     c.className="rc";
-    c.innerHTML='<div class="thumb"><svg viewBox="0 0 220 150" style="filter:url(#f-'+R.key+')"><use href="#land"/></svg>'+
+    c.innerHTML='<div class="thumb"><svg viewBox="0 0 220 150" role="img" aria-label="Minh hoạ màu '+R.name+'" style="filter:url(#f-'+R.key+')"><use href="#land"/></svg>'+
       '<div class="nz" data-sh="'+R.p.sh+'"></div></div>'+
       '<div class="body"><h3>'+R.name+' <span class="tag '+R.tag.t+'">'+R.tag.l+'</span></h3>'+
       '<dl class="set">'+rows(R.p)+'</dl>'+

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sáu màu cảnh và người</title>
+<style>
+  :root{
+    --paper:#F6F4F7; --card:#FFFFFF; --ink:#1A1520; --dim:#6B6076; --line:#E2DDE6;
+    --amber:#E0A038; --blue:#4E7FD0; --green:#4DA85E; --mag:#C455A0; --red:#C8352C;
+    --disp:system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--disp);
+       line-height:1.45;padding:24px 16px 80px}
+  .wrap{max-width:1100px;margin:0 auto}
+  .back{display:inline-block;font-size:13px;color:var(--dim);text-decoration:none;margin-bottom:14px}
+  .back:hover{color:var(--ink)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--dim);margin-bottom:8px}
+  h1{font-size:clamp(28px,6vw,46px);font-weight:800;letter-spacing:-.035em;margin:0 0 8px}
+  .sub{color:var(--dim);font-size:16px;margin:0 0 20px;max-width:680px}
+  h2{font-size:clamp(19px,3.4vw,24px);font-weight:800;letter-spacing:-.02em;margin:44px 0 4px;scroll-margin-top:64px}
+  .lead{color:var(--dim);font-size:14.5px;margin:0 0 14px;max-width:700px}
+  .lead a,.note a,.src a{color:var(--ink)}
+
+  /* ---------- nền chung + chọn cảnh ---------- */
+  .base{background:var(--ink);color:#fff;border-radius:16px;padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+  .base b{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#F1C84B;margin-right:4px}
+  .base span{font-family:var(--mono);font-size:13px}
+  .bar{position:sticky;top:0;z-index:5;background:var(--paper);padding:12px 0 10px;margin-top:14px;
+       display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
+  .bar small{font-size:12.5px;color:var(--dim);margin-right:4px}
+  .sbtn{border:1px solid var(--line);background:var(--card);border-radius:99px;
+        padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--disp);color:var(--ink)}
+  .sbtn[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  /* ---------- thẻ ---------- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .rc{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+  .thumb{position:relative;aspect-ratio:220/150;background:#000}
+  .thumb svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .thumb .nz{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:0}
+  .rc .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .rc h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.015em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:99px;letter-spacing:.02em}
+  .t-src{background:#E7F3EA;color:#2F7D40} .t-cut{background:#FFF1CF;color:#8A5B00} .t-own{background:#EEE9F2;color:var(--dim)} .t-meas{background:#E6EEFA;color:#2F5FA8}
+  .set{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px;margin:0}
+  .set dt{color:var(--dim)}
+  .set dd{margin:0;font-family:var(--mono);font-weight:600}
+  .use{margin:0;font-size:13.5px}
+  .use b{font-weight:600}
+  .kit{margin:0;font-size:12.5px;color:var(--dim);border-left:3px solid var(--line);padding-left:9px}
+  .from{margin:auto 0 0;font-size:11.5px;color:var(--dim)}
+
+  .pick-tbl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media(max-width:760px){.pick-tbl{grid-template-columns:1fr}}
+  .pick-tbl div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;display:flex;flex-direction:column;gap:2px}
+  .pick-tbl b{font-size:13px;font-weight:600;color:var(--dim)}
+  .pick-tbl span{font-size:15px;font-weight:800}
+  .steps{margin:0;padding:0;list-style:none;counter-reset:st;display:grid;gap:8px}
+  .steps li{counter-increment:st;background:var(--card);border:1px solid var(--line);border-radius:12px;
+            padding:11px 14px 11px 46px;position:relative;display:flex;flex-direction:column;gap:2px}
+  .steps li::before{content:counter(st);position:absolute;left:14px;top:11px;width:22px;height:22px;border-radius:50%;
+            background:var(--ink);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .steps b{font-size:14px}
+  .steps span{font-size:13px;color:var(--dim)}
+  .steps a{color:var(--ink)}
+  .note{margin-top:42px;border-left:3px solid var(--line);padding:2px 0 2px 14px;
+        color:var(--dim);font-size:13px;max-width:740px}
+  .src{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--dim)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html">← Sổ tay E-M10 II</a>
+  <p class="eyebrow">E-M10 II · cảnh trước, người vẫn đẹp</p>
+  <h1>Sáu màu cảnh và người</h1>
+  <p class="sub">Sáu màu bạn chọn cho biển, công trình, kiến trúc, phố và bạn bè. Mỗi thẻ ghi rõ màu đó mạnh ở đâu và yếu ở đâu, để biết khi nào nên đổi. Dùng được cho cả 17mm lẫn 14-42mm.</p>
+
+  <div class="base">
+    <b>Đặt một lần cho mọi công thức</b>
+    <span>Chế độ A</span><span>Gradation Normal</span><span>WB Auto</span>
+    <span>ISO-Auto tới 3200 (17mm: 1600 là đủ)</span><span>Noise Filter Low</span><span>Shading Comp. On</span><span>Sharpness 0, trừ khi thẻ ghi khác</span>
+  </div>
+
+  <div class="bar" id="bar">
+    <small>Xem màu trên cảnh:</small>
+    <button class="sbtn" data-scene="sea" aria-pressed="true">Biển</button>
+    <button class="sbtn" data-scene="arch" aria-pressed="false">Kiến trúc</button>
+    <button class="sbtn" data-scene="street" aria-pressed="false">Phố có người</button>
+    <button class="sbtn" data-scene="portrait" aria-pressed="false">Bạn bè</button>
+    <button class="sbtn" data-scene="land" aria-pressed="false">Núi, hồ</button>
+    <button class="sbtn" data-scene="chart" aria-pressed="false">Bảng màu và da</button>
+  </div>
+
+  <h2>Đa dụng, giữ màu biển</h2>
+  <p class="lead">Hợp nhất khi chưa biết sẽ gặp cảnh gì. Biển và trời xanh, da đúng; đổi lại không có chất phim.</p>
+  <div class="grid" id="g-da"></div>
+
+  <h2>Chất phim ấm</h2>
+  <p class="lead">Có chất phim rõ, đẹp với nắng chiều và bạn bè. Ấm nên nước biển và trời bớt xanh.</p>
+  <div class="grid" id="g-am"></div>
+
+  <h2>Chất phim phẳng và kiến trúc</h2>
+  <p class="lead">Hai màu dịu, ít ấm: một cái phẳng êm cho trời xám, một cái lạnh cho công trình.</p>
+  <div class="grid" id="g-kt"></div>
+
+  <h2>Chọn nhanh</h2>
+  <div class="pick-tbl">
+    <div><b>Không biết sẽ gặp cảnh gì</b><span>Provia</span></div>
+    <div><b>Biển, trời trong, phong cảnh</b><span>Scenery (Cảnh)</span></div>
+    <div><b>Nắng chiều, bạn bè, phố</b><span>Nostalgic Neg</span></div>
+    <div><b>Phố cũ, muốn dịu và hoài cổ</b><span>Ấm hoài cổ</span></div>
+    <div><b>Trời xám, nhiều mây</b><span>Eterna</span></div>
+    <div><b>Công trình, bê tông, không có người</b><span>Classic Chrome</span></div>
+  </div>
+
+  <h2>Đặt một màu vào máy</h2>
+  <p class="lead">Làm theo thứ tự, mất khoảng hai phút cho mỗi màu. Đặt xong thì chụp thử một tấm rồi mới chỉnh tiếp.</p>
+  <ol class="steps">
+    <li><b>Picture Mode và ba thông số</b><span>MENU → Shooting Menu 1 → Picture Mode → chọn mode (Natural, Muted…) → bấm phím phải → chỉnh Contrast, Sharpness, Saturation, và để Gradation Normal.</span></li>
+    <li><b>WB và bù A/G</b><span>Để WB ở Auto, rồi vào phần bù WB trong Custom Menu (bánh răng): chọn Auto, bấm phải, chỉnh A và G.</span></li>
+    <li><b>Highlight và Shadow</b><span>Bấm Fn2, chọn Highlight &amp; Shadow: bánh trước chỉnh Highlight, bánh sau chỉnh Shadow.</span></li>
+    <li><b>Bù sáng</b><span>Chỉ khi thẻ có ghi, chỉnh bằng bánh xe bù sáng như bình thường.</span></li>
+    <li><b>Lưu lại nếu ưng</b><span>Lưu vào Myset để lần sau bấm một nút là có. Cách lưu và gán nút, cùng bẫy cần tránh, ở trang <a href="bo-mau-myset.html">Bộ màu Myset</a>.</span></li>
+  </ol>
+
+  <p class="note">
+    Nhãn xanh là công thức có nguồn; nhãn vàng là bản rút gọn vì máy thiếu một tính năng của bản gốc; nhãn lam là bộ số trang tự khớp từ ảnh mẫu của om10mi-mods; nhãn xám là trang tự đề xuất. Nhãn lam và xám chưa ai chụp thử.
+    Ảnh trên thẻ được tính từ con số bằng mô hình màu của trang, chỉ cho thấy hướng màu, không phải ảnh thật từ máy.
+    Muốn gán vài màu vào nút bấm, xem <a href="bo-mau-myset.html">Bộ màu Myset</a>. Muốn thêm lựa chọn, kể cả cho lúc thiếu sáng, xem <a href="cong-thuc-ong-kit.html">Công thức thông dụng cho ống kit</a>.
+  </p>
+  <p class="note" style="margin-top:18px">Nguồn</p>
+  <ul class="src">
+    <li><a href="https://www.robtrek.com/forum/viewtopic.php?t=250">Rob Trek</a> — Provia</li>
+    <li><a href="https://github.com/Meghnus/om10mi-mods">Meghnus/om10mi-mods</a> — Nostalgic Neg và Eterna, trang tự khớp số từ ảnh mẫu của repo</li>
+    <li><a href="http://myolympusomd.blogspot.com/2019/03/a-practical-guide-to-olympus-color.html">VideoPic</a> — Classic Chrome</li>
+    <li>Scenery và Ấm hoài cổ — xem <a href="bo-mau-myset.html">Bộ màu Myset</a></li>
+  </ul>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs">
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#6FB4DC"/><stop offset="1" stop-color="#D6EDF4"/></linearGradient>
+  <linearGradient id="cafeG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8E7A66"/><stop offset="1" stop-color="#4A3A30"/></linearGradient>
+  <filter id="bk"><feGaussianBlur stdDeviation="1"/></filter>
+
+  <symbol id="land" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <circle cx="186" cy="24" r="9" fill="#FFF3CC"/>
+    <g fill="#FFFFFF"><ellipse cx="52" cy="22" rx="20" ry="6"/><ellipse cx="68" cy="17" rx="14" ry="6"/>
+      <ellipse cx="128" cy="32" rx="14" ry="4"/></g>
+    <polygon points="0,88 34,44 62,70 90,34 128,88" fill="#8FA7B8"/>
+    <polygon points="90,34 101,52 80,50" fill="#F3F8FA"/>
+    <polygon points="104,88 150,40 198,88" fill="#7A97AA"/>
+    <polygon points="150,40 160,54 141,53" fill="#F3F8FA"/>
+    <path d="M0,84 Q56,70 112,82 T220,76 L220,150 L0,150 Z" fill="#4E8A5C"/>
+    <path d="M60,96 Q110,86 170,96 Q196,104 160,112 Q100,120 56,110 Q36,102 60,96 Z" fill="#4E7FD0"/>
+    <path d="M70,100 Q110,94 160,100" stroke="#CFE6F6" stroke-width="2" fill="none"/>
+    <path d="M0,116 Q60,104 130,118 T220,112 L220,150 L0,150 Z" fill="#35643F"/>
+    <g fill="#2B5234"><polygon points="20,84 31,112 9,112"/><polygon points="38,90 47,114 29,114"/>
+      <polygon points="192,80 205,112 179,112"/></g>
+    <g fill="#F1D94B"><circle cx="24" cy="134" r="3"/><circle cx="52" cy="140" r="3"/><circle cx="180" cy="136" r="3"/></g>
+    <g fill="#C455A0"><circle cx="38" cy="142" r="2.6"/><circle cx="196" cy="142" r="2.6"/></g>
+    <rect x="112" y="112" width="12" height="20" rx="4" fill="#C8352C"/>
+    <rect x="111" y="130" width="6" height="14" rx="2" fill="#3A3540"/><rect x="119" y="130" width="6" height="14" rx="2" fill="#3A3540"/>
+    <circle cx="118" cy="105" r="6" fill="#E3AE8B"/>
+    <path d="M112,104a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#2B1E1A"/>
+  </symbol>
+
+  <symbol id="street" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <g fill="#FFFFFF"><ellipse cx="78" cy="24" rx="17" ry="6"/><ellipse cx="92" cy="19" rx="13" ry="6"/>
+      <ellipse cx="128" cy="38" rx="12" ry="4"/></g>
+    <polygon points="62,60 86,52 86,104 62,104" fill="#C9C2CC"/>
+    <polygon points="122,56 148,62 148,104 122,104" fill="#B8B4C2"/>
+    <g fill="#3F8752"><circle cx="100" cy="82" r="11"/><circle cx="112" cy="86" r="9"/></g>
+    <rect x="103" y="90" width="3" height="14" fill="#5A4636"/>
+    <polygon points="0,0 60,28 60,104 0,128" fill="#C2A47E"/>
+    <g fill="#6E5A46"><polygon points="8,26 22,31 22,52 8,49"/><polygon points="32,35 48,40 48,58 32,55"/></g>
+    <polygon points="6,66 50,68 50,92 6,96" fill="#C8352C"/>
+    <polygon points="12,74 44,75 44,84 12,86" fill="#F4E9D8"/>
+    <polygon points="220,0 150,24 150,104 220,130" fill="#8E8F9A"/>
+    <polygon points="160,60 212,54 212,114 160,101" fill="#2E3D4A"/>
+    <rect x="168" y="72" width="14" height="24" rx="3" fill="#E0A038"/>
+    <rect x="190" y="70" width="14" height="32" rx="3" fill="#2F8F8A"/>
+    <polygon points="158,46 214,36 214,50 158,57" fill="#F1C84B"/>
+    <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#77737A"/>
+    <polygon points="0,128 60,104 96,104 40,150 0,150" fill="#4E4B55"/>
+    <rect x="124" y="98" width="12" height="26" rx="4" fill="#2F5FA8"/>
+    <rect x="122" y="122" width="6" height="16" rx="2" fill="#3A3540"/><rect x="131" y="122" width="6" height="16" rx="2" fill="#3A3540"/>
+    <circle cx="130" cy="91" r="6" fill="#E3AE8B"/>
+    <path d="M124,90a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#2B1E1A"/>
+    <rect x="76" y="106" width="9" height="18" rx="3" fill="#D45A7A"/><circle cx="80.5" cy="101" r="4.4" fill="#C9906C"/>
+  </symbol>
+
+  <symbol id="portrait" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#cafeG)"/>
+    <g filter="url(#bk)">
+      <rect x="0" y="10" width="62" height="80" fill="#A9C6DA"/>
+      <rect x="150" y="0" width="70" height="60" fill="#5E4A3C"/>
+      <circle cx="170" cy="30" r="10" fill="#FFD98A"/><circle cx="198" cy="44" r="8" fill="#FFC56B"/>
+      <circle cx="140" cy="20" r="7" fill="#F2A65A"/><circle cx="84" cy="26" r="6" fill="#7FD0C8"/>
+      <circle cx="204" cy="86" r="9" fill="#E06A8C"/>
+      <ellipse cx="26" cy="112" rx="24" ry="30" fill="#3F8752"/>
+      <rect x="0" y="118" width="220" height="32" fill="#6B4E3A"/>
+    </g>
+    <path d="M58,150 Q62,108 96,102 L130,102 Q164,108 168,150 Z" fill="#4E6E8E"/>
+    <path d="M100,104 L113,122 L126,104 Z" fill="#F4EEE6"/>
+    <rect x="104" y="84" width="18" height="22" rx="6" fill="#D49C7A"/>
+    <ellipse cx="113" cy="64" rx="24" ry="29" fill="#E3AE8B"/>
+    <path d="M113,35 a24,29 0 0 1 0,58 Z" fill="#CF9670"/>
+    <path d="M88,62 Q86,30 113,30 Q142,30 138,64 Q134,44 113,44 Q94,44 88,62 Z" fill="#2B1E1A"/>
+    <g fill="#3A2A24"><ellipse cx="103" cy="64" rx="2.6" ry="1.8"/><ellipse cx="123" cy="64" rx="2.6" ry="1.8"/></g>
+    <path d="M106,79 Q113,84 120,79" stroke="#B4574F" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <rect x="160" y="118" width="22" height="24" rx="4" fill="#C8352C"/>
+    <ellipse cx="171" cy="118" rx="11" ry="3.5" fill="#F4EEE6"/>
+  </symbol>
+
+  <symbol id="night" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#0B1024"/>
+    <polygon points="0,0 60,22 60,104 0,128" fill="#1A2038"/>
+    <polygon points="220,0 150,20 150,104 220,130" fill="#1F2440"/>
+    <polygon points="62,48 86,42 86,104 62,104" fill="#141930"/>
+    <polygon points="122,46 148,52 148,104 122,104" fill="#161B36"/>
+    <polygon points="0,128 60,104 150,104 220,130 220,150 0,150" fill="#1C1C26"/>
+    <g fill="#FFD98A"><polygon points="8,30 20,34 20,48 8,46"/><polygon points="32,62 46,63 46,78 32,79"/>
+      <rect x="68" y="60" width="6" height="8"/><rect x="128" y="64" width="6" height="8"/><rect x="138" y="76" width="6" height="8"/></g>
+    <polygon points="160,50 208,42 208,60 160,64" fill="#FF4FA3"/>
+    <polygon points="166,54 200,49 200,56 166,60" fill="#FFD1E6"/>
+    <polygon points="10,70 26,72 26,96 10,100" fill="#3FE0E8"/>
+    <rect x="170" y="74" width="30" height="24" fill="#FFB85A"/>
+    <circle cx="60" cy="40" r="5" fill="#FFF0BF"/><circle cx="150" cy="36" r="5" fill="#FFF0BF"/>
+    <g opacity=".45"><polygon points="168,116 202,124 206,146 164,134" fill="#FF4FA3"/>
+      <polygon points="8,122 26,116 30,138 6,146" fill="#3FE0E8"/><polygon points="92,108 128,108 136,150 84,150" fill="#FFB85A"/></g>
+    <rect x="104" y="92" width="13" height="26" rx="4" fill="#7A3B46"/>
+    <rect x="103" y="116" width="6" height="16" rx="2" fill="#262331"/><rect x="112" y="116" width="6" height="16" rx="2" fill="#262331"/>
+    <circle cx="110.5" cy="85" r="6" fill="#D9A07C"/>
+    <path d="M104.5,84a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#1E1614"/>
+  </symbol>
+
+  <symbol id="chart" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="#E8E6E2"/>
+    <rect x="14" y="14" width="38" height="34" fill="#FFFFFF"/><rect x="56" y="14" width="38" height="34" fill="#C9C9C9"/>
+    <rect x="98" y="14" width="38" height="34" fill="#8C8C8C"/><rect x="140" y="14" width="38" height="34" fill="#4A4A4A"/>
+    <rect x="182" y="14" width="24" height="34" fill="#141414"/>
+    <rect x="14" y="54" width="29" height="30" fill="#C8352C"/><rect x="47" y="54" width="29" height="30" fill="#E0A038"/>
+    <rect x="80" y="54" width="29" height="30" fill="#F1D94B"/><rect x="113" y="54" width="29" height="30" fill="#4DA85E"/>
+    <rect x="146" y="54" width="29" height="30" fill="#4E7FD0"/><rect x="179" y="54" width="27" height="30" fill="#C455A0"/>
+    <rect x="14" y="90" width="62" height="46" rx="6" fill="#F0C4A4"/><rect x="80" y="90" width="62" height="46" rx="6" fill="#D9A07C"/>
+    <rect x="146" y="90" width="60" height="46" rx="6" fill="#9A6A4C"/>
+    <text x="19" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#6B5A4E">da sáng</text>
+    <text x="85" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#5A4636">da ngăm</text>
+    <text x="151" y="130" font-family="ui-monospace,monospace" font-size="10" fill="#F0E2D6">da nâu</text>
+  </symbol>
+
+  <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1F5E9E"/><stop offset="1" stop-color="#3FA6B5"/></linearGradient>
+  <symbol id="sea" viewBox="0 0 220 150">
+    <rect width="220" height="70" fill="url(#skyG)"/>
+    <circle cx="176" cy="22" r="9" fill="#FFF6D6"/>
+    <g fill="#FFFFFF"><ellipse cx="60" cy="20" rx="20" ry="6"/><ellipse cx="78" cy="15" rx="13" ry="6"/><ellipse cx="128" cy="30" rx="15" ry="4"/></g>
+    <rect y="62" width="220" height="44" fill="url(#seaG)"/>
+    <polygon points="0,64 0,40 22,46 40,56 58,64" fill="#6F7A72"/>
+    <polygon points="186,64 196,58 204,60 212,57 220,59 220,64" fill="#8C958A"/>
+    <polygon points="150,70 162,70 158,74 152,74" fill="#F4F1EA"/><rect x="155" y="64" width="1.5" height="7" fill="#5A4636"/>
+    <g fill="#F2F7F8" opacity=".9"><ellipse cx="150" cy="80" rx="22" ry="1.6"/><ellipse cx="70" cy="86" rx="30" ry="1.6"/></g>
+    <path d="M0,104 Q28,98 56,104 T112,103 T168,104 T220,102 L220,150 L0,150 Z" fill="#E6D2A6"/>
+    <path d="M0,104 Q28,98 56,104 T112,103 T168,104 T220,102 L220,110 Q160,114 110,110 T0,112 Z" fill="#C9B184"/>
+    <path d="M0,103 Q28,97 56,103 T112,102 T168,103 T220,101" stroke="#FFFFFF" stroke-width="2.4" fill="none"/>
+    <rect x="132" y="110" width="12" height="21" rx="4" fill="#F4F1EA"/>
+    <rect x="131" y="129" width="6" height="15" rx="2" fill="#3A5A7A"/><rect x="139" y="129" width="6" height="15" rx="2" fill="#3A5A7A"/>
+    <circle cx="138" cy="104" r="6" fill="#E3AE8B"/>
+    <path d="M132,103a6,6 0 0 1 12,0q-6,-4 -12,0z" fill="#2B1E1A"/>
+    <ellipse cx="60" cy="128" rx="16" ry="5" fill="#C8352C" opacity=".9"/>
+  </symbol>
+  <symbol id="arch" viewBox="0 0 220 150">
+    <rect width="220" height="150" fill="url(#skyG)"/>
+    <g fill="#FFFFFF"><ellipse cx="40" cy="16" rx="16" ry="5"/><ellipse cx="190" cy="22" rx="18" ry="5"/></g>
+    <rect x="14" y="30" width="192" height="94" fill="#EDE3D1"/>
+    <rect x="10" y="24" width="200" height="8" fill="#C0603A"/>
+    <rect x="14" y="32" width="192" height="4" fill="#D6C7AE"/>
+    <g fill="#5C4A3F">
+      <path d="M30,124 V86 a14,14 0 0 1 28,0 V124 Z"/><path d="M96,124 V82 a14,14 0 0 1 28,0 V124 Z"/><path d="M162,124 V86 a14,14 0 0 1 28,0 V124 Z"/></g>
+    <g fill="#4E7FD0"><rect x="34" y="44" width="20" height="24"/><rect x="100" y="44" width="20" height="24"/><rect x="166" y="44" width="20" height="24"/></g>
+    <g fill="#F4F1EA"><rect x="43" y="44" width="2" height="24"/><rect x="109" y="44" width="2" height="24"/><rect x="175" y="44" width="2" height="24"/></g>
+    <g fill="#D9CBB2"><rect x="70" y="36" width="10" height="88"/><rect x="140" y="36" width="10" height="88"/></g>
+    <polygon points="120,30 206,30 206,124 160,124" fill="#3A3040" opacity=".22"/>
+    <rect y="124" width="220" height="26" fill="#C9B9A0"/>
+    <polygon points="120,124 220,124 220,150 170,150" fill="#3A3040" opacity=".18"/>
+    <rect x="84" y="116" width="10" height="19" rx="3" fill="#F4F1EA"/>
+    <rect x="83" y="133" width="5" height="12" rx="2" fill="#3A3540"/><rect x="90" y="133" width="5" height="12" rx="2" fill="#3A3540"/>
+    <circle cx="89" cy="111" r="5" fill="#D9A07C"/>
+    <path d="M84,110a5,5 0 0 1 10,0q-5,-3.4 -10,0z" fill="#2B1E1A"/>
+    <rect x="186" y="112" width="12" height="14" rx="2" fill="#3F8752"/><ellipse cx="192" cy="110" rx="9" ry="7" fill="#4DA85E"/>
+  </symbol>
+</defs></svg>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var NS="http://www.w3.org/2000/svg";
+
+  /* ---------- mô hình màu: giống hệt các trang thư viện ---------- */
+  var MODES={
+    "Vivid":{sat:1.3,con:.6},
+    "Natural":{sat:1,con:0},
+    "Muted":{sat:.8,con:-.6},
+    "Portrait":{sat:.95,con:-.3,warm:.6},
+    "Monotone":{sat:0,con:.2}
+  };
+  function clamp(x){ return Math.max(0,Math.min(1,x)); }
+  function model(p){
+    var m=MODES[p.mode], mono=p.mode==="Monotone", w=(m.warm||0)+p.a,
+        r=(1+.018*w)*(1-.005*p.g), g=1+.013*p.g, b=(1-.028*w)*(1-.005*p.g), mat, i, tab=[];
+    var L=.3*r+.59*g+.11*b; r/=L; g/=L; b/=L;
+    if(mono){ var row=(p.bw==="Vàng" ? ".38 .57 .05" : ".30 .59 .11")+" 0 0 "; mat=row+row+row+"0 0 0 1 0"; }
+    else mat=r.toFixed(3)+" 0 0 0 0 0 "+g.toFixed(3)+" 0 0 0 0 0 "+b.toFixed(3)+" 0 0 0 0 0 1 0";
+    var a=.03*(m.con+p.con);
+    for(i=0;i<=16;i++){
+      var x=i/16, y=x-a*Math.sin(2*Math.PI*x)+.032*p.sh*4*x*(1-x)*(1-x)+.032*p.hl*4*x*x*(1-x);
+      tab.push(clamp(y).toFixed(3));
+    }
+    return {mat:mat, sat:mono?1:Math.max(0,m.sat*(1+.13*p.sat)), tab:tab.join(" ")};
+  }
+  function mk(name,attrs,parent){
+    var e=document.createElementNS(NS,name), k;
+    for(k in attrs) e.setAttribute(k,attrs[k]);
+    if(parent) parent.appendChild(e);
+    return e;
+  }
+  function makeFilter(id,p){
+    var f=mk("filter",{id:id,x:"0",y:"0",width:"100%",height:"100%","color-interpolation-filters":"sRGB"},$("defs")),
+        o=model(p), ct;
+    mk("feColorMatrix",{type:"matrix",values:o.mat},f);
+    mk("feColorMatrix",{type:"saturate",values:o.sat.toFixed(3)},f);
+    ct=mk("feComponentTransfer",{},f);
+    ["R","G","B"].forEach(function(c){ mk("feFunc"+c,{type:"table",tableValues:o.tab},ct); });
+  }
+
+  /* ---------- 12 công thức ---------- */
+  function P(o){ var d={mode:"Natural",con:0,sat:0,sharp:0,hl:0,sh:0,wb:"Auto",a:0,g:0,bw:""}, k; for(k in o) d[k]=o[k]; return d; }
+  var SRC={t:"t-src",l:"có nguồn"}, CUT={t:"t-cut",l:"rút gọn"}, MEAS={t:"t-meas",l:"đo, chưa thử"}, OWN={t:"t-own",l:"chưa thử"};
+  var LIST=[
+    {grp:"g-da", key:"provia", name:"Provia", tag:SRC, p:P({a:2,g:1}),
+     use:"Màu tự nhiên hơi ấm, giữ nguyên tương phản và độ đậm. Biển, phố, bạn bè đều ổn.",
+     kit:"Yếu ở chỗ: không có chất phim. Muốn mềm hơn một chút thì Highlight −2.", from:"Rob Trek, viết cho E-M10 II"},
+    {grp:"g-da", key:"scenery", name:"Scenery (Cảnh)", tag:OWN, p:P({sat:1,hl:-2,a:2}),
+     use:"Đậm hơn mặc định một nấc, ấm nhẹ, giữ trời và mây. Phong cảnh, biển, có bạn bè lọt khung vẫn ổn.",
+     kit:"Yếu ở chỗ: không có chất phim. Đây đang là màu mặc định Myset1.", from:"Màu Cảnh trong bộ Myset, trang tự đề xuất"},
+
+    {grp:"g-am", key:"nneg", name:"Nostalgic Neg", tag:MEAS, p:P({con:1,hl:-5,sh:1,a:2,g:-1}),
+     use:"Ấm màu hổ phách, vùng sáng mềm rõ. Nắng chiều, phố, bạn bè, ảnh kỷ niệm.",
+     kit:"Yếu ở chỗ: biển và trời bớt xanh. Ở biển thì hạ A về +1.", from:"Trang tự khớp số từ ảnh mẫu om10mi-mods"},
+    {grp:"g-am", key:"amhoaico", name:"Ấm hoài cổ", tag:OWN, p:P({mode:"Muted",hl:-2,sh:2,a:3,g:-1}),
+     use:"Dịu, ấm rõ, vùng tối mềm như ảnh in cũ. Phố cũ, quán xá, bạn bè dưới nắng.",
+     kit:"Yếu ở chỗ: biển ngả xanh lục, trời nhạt. Đây đang là Myset2 (Fn1).", from:"Màu Ấm hoài cổ trong bộ Myset, đề xuất của lượt phản biện"},
+
+    {grp:"g-kt", key:"eterna", name:"Eterna", tag:MEAS, p:P({mode:"Muted",hl:-5}),
+     use:"Phẳng, êm, nén vùng sáng mạnh. Trời xám, nhiều mây, ánh sáng lẫn lộn; da vẫn tự nhiên.",
+     kit:"Yếu ở chỗ: biển và kiến trúc dưới nắng trông nhạt. Thấy bệt thì Contrast +1.", from:"Trang tự khớp số từ ảnh mẫu om10mi-mods"},
+    {grp:"g-kt", key:"chrome", name:"Classic Chrome", tag:CUT, p:P({mode:"Muted",sat:-2,hl:2,sh:-3,a:-2,g:-2}),
+     use:"Lạnh, phai màu, vùng tối sâu. Công trình, bê tông, đường nét, trời xám.",
+     kit:"Yếu ở chỗ: da người xám. Highlight +2 dễ cháy trời, bù sáng −0,3 EV.", from:"VideoPic, bỏ Midtone −2 và lớp Color Creator"}
+  ];
+
+  function sg(n){ return n>0 ? "+"+n : (n<0 ? "−"+(-n) : "0"); }
+  function rows(p){
+    var r=[["Picture Mode",p.mode],["Contrast",sg(p.con)]];
+    if(p.mode!=="Monotone") r.push(["Saturation",sg(p.sat)]);
+    else r.push(["B&amp;W Filter",p.bw==="Vàng" ? "Yellow" : "Neutral"]);
+    r.push(["Sharpness",sg(p.sharp)]);
+    r.push(["Highlight",sg(p.hl)],["Shadow",sg(p.sh)]);
+    if(p.mode!=="Monotone") r.push(["WB",p.wb+" · A"+sg(p.a)+" G"+sg(p.g)]);
+    return r.map(function(x){ return "<dt>"+x[0]+"</dt><dd>"+x[1]+"</dd>"; }).join("");
+  }
+
+  var grain="url(\"data:image/svg+xml;utf8,"+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>')+"\")";
+
+  LIST.forEach(function(R){
+    makeFilter("f-"+R.key,R.p);
+    var c=document.createElement("article");
+    c.className="rc";
+    c.innerHTML='<div class="thumb"><svg viewBox="0 0 220 150" role="img" aria-label="Minh hoạ màu '+R.name+'" style="filter:url(#f-'+R.key+')"><use href="#sea"/></svg>'+
+      '<div class="nz" data-sh="'+R.p.sh+'"></div></div>'+
+      '<div class="body"><h3>'+R.name+' <span class="tag '+R.tag.t+'">'+R.tag.l+'</span></h3>'+
+      '<dl class="set">'+rows(R.p)+'</dl>'+
+      '<p class="use"><b>Dùng khi:</b> '+R.use+'</p>'+
+      (R.kit ? '<p class="kit">'+R.kit+'</p>' : '')+
+      '<p class="from">'+R.from+'</p></div>';
+    c.querySelector(".nz").style.backgroundImage=grain;
+    $(R.grp).appendChild(c);
+  });
+
+  var btns=document.querySelectorAll("[data-scene]");
+  Array.prototype.forEach.call(btns,function(b){
+    b.addEventListener("click",function(){
+      Array.prototype.forEach.call(btns,function(x){ x.setAttribute("aria-pressed","false"); });
+      b.setAttribute("aria-pressed","true");
+      var s=b.getAttribute("data-scene");
+      Array.prototype.forEach.call(document.querySelectorAll(".thumb use"),function(u){ u.setAttribute("href","#"+s); });
+      /* cảnh tối: ống khẩu nhỏ nên ISO cao, vẽ thêm hạt; nâng Shadow là hạt dày lên */
+      Array.prototype.forEach.call(document.querySelectorAll(".nz"),function(n){
+        var sh=parseInt(n.getAttribute("data-sh"),10);
+        n.style.opacity = s==="night" ? Math.max(.15,Math.min(.6,.32+.025*sh)).toFixed(2) : 0;
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
