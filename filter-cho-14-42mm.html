@@ -266,6 +266,7 @@
     <li><a href="https://www.mu-43.com/threads/how-to-get-best-jpeg-on-e-m10.79284/">mu-43 — How to get best JPEG on E-M10</a> và <a href="https://www.mu-43.com/threads/which-settings-for-jpeg-film-simulation-on-om-1.118937/">JPEG film simulation on OM-1</a> — Pop, Phẳng, Ấm hằng ngày</li>
     <li><a href="https://www.dpreview.com/forums/threads/em-1-monotone-settings.4037783/">DPReview — E-M1 Monotone settings</a> — Mono kính đỏ</li>
     <li><a href="https://www.mu-43.com/threads/pen-f-tri-x-settings-question.83052/">mu-43 — Tri-X settings</a> — Tri-X Low Key; <a href="https://myolympusomd.blogspot.com/2020/03/editing-your-images-with-your-olympus.html">VideoPic — Editing your images</a> — i-Enhance dịu</li>
+    <li><a href="https://github.com/Meghnus/om10mi-mods">Meghnus/om10mi-mods</a> — Eterna, Classic Neg, Nostalgic Neg, Ektar 100 (đo): trang tự khớp bộ số từ ảnh mẫu của repo, so ảnh Natural gốc với ảnh đã qua look trên cùng một tấm RAW. Ảnh mẫu thuộc bản quyền tác giả, chỉ được đọc để đo, không đưa lên trang.</li>
     <li><a href="https://om-recipes.com/">om-recipes.com</a> — kho công thức lớn nhất, nhưng phần lớn cần Color Profile 12 màu nên không đưa vào đây</li>
   </ul>
 </div>
@@ -466,9 +467,10 @@
       OMTC="https://omtc.substack.com/p/5-jpeg-recipes-for-the-om-system",
       MU="https://www.mu-43.com/threads/how-to-get-best-jpeg-on-e-m10.79284/",
       ROBF="https://www.robtrek.com/forum/viewtopic.php?t=250",
-      TRIX="https://www.mu-43.com/threads/pen-f-tri-x-settings-question.83052/";
+      TRIX="https://www.mu-43.com/threads/pen-f-tri-x-settings-question.83052/",
+      OM10="https://github.com/Meghnus/om10mi-mods";
 
-  var GROUPS={film:"Giả phim",daily:"Hằng ngày",mono:"Đen trắng",om3:"Rút gọn từ OM-3",own:"Gợi ý của trang"};
+  var GROUPS={film:"Giả phim",daily:"Hằng ngày",mono:"Đen trắng",om3:"Rút gọn từ OM-3",om10:"Đo từ om10mi",own:"Gợi ý của trang"};
 
   var RECIPES=[
     R("eterna","Eterna","film",{mode:"Muted",sat:-2,sh:-2,a:1,g:1},"hop",
@@ -547,6 +549,22 @@
       "Bản gốc dùng CWB 5600K. Sách hướng dẫn chỉ nêu bù A/G cho WB Auto và preset, nên thay bằng preset Nắng 5300K; thấy lạnh hơn bản gốc thì thử A+2. Tác giả khuyên chụp thiếu sáng nhẹ và nhìn histogram.","Ali O'Keefe",OMTC,
       "Bù sáng −0,3 EV."),
 
+    R("eterna_m","Eterna (đo)","om10",{mode:"Muted",hl:-5},"hop",
+      "Phẳng, nén vùng sáng, màu không lệch: an toàn suốt dải zoom, giữ trời tốt ở 14mm.",
+      "Khớp từ ảnh mẫu: sai lệch trung bình ΔE 7,2 so với 10,2 của ảnh gốc. Khác hẳn Eterna của Rob Trek: bản đo nén vùng sáng chứ không ép vùng tối. Phần không làm được: bản gốc làm nhạt riêng màu đỏ mạnh hơn các màu khác.","Đo từ ảnh mẫu om10mi-mods (Meghnus)",OM10,
+      "Bộ số do trang tự khớp bằng mô hình màu, chưa chụp thử."),
+    R("cneg_m","Classic Neg (đo)","om10",{mode:"Muted",con:2,hl:-5,a:1,g:-2},"tuy",
+      "Contrast +2 cộng G−2: đẹp cho phố và đồ vật, nhưng da người ở 42mm dễ hơi hồng.",
+      "Khớp từ ảnh mẫu: ΔE 8,6 so với 10,9. Phần không làm được: bản gốc xoay riêng màu lam về phía tím khoảng 15°.","Đo từ ảnh mẫu om10mi-mods (Meghnus)",OM10,
+      "Bộ số do trang tự khớp bằng mô hình màu, chưa chụp thử."),
+    R("nneg_m","Nostalgic Neg (đo)","om10",{mode:"Natural",con:1,hl:-5,sh:1,a:2,g:-1},"hop",
+      "Ấm dịu, vùng sáng mềm, đúng gu hoài cổ; hợp phong cảnh nắng chiều ở 14mm.",
+      "Khớp từ ảnh mẫu: ΔE 7,8 so với 10,2. Phần không làm được: bản gốc đẩy riêng cam và vàng đậm thêm khoảng 40%, làm nhạt lam và tím; WB ấm chỉ bù được một phần.","Đo từ ảnh mẫu om10mi-mods (Meghnus)",OM10,
+      "Bộ số do trang tự khớp bằng mô hình màu, chưa chụp thử."),
+    R("ektar_m","Ektar 100 (đo)","om10",{mode:"Portrait",con:1,hl:-5,sh:-3,a:-1},"tuy",
+      "Bản xa bản gốc nhất: phần làm nên Ektar là xoay riêng vàng và lục sang cam, máy này không làm được.",
+      "Khớp từ ảnh mẫu: ΔE 9,6 so với 18,8. Phần không làm được: bản gốc xoay vàng và vàng lục sang cam tới 30–48°, đó là thứ làm nên chất Ektar.","Đo từ ảnh mẫu om10mi-mods (Meghnus)",OM10,
+      "Bù sáng −0,3 EV. Bộ số do trang tự khớp bằng mô hình màu, chưa chụp thử."),
     R("land14","Phong cảnh 14mm","own",{mode:"Natural",con:1,sat:1,hl:-2},"thu",
       "Như Pop nhưng nén thêm vùng sáng để mây và trời còn chi tiết. Nhẹ tay hơn Velvia, có người trong khung vẫn dùng được.",
       "Chưa có nguồn. Điểm xuất phát để tự chỉnh.","Trang này","","f/5.6–f/8, ISO 200. Trời sáng gắt thì bù sáng −0,3 EV."),
